@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Property {
+  id             Int                     @id @default(autoincrement())
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+  title          String                  @db.VarChar(255)
+  propertyType   PropertyType?           @relation(fields: [propertyTypeId], references: [id])
+  propertyTypeId Int
+  description    String?
+  city           String
+  country        String
+  bedrooms       Int
+  beds           Int
+  baths          Int?
+  entirePlace    Boolean                 @default(false)
+  defaultImage   String?
+  amenities      AmenitiesOnProperties[]
+  reviews        Review[]
+  host           PropertiesOnHosts[]
+}
+
+model Review {
+  id         Int       @id @default(autoincrement())
+  reviewer   User      @relation(fields: [reviewerId], references: [id])
+  reviewerId Int       @unique
+  property   Property? @relation(fields: [propertyId], references: [id])
+  propertyId Int?      @unique
+  avatar     String
+  comment    String
+  rating     Decimal
+  date       DateTime  @default(now())
+}
+
+model Amenity {
+  id         Int                     @id @default(autoincrement())
+  properties AmenitiesOnProperties[]
+  name       String
+
+  @@unique([name])
+}
+
+model AmenitiesOnProperties {
+  amenity    Amenity   @relation(fields: [amenityId], references: [id])
+  amenityId  Int // relation scalar field (used in the `@relation` attribute above)
+  property   Property? @relation(fields: [propertyId], references: [id])
+  propertyId Int // relation scalar field (used in the `@relation` attribute above)
+  assignedAt DateTime  @default(now())
+  assignedBy String?
+
+  @@id([amenityId, propertyId])
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  profile   Profile?
+  host      Host[]
+  reviews   Review[]
+  role      Role?    @default(USER)
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Profile {
+  id     Int     @id @default(autoincrement())
+  bio    String?
+  user   User    @relation(fields: [userId], references: [id])
+  userId Int     @unique
+}
+
+model Host {
+  id         Int                 @id @default(autoincrement())
+  properties PropertiesOnHosts[]
+  user       User?               @relation(fields: [userId], references: [id])
+  userId     Int
+}
+
+model PropertiesOnHosts {
+  host       Host      @relation(fields: [hostId], references: [id])
+  hostId     Int // relation scalar field (used in the `@relation` attribute above)
+  property   Property? @relation(fields: [propertyId], references: [id])
+  propertyId Int // relation scalar field (used in the `@relation` attribute above)
+  superHost  Boolean   @default(false)
+  assignedAt DateTime  @default(now())
+  assignedBy String?
+
+  @@id([hostId, propertyId])
+}
+
+model PropertyType {
+  id   Int        @id @default(autoincrement())
+  name String     @db.VarChar(100)
+  type Property[]
+
+  @@unique([name])
+}

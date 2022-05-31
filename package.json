@@ -1,0 +1,70 @@
+{
+  "name": "feathers-prisma",
+  "description": "feathers prisma playground",
+  "version": "0.0.0",
+  "homepage": "",
+  "private": true,
+  "main": "src",
+  "keywords": [
+    "feathers"
+  ],
+  "author": {
+    "name": "anthonymunene",
+    "email": "munene.anthony@gmail.com"
+  },
+  "contributors": [],
+  "bugs": {},
+  "directories": {
+    "lib": "src",
+    "test": "test/",
+    "config": "config/"
+  },
+  "engines": {
+    "node": "^16.0.0",
+    "npm": ">= 3.0.0"
+  },
+  "scripts": {
+    "test": "npm run lint && npm run jest",
+    "lint": "eslint src/. test/. --config .eslintrc.json --fix",
+    "dev": "nodemon src/",
+    "start": "node src/",
+    "start:db": "docker run --rm --name pg-docker -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e PGDATA=/var/lib/postgresql/data/pgdata -e PG_TRUST_LOCALNET=true -p 5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data:z postgres",
+    "jest": "jest --forceExit"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ],
+    "ignore": []
+  },
+  "dependencies": {
+    "@feathersjs/configuration": "^4.5.12",
+    "@feathersjs/errors": "^4.5.12",
+    "@feathersjs/express": "^4.5.12",
+    "@feathersjs/feathers": "^4.5.12",
+    "@feathersjs/socketio": "^4.5.13",
+    "@feathersjs/transport-commons": "^4.5.12",
+    "@prisma/client": "^3.10.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "feathers-prisma": "^0.5.7",
+    "helmet": "^4.6.0",
+    "serve-favicon": "^2.5.0",
+    "winston": "^3.6.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^7.1.0",
+    "axios": "^0.26.1",
+    "eslint": "^8.11.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^27.5.1",
+    "nodemon": "^2.0.15",
+    "prettier": "2.6.2",
+    "prisma": "^3.10.0",
+    "prisma-dbml-generator": "^0.9.1"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  }
+}
