@@ -1,6 +1,6 @@
 const { PrismaService } = require("feathers-prisma");
 
-exports.Property = class Property extends PrismaService {
+exports.Properties = class Properties extends PrismaService {
   constructor({ model, ...options }, app) {
     super(
       {

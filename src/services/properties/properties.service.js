@@ -1,19 +1,20 @@
-// Initializes the `property` service on path `/property`
-const { Property } = require("./property.class");
-const hooks = require("./property.hooks");
+// Initializes the `properties` service on path `/y`
+const { Properties } = require("./properties.class");
+const hooks = require("./properties.hooks");
 
 module.exports = function (app) {
   const options = {
     model: "property",
     client: app.get("prisma"),
     paginate: app.get("paginate"),
+    whitelist: ["$rawWhere", "$eager"],
   };
 
   // Initialize our service with any options it requires
-  app.use("/property", new Property(options, app));
+  app.use("/properties", new Properties(options, app));
 
   // Get our initialized service so that we can register hooks
-  const service = app.service("property");
+  const service = app.service("properties");
 
   service.hooks(hooks);
 };
