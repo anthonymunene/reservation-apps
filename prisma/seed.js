@@ -1,50 +1,36 @@
 const { faker } = require("@faker-js/faker");
 const { PrismaClient } = require("@prisma/client");
 
-const { createUser } = require("../src/db/seed/users");
+const { createUsers } = require("../src/db/seed/users");
 const {
   createProperties,
   createPropertyTypes,
-  getPropertiesById,
-  getPropertiesTypeById,
   propertyTypes,
   createAmenities,
 } = require("../src/db/seed/properties");
+const { createReview } = require("../src/db/seed/reviews");
 
 const prisma = new PrismaClient();
 faker.setLocale("en_GB");
 
-
+async function createSeedTransaction(client) {
+  return await client.$transaction(async () => {
+    return [
+      await createProperties(client),
+      await createUsers(client),
+      await createReview(client),
+    ];
+  });
+}
 
 async function main() {
-  // console.log(propertyTypes)
-  await createPropertyTypes(propertyTypes);
-
-  await createAmenities();
-
-  await createProperties();
-
-  // await prisma.amenity.createMany({
-  //   data: amenityData
-  // });
-
-  // const propertiesWhere = await prisma.property.findMany({
-  //   where: {
-  //     amenities: {
-  //       some: {
-  //         amenity: {
-  //           id: 1
-  //         }
-  //       }
-  //     },
-  //   }
-  // });
-
-  // const users = await prisma.user.findMany();
-
-  // await prisma.property.createMany({
-  //   data: propertyData,
-  // });
+  await Promise.all([
+    await createAmenities(prisma),
+    await createPropertyTypes(prisma, propertyTypes),
+  ])
+  .then(async () => {
+    await createSeedTransaction(prisma)
+  });
 }
 
 main()
