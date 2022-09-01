@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 generator dbml {
@@ -12,11 +13,11 @@ datasource db {
 }
 
 model Property {
-  id             Int                     @id @default(autoincrement())
-  createdAt      DateTime                @default(now())
-  updatedAt      DateTime                @updatedAt
-  title          String                  @db.VarChar(255)
-  propertyType   PropertyType?           @relation(fields: [propertyTypeId], references: [id])
+  id             Int                   @id @default(autoincrement())
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  title          String                @db.VarChar(255)
+  propertyType   PropertyType?         @relation(fields: [propertyTypeId], references: [id])
   propertyTypeId Int
   description    String?
   city           String
@@ -24,85 +25,65 @@ model Property {
   bedrooms       Int
   beds           Int
   baths          Int?
-  entirePlace    Boolean                 @default(false)
+  entirePlace    Boolean               @default(false)
   defaultImage   String?
-  amenities      AmenitiesOnProperties[]
+  amenities      AmenitiesOnProperty[]
+  host           User?                 @relation(fields: [hostId], references: [id])
+  hostId         Int?
   reviews        Review[]
-  host           PropertiesOnHosts[]
 }
 
 model Review {
-  id         Int       @id @default(autoincrement())
-  reviewer   User      @relation(fields: [reviewerId], references: [id])
-  reviewerId Int       @unique
-  property   Property? @relation(fields: [propertyId], references: [id])
-  propertyId Int?      @unique
-  avatar     String
-  comment    String
-  rating     Decimal
-  date       DateTime  @default(now())
+  id                Int                 @id @default(autoincrement())
+  comment           String
+  rating            Int
+  date              DateTime            @default(now())
+  reviewer User @relation(fields:[reviewerId],references: [id])
+  reviewerId Int
+  property Property @relation(fields:[propertyId],references: [id])
+  propertyId Int
+
+
 }
 
 model Amenity {
-  id         Int                     @id @default(autoincrement())
-  properties AmenitiesOnProperties[]
+  id         Int                   @id @default(autoincrement())
+  properties AmenitiesOnProperty[]
   name       String
 
   @@unique([name])
 }
 
-model AmenitiesOnProperties {
-  amenity    Amenity   @relation(fields: [amenityId], references: [id])
-  amenityId  Int // relation scalar field (used in the `@relation` attribute above)
-  property   Property? @relation(fields: [propertyId], references: [id])
-  propertyId Int // relation scalar field (used in the `@relation` attribute above)
-  assignedAt DateTime  @default(now())
-  assignedBy String?
+model AmenitiesOnProperty {
+  amenity   Amenity   @relation(fields: [amenityId], references: [id])
+  amenityId Int // relation scalar field (used in the `@relation` attribute above)
+  property    Property? @relation(fields: [propertyId], references: [id])
+  propertyId  Int // relation scalar field (used in the `@relation` attribute above)
+  assignedAt  DateTime  @default(now())
+  assignedBy  String?
 
   @@id([amenityId, propertyId])
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  firstName String?
-  lastName  String?
-  profile   Profile?
-  host      Host[]
-  reviews   Review[]
-  role      Role?    @default(USER)
-}
-
-enum Role {
-  USER
-  ADMIN
+  id         Int        @id @default(autoincrement())
+  email      String     @unique
+  firstName  String?
+  lastName   String?
+  profile    Profile?
+  properties Property[]
+  reviews Review[]
 }
 
 model Profile {
-  id     Int     @id @default(autoincrement())
-  bio    String?
-  user   User    @relation(fields: [userId], references: [id])
-  userId Int     @unique
+  id         Int     @id @default(autoincrement())
+  bio        String?
+  profilePic String?
+  account        User    @relation(fields: [accountId], references: [email])
+  accountId     String     @unique
+  superHost  Boolean @default(false)
 }
 
-model Host {
-  id         Int                 @id @default(autoincrement())
-  properties PropertiesOnHosts[]
-  user       User?               @relation(fields: [userId], references: [id])
-  userId     Int
-}
-
-model PropertiesOnHosts {
-  host       Host      @relation(fields: [hostId], references: [id])
-  hostId     Int // relation scalar field (used in the `@relation` attribute above)
-  property   Property? @relation(fields: [propertyId], references: [id])
-  propertyId Int // relation scalar field (used in the `@relation` attribute above)
-  superHost  Boolean   @default(false)
-  assignedAt DateTime  @default(now())
-  assignedBy String?
-
-  @@id([hostId, propertyId])
-}
 
 model PropertyType {
   id   Int        @id @default(autoincrement())

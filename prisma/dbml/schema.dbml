@@ -17,30 +17,30 @@ Table Property {
   baths Int
   entirePlace Boolean [not null, default: false]
   defaultImage String
-  amenities AmenitiesOnProperties [not null]
+  amenities AmenitiesOnProperty [not null]
+  host User
+  hostId Int
   reviews Review [not null]
-  host PropertiesOnHosts [not null]
 }
 
 Table Review {
   id Int [pk, increment]
-  reviewer User [not null]
-  reviewerId Int [unique, not null]
-  property Property
-  propertyId Int [unique]
-  avatar String [not null]
   comment String [not null]
-  rating Decimal [not null]
+  rating Int [not null]
   date DateTime [default: `now()`, not null]
+  reviewer User [not null]
+  reviewerId Int [not null]
+  property Property [not null]
+  propertyId Int [not null]
 }
 
 Table Amenity {
   id Int [pk, increment]
-  properties AmenitiesOnProperties [not null]
+  properties AmenitiesOnProperty [not null]
   name String [unique, not null]
 }
 
-Table AmenitiesOnProperties {
+Table AmenitiesOnProperty {
   amenity Amenity [not null]
   amenityId Int [not null]
   property Property
@@ -59,37 +59,17 @@ Table User {
   firstName String
   lastName String
   profile Profile
-  host Host [not null]
+  properties Property [not null]
   reviews Review [not null]
-  role Role [default: 'USER']
 }
 
 Table Profile {
   id Int [pk, increment]
   bio String
-  user User [not null]
-  userId Int [unique, not null]
-}
-
-Table Host {
-  id Int [pk, increment]
-  properties PropertiesOnHosts [not null]
-  user User
-  userId Int [not null]
-}
-
-Table PropertiesOnHosts {
-  host Host [not null]
-  hostId Int [not null]
-  property Property
-  propertyId Int [not null]
+  profilePic String
+  account User [not null]
+  accountId String [unique, not null]
   superHost Boolean [not null, default: false]
-  assignedAt DateTime [default: `now()`, not null]
-  assignedBy String
-
-  indexes {
-    (hostId, propertyId) [pk]
-  }
 }
 
 Table PropertyType {
@@ -98,25 +78,16 @@ Table PropertyType {
   type Property [not null]
 }
 
-Enum Role {
-  USER
-  ADMIN
-}
-
 Ref: Property.propertyTypeId > PropertyType.id
+
+Ref: Property.hostId > User.id
 
 Ref: Review.reviewerId > User.id
 
 Ref: Review.propertyId > Property.id
 
-Ref: AmenitiesOnProperties.amenityId > Amenity.id
+Ref: AmenitiesOnProperty.amenityId > Amenity.id
 
-Ref: AmenitiesOnProperties.propertyId > Property.id
+Ref: AmenitiesOnProperty.propertyId > Property.id
 
-Ref: Profile.userId - User.id
-
-Ref: Host.userId > User.id
-
-Ref: PropertiesOnHosts.hostId > Host.id
-
-Ref: PropertiesOnHosts.propertyId > Property.id
+Ref: Profile.accountId - User.email

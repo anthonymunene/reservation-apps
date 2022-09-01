@@ -109,3 +109,7 @@ $RECYCLE.BIN/
 # Others
 lib/
 data/
+
+# Seed data
+
+src/db/seed/users/images/
