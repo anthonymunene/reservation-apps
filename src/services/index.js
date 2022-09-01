@@ -1,7 +1,6 @@
 const users = require("./users/users.service.js");
-const property = require("./property/property.service.js");
-// eslint-disable-next-line no-unused-vars
+const properties = require("./properties/properties.service.js");
 module.exports = function (app) {
   app.configure(users);
-  app.configure(property);
+  app.configure(properties);
 };
