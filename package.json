@@ -26,13 +26,12 @@
   "scripts": {
     "test": "npm run lint && npm run jest",
     "lint": "eslint src/. test/. --config .eslintrc.json --fix",
-    "dev": "nodemon src/index.js",
+    "dev": "docker-compose down && docker-compose up -d --scale prisma=0 && npm run start ",
+    "dev:seed": "docker-compose down && docker-compose up -d && npm run start",
     "debug": "nodemon --inspect src/index.js",
-    "start": "node src/index.js",
-    "start:db": "docker run --rm --name pg-docker -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e PGDATA=/var/lib/postgresql/data/pgdata -e PG_TRUST_LOCALNET=true -p 5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data:z postgres",
-    "start:lorem-server": "docker run --env-file=./.env -p 8080:8080 -v images:/app/images ghcr.io/manasky/lorem-server:latest",
+    "start": "nodemon src/index.js",
     "jest": "jest --forceExit",
-    "code_mod": "export LATEST_VERSION=$(npm view commonjs-to-es-module-codemod version); jscodeshift -t \"https://unpkg.com/commonjs-to-es-module-codemod@${LATEST_VERSION}/dist/index.js\""
+    "postinstall": "prisma generate"
   },
   "standard": {
     "env": [
