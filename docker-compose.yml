@@ -14,7 +14,7 @@ services:
       - db:/var/lib/postgresql/data
   prisma:
     container_name: database-seeder
-    command: sh -c "npx prisma migrate dev  && node prisma/seed.js --experimental-fetch"
+    command: sh -c "npx prisma migrate dev  && node --experimental-fetch prisma/seed.js"
 
     ports:
       - 8080:8080
@@ -24,9 +24,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-seeder
+    volumes:
+      - ./src/db/seed/users/images:/usr/src/app/src/db/seed/users/images
 
   # PostgreSQL pgAdmin panel accessible at http://localhost:16543/
-  .pgadmin-compose:
+  pgadmin-compose:
+    container_name: postgres-admin
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: "postgres@postgres.com"
@@ -35,8 +38,13 @@ services:
       - "16543:80"
     depends_on:
       - db
+    volumes:
+      - pgadmin:/var/lib/pgadmin
 
 volumes:
   node_modules_cache:
   db:
     driver: local
+  pgadmin:
+    driver: local
+
