@@ -34,33 +34,34 @@ model Property {
 }
 
 model Review {
-  id                Int                 @id @default(autoincrement())
-  comment           String
-  rating            Int
-  date              DateTime            @default(now())
-  reviewer User @relation(fields:[reviewerId],references: [id])
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  comment    String
+  rating     Int
+  reviewer   User     @relation(fields: [reviewerId], references: [id])
   reviewerId Int
-  property Property @relation(fields:[propertyId],references: [id])
+  property   Property @relation(fields: [propertyId], references: [id])
   propertyId Int
-
-
 }
 
 model Amenity {
   id         Int                   @id @default(autoincrement())
   properties AmenitiesOnProperty[]
   name       String
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
 
   @@unique([name])
 }
 
 model AmenitiesOnProperty {
-  amenity   Amenity   @relation(fields: [amenityId], references: [id])
-  amenityId Int // relation scalar field (used in the `@relation` attribute above)
-  property    Property? @relation(fields: [propertyId], references: [id])
-  propertyId  Int // relation scalar field (used in the `@relation` attribute above)
-  assignedAt  DateTime  @default(now())
-  assignedBy  String?
+  amenity    Amenity   @relation(fields: [amenityId], references: [id])
+  amenityId  Int // relation scalar field (used in the `@relation` attribute above)
+  property   Property? @relation(fields: [propertyId], references: [id])
+  propertyId Int // relation scalar field (used in the `@relation` attribute above)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@id([amenityId, propertyId])
 }
@@ -72,23 +73,28 @@ model User {
   lastName   String?
   profile    Profile?
   properties Property[]
-  reviews Review[]
+  reviews    Review[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 model Profile {
-  id         Int     @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   bio        String?
   profilePic String?
-  account        User    @relation(fields: [accountId], references: [email])
-  accountId     String     @unique
-  superHost  Boolean @default(false)
+  account    User     @relation(fields: [accountId], references: [email])
+  accountId  String   @unique
+  superHost  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
-
 model PropertyType {
-  id   Int        @id @default(autoincrement())
-  name String     @db.VarChar(100)
-  type Property[]
+  id        Int        @id @default(autoincrement())
+  name      String     @db.VarChar(100)
+  type      Property[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   @@unique([name])
 }
