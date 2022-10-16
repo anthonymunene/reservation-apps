@@ -112,3 +112,7 @@ data/
 
 # Volumes
 
+
+# Seed data
+
+src/db/seed/users/images/

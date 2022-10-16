@@ -1,0 +1,102 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table Property {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  title String [not null]
+  propertyTypeId Int [not null]
+  description String
+  city String [not null]
+  country String [not null]
+  bedrooms Int [not null]
+  beds Int [not null]
+  baths Int
+  entirePlace Boolean [not null, default: false]
+  defaultImage String
+  hostId Int
+  host User
+  propertyType PropertyType [not null]
+  amenities AmenitiesOnProperty [not null]
+  reviews Review [not null]
+}
+
+Table Review {
+  id Int [pk, increment]
+  comment String [not null]
+  rating Int [not null]
+  reviewerId Int [not null]
+  propertyId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  property Property [not null]
+  reviewer User [not null]
+}
+
+Table Amenity {
+  id Int [pk, increment]
+  name String [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  properties AmenitiesOnProperty [not null]
+}
+
+Table AmenitiesOnProperty {
+  amenityId Int [not null]
+  propertyId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  amenity Amenity [not null]
+  property Property [not null]
+
+  indexes {
+    (amenityId, propertyId) [pk]
+  }
+}
+
+Table User {
+  id Int [pk, increment]
+  email String [unique, not null]
+  firstName String
+  lastName String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  profile Profile
+  properties Property [not null]
+  reviews Review [not null]
+}
+
+Table Profile {
+  id Int [pk, increment]
+  bio String
+  profilePic String
+  accountId String [unique, not null]
+  superHost Boolean [not null, default: false]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  account User [not null]
+}
+
+Table PropertyType {
+  id Int [pk, increment]
+  name String [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  type Property [not null]
+}
+
+Ref: Property.hostId > User.id
+
+Ref: Property.propertyTypeId > PropertyType.id
+
+Ref: Review.propertyId > Property.id
+
+Ref: Review.reviewerId > User.id
+
+Ref: AmenitiesOnProperty.amenityId > Amenity.id
+
+Ref: AmenitiesOnProperty.propertyId > Property.id
+
+Ref: Profile.accountId - User.email

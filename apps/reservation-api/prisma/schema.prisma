@@ -1,0 +1,96 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Property {
+  id             Int                   @id @default(autoincrement())
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  title          String                @db.VarChar(255)
+  propertyTypeId Int
+  description    String?
+  city           String
+  country        String
+  bedrooms       Int
+  beds           Int
+  baths          Int?
+  entirePlace    Boolean               @default(false)
+  defaultImage   String?
+  hostId         Int?
+  host           User?                 @relation(fields: [hostId], references: [id])
+  propertyType   PropertyType          @relation(fields: [propertyTypeId], references: [id])
+  amenities      AmenitiesOnProperty[]
+  reviews        Review[]
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  comment    String
+  rating     Int
+  reviewerId Int
+  propertyId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  property   Property @relation(fields: [propertyId], references: [id])
+  reviewer   User     @relation(fields: [reviewerId], references: [id])
+}
+
+model Amenity {
+  id         Int                   @id @default(autoincrement())
+  name       String                @unique
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+  properties AmenitiesOnProperty[]
+}
+
+model AmenitiesOnProperty {
+  amenityId  Int
+  propertyId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  amenity    Amenity  @relation(fields: [amenityId], references: [id])
+  property   Property @relation(fields: [propertyId], references: [id])
+
+  @@id([amenityId, propertyId])
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  email      String     @unique
+  firstName  String?
+  lastName   String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  profile    Profile?
+  properties Property[]
+  reviews    Review[]
+}
+
+model Profile {
+  id         Int      @id @default(autoincrement())
+  bio        String?
+  profilePic String?
+  accountId  String   @unique
+  superHost  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  account    User     @relation(fields: [accountId], references: [email])
+}
+
+model PropertyType {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique @db.VarChar(100)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  type      Property[]
+}

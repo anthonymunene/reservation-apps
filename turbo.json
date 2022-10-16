@@ -1,0 +1,38 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "pipeline": {
+    "build": {
+      "outputs": [
+        "lib/**",
+        "dist/**",
+        "server/**"
+      ],
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "test": {
+      "outputs": [],
+      "dependsOn": []
+    },
+    "lint": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": []
+    },
+    "dev:api:docker": {
+      "cache": false
+    },
+    "dev": {
+      "dependsOn": [
+        "dev:api:docker"
+      ],
+      "cache": false
+    },
+
+    "clean": {
+      "cache": false
+    }
+  }
+}
