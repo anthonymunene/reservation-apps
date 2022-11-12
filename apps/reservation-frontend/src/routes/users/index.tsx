@@ -18,7 +18,9 @@ export default component$(() => {
                     <p>{user.firstName}</p>
                     <p>{user.lastName} </p>
                     <p>{user.profile.bio}</p>
-                    <p>{user.profile.profilePic}</p>
+                    <p>
+                      <img src={`images/users/${user.profile.defaultProfilePic}`} />
+                     </p>
                     <p>{user.profile.superHost}</p>
                   </li>
                 ))}
@@ -33,10 +35,12 @@ export default component$(() => {
 
 export const onGet: RequestHandler<EndpointData> = async () => {
   try {
-    const users = await fetch('http://localhost:3030/users').then(response => response.json())
-    return users
+    const users = await fetch("http://localhost:3030/users").then((response) =>
+      response.json()
+    );
+    return users;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
 
@@ -47,6 +51,7 @@ interface UserProperties {
 interface UserProfile {
   id: number;
   bio: string;
+  defaultProfilePic: string
   profilePic: string;
   accountId: string;
   superHost: boolean;
