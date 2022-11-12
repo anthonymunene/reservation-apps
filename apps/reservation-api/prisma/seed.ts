@@ -7,7 +7,6 @@ import {
   createPropertyTypes,
   createAmenities,
 } from '../src/db/seed/properties';
-import { Property } from '../interfaces/prismaTypes';
 import { createReview } from '../src/db/seed/reviews';
 
 const prisma = new PrismaClient();
@@ -24,14 +23,20 @@ async function createSeedTransaction(client: PrismaClient) {
 }
 
 async function main() {
-  await Promise.all([
-    await createAmenities(prisma),
-    await createPropertyTypes(prisma),
-  ]).then(async () => {
-    await createSeedTransaction(prisma);
-  });
-}
 
+  const users = await prisma.user.findMany({});
+  console.log(`number of users is ${users.length}`);
+  if (!users.length) {
+    await Promise.all([
+      await createAmenities(prisma),
+      await createPropertyTypes(prisma),
+    ]).then(async () => {
+      await createSeedTransaction(prisma);
+    });
+  } else {
+    console.log('users exist.... not seeding database');
+  }
+}
 main()
   .catch((e) => {
     console.error(e);
