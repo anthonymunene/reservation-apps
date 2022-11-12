@@ -15,7 +15,7 @@ services:
       - db:/var/lib/postgresql/data
   prisma:
     container_name: database-seeder
-    command: sh -c "npx prisma generate && npx prisma migrate deploy  && node --experimental-fetch prisma/seed.js"
+    command: sh -c "npx prisma generate && npx prisma migrate deploy  && node --loader ts-node/esm --experimental-specifier-resolution=node prisma/seed.ts"
 
     ports:
       - 8080:8080
@@ -24,23 +24,26 @@ services:
     image: database-seeder
     build:
       context: .
-      dockerfile: Dockerfile-seeder
+      dockerfile: docker/Dockerfile-seeder
     volumes:
-      - ./src/db/seed/users/images:/usr/src/app/src/db/seed/users/images
+      - ../reservation-frontend/public/images/users:/usr/src/app/src/db/seed/users/images
 
   # PostgreSQL pgAdmin panel accessible at http://localhost:16543/
-  pgadmin-compose:
-    container_name: postgres-admin
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "postgres@postgres.com"
-      PGADMIN_DEFAULT_PASSWORD: "postgresadmin!"
-    ports:
-      - "16543:80"
-    depends_on:
-      - db
-    volumes:
-      - pgadmin:/var/lib/pgadmin
+  # pgadmin-compose:
+  #   container_name: postgres-admin
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: "postgres@postgres.com"
+  #     PGADMIN_DEFAULT_PASSWORD: "postgresadmin!"
+  #     GUNICORN_ACCESS_LOGFILE: '/dev/null'
+  #   ports:
+  #     - "16543:80"
+  #   depends_on:
+  #     - db
+  #   volumes:
+  #     - pgadmin:/var/lib/pgadmin
+  #   logging:
+  #     driver: none
 
 volumes:
   node_modules_cache:

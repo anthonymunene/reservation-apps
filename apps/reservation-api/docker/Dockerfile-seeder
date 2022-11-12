@@ -1,0 +1,34 @@
+# Container used for the postgres db seed data
+FROM node:18-alpine
+
+WORKDIR /usr/src/app
+
+COPY prisma ./prisma
+COPY src/db ./src/db
+COPY src/utils ./src/utils
+COPY interfaces ./interfaces
+COPY tsconfig.json .
+COPY .env ./
+
+
+# COPY docker/wait-for-it.sh ./
+# COPY docker/start.sh ./
+# COPY docker/docker-entrypoint.sh ./
+# RUN chmod +x wait-for-it.sh docker-entrypoint.sh start.sh
+RUN npm i \
+    @prisma/client \
+    @faker-js/faker \
+    file-type-cjs \
+    glob \
+    @types/glob \
+    prisma-dbml-generator \
+    ts-node-dev typescript && \
+    npx json -I -f package.json -e "this.type=\"module\"" && \
+    npx json -I -f tsconfig.json -e "this.compilerOptions.module=\"es6\"" && \
+    npx json -I -f tsconfig.json -e "this.compilerOptions.moduleResolution=\"node\""
+
+
+
+EXPOSE 8080
+# ENTRYPOINT [ "./docker-entrypoint.sh" ]
+# CMD [ "./start.sh" ]
