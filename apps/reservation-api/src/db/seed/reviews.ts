@@ -1,3 +1,7 @@
+// 👇️ ts-nocheck disables type checking for entire file
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import { getAllProperties } from './properties';
 import { randomiseArray, randomiseInt } from '../../utils/randomise';
 import { faker } from '@faker-js/faker';
