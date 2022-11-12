@@ -17,6 +17,7 @@ Table Property {
   entirePlace Boolean [not null, default: false]
   defaultImage String
   hostId Int
+  images String[] [not null]
   host User
   propertyType PropertyType [not null]
   amenities AmenitiesOnProperty [not null]
@@ -71,7 +72,8 @@ Table User {
 Table Profile {
   id Int [pk, increment]
   bio String
-  profilePic String
+  defaultProfilePic String
+  profilePics String[] [not null]
   accountId String [unique, not null]
   superHost Boolean [not null, default: false]
   createdAt DateTime [default: `now()`, not null]

@@ -27,6 +27,7 @@ model Property {
   entirePlace    Boolean               @default(false)
   defaultImage   String?
   hostId         Int?
+  images         String[]
   host           User?                 @relation(fields: [hostId], references: [id])
   propertyType   PropertyType          @relation(fields: [propertyTypeId], references: [id])
   amenities      AmenitiesOnProperty[]
@@ -77,14 +78,15 @@ model User {
 }
 
 model Profile {
-  id         Int      @id @default(autoincrement())
-  bio        String?
-  profilePic String?
-  accountId  String   @unique
-  superHost  Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  account    User     @relation(fields: [accountId], references: [email])
+  id                Int      @id @default(autoincrement())
+  bio               String?
+  defaultProfilePic String?
+  profilePics       String[]
+  accountId         String   @unique
+  superHost         Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  account           User     @relation(fields: [accountId], references: [email])
 }
 
 model PropertyType {
