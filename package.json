@@ -10,7 +10,7 @@
   "scripts": {
     "test": "turbo run test",
     "build": "turbo run build",
-    "dev": "turbo run dev --no-cache --parallel --continue"
+    "dev": "turbo run dev --no-cache --continue"
   },
   "repository": {
     "type": "git",
