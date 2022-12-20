@@ -1,24 +1,18 @@
 version: "3.8"
 services:
   postgres:
-    init: true
     container_name: postgres
     image: postgres:14.5-alpine
-    environment:
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
-      POSTGRES_DB: "reservation_test"
-      TZ: "utc"    
     restart: always
     ports:
       - 5432:5432
     volumes:
       - db:/var/lib/postgresql/data
+    env_file:
+      - .env.test      
   prisma:
-    init: true  
     container_name: database-seeder
-    command: sh -c ""
-
+    command: sh -c "npx dotenv-cli -e .env.test -- npx prisma generate && npx dotenv-cli -e .env.test -- npx prisma migrate deploy  && node --loader ts-node/esm --experimental-specifier-resolution=node prisma/seed.ts"
     ports:
       - 8080:8080
     depends_on:
@@ -29,16 +23,17 @@ services:
       dockerfile: docker/Dockerfile-seeder
     volumes:
       - ../reservation-frontend/public/images:/usr/src/app/src/db/seed/images
+    env_file:
+      - .env.test
 
   # PostgreSQL pgAdmin panel accessible at http://localhost:16543/
   pgadmin-compose:
-    init: true  
     container_name: postgres-admin
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: "postgres@postgres.com"
       PGADMIN_DEFAULT_PASSWORD: "postgresadmin!"
-      GUNICORN_ACCESS_LOGFILE: '/dev/null'
+      GUNICORN_ACCESS_LOGFILE: "/dev/null"
     ports:
       - "16543:80"
     depends_on:
@@ -54,4 +49,3 @@ volumes:
     driver: local
   pgadmin:
     driver: local
-
