@@ -96,6 +96,7 @@
     "file-type": "^17.1.6",
     "file-type-cjs": "^1.0.7",
     "glob": "^8.0.3",
+    "is-port-reachable": "^4.0.0",
     "jest": "^29.3.1",
     "mocha": "^10.1.0",
     "nodemon": "^2.0.19",
