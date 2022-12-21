@@ -1,1 +1,3 @@
-{}
+{
+    "postgres": "postgres://postgres:postgres@localhost:5432/reservation_test"
+}
