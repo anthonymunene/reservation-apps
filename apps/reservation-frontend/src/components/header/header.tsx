@@ -14,20 +14,11 @@ export default component$(() => {
           <a href="/">Qwik City 🏙</a>
         </section>
         <nav>
-          <a href="/blog" class={{ active: pathname.startsWith('/blog') }}>
-            Blog
+          <a href="/users" class={{ active: pathname.startsWith('/users') }}>
+            Users
           </a>
-          <a href="/docs" class={{ active: pathname.startsWith('/docs') }}>
-            Docs
-          </a>
-          <a href="/api" class={{ active: pathname.startsWith('/api') }}>
-            API
-          </a>
-          <a href="/products/hat" class={{ active: pathname.startsWith('/products') }}>
-            Products
-          </a>
-          <a href="/about-us" class={{ active: pathname.startsWith('/about-us') }}>
-            About Us
+          <a href="/properties" class={{ active: pathname.startsWith('/properties') }}>
+            Properties
           </a>
         </nav>
       </div>

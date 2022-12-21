@@ -1,11 +1,13 @@
 import { faker } from '@faker-js/faker';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 // import { getAllPropertiesById, randomised } from '../properties/';
 
-import { seedImages, clearImageFolder } from '../seedImages';
+import { seedImages, clearImageFolder, createIfNotExist } from '../seedImages';
 
-const userImageDir = './src/db/seed/users/images';
+const userImageDir = `${process.cwd()}/src/db/seed/images/users`;
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 const getMultipleRandomisedPropertyIds = async (properties) =>
   faker.helpers.arrayElements(properties, 2);
 
@@ -19,37 +21,45 @@ const getAllPropertiesWithoutOwner = async (client: PrismaClient) => {
     },
   });
 };
-const userAccounts = Array.from({ length: 10 }).map(() => ({
-  email: faker.internet.email(),
-  firstName: faker.name.firstName(),
-  lastName: faker.name.lastName(),
-}));
+const userAccounts = Array.from({ length: 10 }).map(() => {
+  const firstName = faker.name.firstName();
+  const lastName = faker.name.lastName();
+  return {
+    email: faker.internet.email(firstName, lastName),
+    firstName,
+    lastName
+  };
+});
 
 export const createUsers = async (client: PrismaClient) => {
+  createIfNotExist(userImageDir);
   await clearImageFolder(`${userImageDir}/*.png`)
     .then((deletedFiles) => console.log('done! deleted files:', deletedFiles))
-    .catch(console.error);
+    .catch(error => console.log(`something went wrong deleting files:\n${error}`));
   for (let index = 0; index < userAccounts.length; index++) {
     const imageURL = await seedImages('face', {
       dir: userImageDir,
-      user: userAccounts[index],
+      user: userAccounts[index]
     });
-    console.log(imageURL);
+
     await getAllPropertiesWithoutOwner(client).then(async (properties) => {
       const randomProperties = await getMultipleRandomisedPropertyIds(
         properties
       );
-      const user = await client.user.create({
+      await client.user.create({
         data: {
           ...userAccounts[index],
           profile: {
             create: {
               bio: faker.lorem.sentences(),
-              profilePic: imageURL,
+              defaultProfilePic: imageURL[0],
               superHost: false,
+
             },
           },
           properties: {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             connect: randomProperties,
           },
         },

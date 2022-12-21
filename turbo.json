@@ -12,8 +12,11 @@
       ]
     },
     "test": {
-      "outputs": [],
-      "dependsOn": []
+      "dependsOn": [
+        "dev:api:docker:test",
+        "dev:api"
+      ],
+      "cache": false
     },
     "lint": {
       "dependsOn": [
@@ -24,9 +27,16 @@
     "dev:api:docker": {
       "cache": false
     },
-    "dev": {
+    "dev:api": {
       "dependsOn": [
         "dev:api:docker"
+      ],
+      "cache": false
+    },
+    "dev": {
+      "dependsOn": [
+        "dev:api:docker",
+        "dev:api"
       ],
       "cache": false
     },

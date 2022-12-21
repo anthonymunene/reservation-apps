@@ -1,0 +1,48 @@
+# Container used for the postgres db seed
+
+# change with the Node.js version of your choice
+ARG NODE_VERSION="18.12.1"
+
+# change with the Linux Alpine version of your choice
+ARG ALPINE_VERSION="3.17"
+
+
+FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION}
+
+ARG DOCKER_COMPOSE_WAIT_VERSION="2.9.0"
+WORKDIR /usr/src/app
+
+COPY prisma ./prisma
+COPY src/db ./src/db
+COPY src/utils ./src/utils
+COPY interfaces ./interfaces
+COPY tsconfig.json .
+COPY .env.test ./
+COPY .env ./
+COPY docker/docker-entrypoint.sh .
+
+
+# COPY docker/wait-for-it.sh ./
+# COPY docker/start.sh ./
+# COPY docker/docker-entrypoint.sh ./
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/${DOCKER_COMPOSE_WAIT_VERSION}/wait /wait
+RUN chmod +x /wait && \
+    chmod +x docker-entrypoint.sh && \
+    apk add --update --no-cache openssl1.1-compat && \
+    npm i \
+    @prisma/client \
+    @faker-js/faker \
+    file-type-cjs \
+    glob \
+    @types/glob \
+    prisma-dbml-generator \
+    ts-node-dev typescript && \
+    npx json -I -f package.json -e "this.type=\"module\"" && \
+    npx json -I -f tsconfig.json -e "this.compilerOptions.module=\"es6\"" && \
+    npx json -I -f tsconfig.json -e "this.compilerOptions.moduleResolution=\"node\""
+
+
+
+EXPOSE 8080
+ENTRYPOINT [ "./docker-entrypoint.sh" ]
+# CMD [ "./start.sh" ]

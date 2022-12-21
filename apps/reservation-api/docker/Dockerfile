@@ -1,4 +1,4 @@
-FROM node:17-alpine
+FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
@@ -15,4 +15,6 @@ COPY config ./config
 RUN npm install
 
 EXPOSE 3030
+
+
 
