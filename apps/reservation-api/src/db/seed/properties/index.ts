@@ -3,9 +3,10 @@
 // @ts-nocheck
 
 import { faker } from '@faker-js/faker';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { PROPERTY } from '../../../utils/variables';
 import { randomiseArray } from '../../../utils/randomise';
+import { createIfNotExist, seedImages, clearImageFolder } from '../seedImages';
 
 export const getAmenitiesById = (client: PrismaClient) =>
   client.amenity.findMany({
@@ -62,16 +63,26 @@ export const createProperties = async (client: PrismaClient) => {
   const connectAmenities = (data: []) =>
     data.map((item) => ({ amenity: { connect: item } }));
 
+  const propertiesImageDir = `${process.cwd()}/src/db/seed/images/properties`;
+  await clearImageFolder(`${propertiesImageDir}/*.png`)
+    .then((deletedFiles) => console.log('done! deleted files:', deletedFiles));
   await Promise.all(
     properties.map(async (property) => {
       const randomisedPropertyType = await getPropertyTypeById(
         client,
         randomiseArray(propertyTypes)
       );
+      const title = `${faker.word.adjective(7)} ${randomisedPropertyType[0].name}`;
+      createIfNotExist(propertiesImageDir);
+      const propertyImage = await seedImages('house', {
+        dir: propertiesImageDir,
+        property: { title }
+      });
       return client.property.create({
         data: {
-          title: `${faker.word.adjective(7)} ${randomisedPropertyType[0].name}`,
+          title,
           ...property,
+          defaultImage: propertyImage[0],
           propertyType: { connect: { id: randomisedPropertyType[0].id } },
           amenities: {
             create: connectAmenities(randomiseArray(amenities, 3)),

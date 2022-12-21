@@ -3,9 +3,9 @@ import { PrismaClient } from '@prisma/client';
 
 // import { getAllPropertiesById, randomised } from '../properties/';
 
-import { seedImages, clearImageFolder } from '../seedImages';
+import { seedImages, clearImageFolder, createIfNotExist } from '../seedImages';
 
-const userImageDir = './src/db/seed/users/images';
+const userImageDir = `${process.cwd()}/src/db/seed/images/users`;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const getMultipleRandomisedPropertyIds = async (properties) =>
@@ -32,6 +32,7 @@ const userAccounts = Array.from({ length: 10 }).map(() => {
 });
 
 export const createUsers = async (client: PrismaClient) => {
+  createIfNotExist(userImageDir);
   await clearImageFolder(`${userImageDir}/*.png`)
     .then((deletedFiles) => console.log('done! deleted files:', deletedFiles))
     .catch(error => console.log(`something went wrong deleting files:\n${error}`));

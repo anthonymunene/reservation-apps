@@ -1,16 +1,9 @@
 import glob from 'glob';
 import { downloadImage } from '../../utils/downloadImage';
 import { unlink } from 'fs/promises';
-import { promises } from 'fs';
+import { promises, existsSync, mkdirSync } from 'fs';
 import crypto from 'crypto';
 
-export const clearImageFolder = async (path = '') => {
-  const files = glob.sync(path);
-
-  return files.length === 0
-    ? [] // <-- automatically wrapped in a Promise
-    : Promise.all(files.map((f) => unlink(f).then((_) => f)));
-};
 
 interface ImageOptions {
   user?: {
@@ -38,6 +31,22 @@ const saveImage = async (buffer: string | Buffer, fileName: string, dir: string)
 
 
 };
+
+export const clearImageFolder = async (path = '') => {
+  const files = glob.sync(path);
+
+  return files.length === 0
+    ? [] // <-- automatically wrapped in a Promise
+    : Promise.all(files.map((f) => unlink(f).then((_) => f)));
+};
+
+export const createIfNotExist = (filepath: string) => {
+  if (!existsSync(filepath)) {
+    mkdirSync(filepath);
+  } else {
+    return;
+  }
+};
 export const seedImages = async (imageCategory: string, { user, property, dir, imageCount = 1 }: ImageOptions) => {
   const images: string[] = [];
   const removePath = (imagePath: string) => imagePath?.split(`${dir}/`)[1];
@@ -53,7 +62,7 @@ export const seedImages = async (imageCategory: string, { user, property, dir, i
     }
 
     if (property) {
-      const imageName = `${property.title}`;
+      const imageName = `${property.title}`.replace(/ /g, '_');
       await downloadImage(imageCategory).then(async image => {
         await saveImage(image, imageName, dir).then(fileName => images.push(removePath(fileName)));
       });
