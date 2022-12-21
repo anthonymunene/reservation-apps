@@ -1,23 +1,22 @@
 version: "3.8"
 services:
   postgres:
-    init: true
     container_name: postgres
     image: postgres:14.5-alpine
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
       POSTGRES_DB: "reservation_test"
-      TZ: "utc"    
+      TZ: "utc"
     restart: always
     ports:
       - 5432:5432
     volumes:
       - db:/var/lib/postgresql/data
   prisma:
-    init: true  
     container_name: database-seeder
-    command: sh -c ""
+    environment:
+      WAIT_HOSTS: postgres:5432
 
     ports:
       - 8080:8080
@@ -32,7 +31,6 @@ services:
 
   # PostgreSQL pgAdmin panel accessible at http://localhost:16543/
   pgadmin-compose:
-    init: true  
     container_name: postgres-admin
     image: dpage/pgadmin4
     environment:
