@@ -15,7 +15,7 @@ export default component$(() => {
                 {propertys.data.map((property) => (
                   <li>
                     <div>
-                      <p>{property.id}</p>
+                      <p><img src={`images/properties/${property.defaultImage}`} /></p>
                     </div>
                     <div>
                       <p>{property.title}</p>
