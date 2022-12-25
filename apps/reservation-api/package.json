@@ -32,6 +32,7 @@
     "test": "NODE_ENV=test env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'test/**/*.ts'",
     "lint": "eslint src/. test/. prisma/. --config ../../.eslintrc.json --fix",
     "dev:api:docker": "docker compose -f docker-compose.yml --env-file .env up -d --remove-orphans",
+    "dev:api:docker:seed": "docker compose -f docker-compose-seed-data.yml --env-file .env up -d --remove-orphans",
     "dev:api:docker:test": "docker compose -f docker-compose.test.yml --env-file .env.test up -d",
     "docker:build": "docker compose build --no-cache",
     "docker:clean-volumes": "docker volume rm $(docker volume ls -qf dangling=true)",

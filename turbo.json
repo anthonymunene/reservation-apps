@@ -40,6 +40,13 @@
       ],
       "cache": false
     },
+    "dev:seed": {
+      "dependsOn": [
+        "dev:api:docker:seed",
+        "dev:api"
+      ],
+      "cache": false
+    },
 
     "clean": {
       "cache": false
