@@ -10,10 +10,14 @@
     "sourceType": "module"
   },
   "plugins": [
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "prettier"
   ],
   "extends": [
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "prettier"
   ],
   "rules": {
     "indent": [
@@ -32,6 +36,8 @@
       "error",
       "always"
     ],
+    "no-console": 1,       // Means warning
+    "prettier/prettier": 2, // Means error
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-empty-interface": "off"
   }

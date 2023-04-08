@@ -1,0 +1,42 @@
+version: "3.8"
+services:
+  postgres-knex:
+    container_name: postgres-knex
+    image: postgres:14.5-alpine
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "reservation_knex"
+      TZ: "utc"
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - db_knex:/var/lib/postgresql/data
+    command: -p 5432
+
+
+  # PostgreSQL pgAdmin panel accessible at http://localhost:16543/
+  pgadmin-compose-knex:
+    container_name: postgres-admin-knex
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "postgres@postgres.com"
+      PGADMIN_DEFAULT_PASSWORD: "postgresadmin!"
+      GUNICORN_ACCESS_LOGFILE: '/dev/null'
+    ports:
+      - "16544:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    logging:
+      driver: none
+
+volumes:
+  node_modules_cache:
+  pgadmin:
+    driver: local
+  db_knex:
+    driver: local
+

@@ -29,7 +29,8 @@
   },
   "homepage": "https://github.com/anthonymunene/reservation-app#readme",
   "devDependencies": {
-    "husky": "^8.0.1"
+    "husky": "^8.0.1",
+    "prettier": "^2.8.4"
   },
   "dependencies": {
     "turbo": "^1.5.6"
