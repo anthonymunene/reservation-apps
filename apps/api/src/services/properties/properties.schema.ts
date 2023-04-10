@@ -19,7 +19,7 @@ export const propertiesSchema = Type.Object(
     bedrooms: Type.Number(),
     beds: Type.Number(),
     images: Type.Array(Type.Object({ image: Type.String() })),
-    hostId: Type.String({ format: 'uuid' }),
+    host: Type.String({ format: 'uuid' }),
     propertyTypeId: Type.String(),
     propertyType: Type.String(),
     ownedBy: Type.String(),
@@ -34,7 +34,7 @@ export type Properties = Static<typeof propertiesSchema>;
 type Users = Static<typeof usersDataSchema>;
 export const propertiesResolver = resolve<Properties, HookContext>({
   ownedBy: virtual(async (property, context) => {
-    const user: Users = await context.app.service('users').get(property.hostId);
+    const user: Users = await context.app.service('users').get(property.host);
     return `${user.id}`;
   }),
   amenities: virtual(async (property, context) => {
@@ -74,7 +74,7 @@ export const propertiesResolver = resolve<Properties, HookContext>({
 });
 
 export const propertiesExternalResolver = resolve<Properties, HookContext>({
-  hostId: async () => undefined,
+  host: async () => undefined,
   propertyTypeId: async () => undefined,
   createdAt: async () => undefined,
   updatedAt: async () => undefined,
@@ -82,9 +82,9 @@ export const propertiesExternalResolver = resolve<Properties, HookContext>({
 });
 
 // Schema for creating new entries
-export const propertiesDataSchema = Type.Omit(
+export const propertiesDataSchema = Type.Pick(
   propertiesSchema,
-  ['title', 'description', 'city', 'countryCode', 'bedrooms', 'beds'],
+  ['id', 'title', 'description', 'city', 'countryCode', 'bedrooms', 'beds'],
   {
     $id: 'PropertiesData',
   }
