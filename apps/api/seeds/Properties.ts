@@ -133,12 +133,14 @@ const createReviews = async (dbClient: Knex): Promise<void> => {
   const properties = await dbClient.select('id').from('Property');
   const allReviews = [...reviews.positive, ...reviews.negative, ...reviews.mixed];
   for (let index = 0; index < properties.length; index++) {
+    const userId = users[randomiseInt(users.length)].id;
+    const review = allReviews[randomiseInt(allReviews.length)];
     await dbClient
       .insert({
         id: randomUUID(),
         propertyId: properties[index].id,
-        userId: users[randomiseInt(users.length)].id,
-        comment: allReviews[randomiseInt(allReviews.length)],
+        userId: userId,
+        comment: review,
       })
       .into('Review');
   }
