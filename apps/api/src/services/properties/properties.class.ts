@@ -14,20 +14,13 @@ export class PropertiesService<ServiceParams extends Params = PropertiesParams> 
   PropertiesData,
   ServiceParams,
   PropertiesPatch
-> {
-  createQuery(params: ServiceParams) {
-    const db = super.createQuery(params);
-    db.join('PropertyType as propertyType', 'Property.propertyTypeId', '=', 'propertyType.id').select(
-      'propertyType.name'
-    );
-    return db;
-  }
-}
+> {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
   return {
     paginate: app.get('paginate'),
     Model: app.get('postgresqlClient'),
     name: 'Property',
+    multi: true,
   };
 };
