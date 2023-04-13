@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 import { Knex } from 'knex';
 import { faker } from '@faker-js/faker';
 // import { seedUserImageDir, createIfNotExist, clearImageFolder, seedImages } from './utils/seedImages';
@@ -6,6 +7,8 @@ import { Properties } from '../src/services/properties/properties.schema';
 import { Profiles } from '../src/services/profiles/profiles.schema';
 import { randomUUID } from 'crypto';
 
+import { randomiseInt } from '../src/utils/randomise';
+import reviews from './data/reviews.json';
 // //TODO: move to config
 const userAccounts: Array<UsersData> = Array.from({ length: 10 }).map(() => {
   return {
@@ -82,10 +85,29 @@ const createUsers = async (knex: Knex) => {
     const { id } = await createProfile(knex, user);
     await knex('User').where({ id: user.id }).update('profileId', id);
     if (freeProperties.length) {
-      ownProperty(freeProperties, user);
+      await ownProperty(freeProperties, user);
     } else {
       console.log(`not creating profiles for User ${user.id}} `);
     }
+  }
+};
+
+const createReviews = async (dbClient: Knex): Promise<void> => {
+  const users: Users[] = await dbClient.select('id').from('User');
+  const properties = await dbClient.select('id').from('Property');
+  const allReviews = [...reviews.positive, ...reviews.negative, ...reviews.mixed];
+  for (let index = 0; index < properties.length; index++) {
+    const { id }: UserId = users[randomiseInt(users.length)];
+
+    const review = allReviews[randomiseInt(allReviews.length)];
+    await dbClient
+      .insert({
+        id: randomUUID(),
+        propertyId: properties[index].id,
+        userId: id,
+        comment: review,
+      })
+      .into('Review');
   }
 };
 
@@ -93,4 +115,5 @@ export async function seed(knex: Knex): Promise<void> {
   // Deletes ALL existing entries
   // await knex('User').del();
   await createUsers(knex);
+  await createReviews(knex);
 }
