@@ -57,17 +57,19 @@ export const amenitiesPatchResolver = resolve<Amenities, HookContext>({
 });
 
 // Schema for allowed query properties
-export const amenitiesQueryProperties = Type.Pick(amenitiesSchema, ['name']);
+export const amenitiesQueryProperties = Type.Pick(amenitiesSchema, ['id', 'name']);
 export const amenitiesQuerySchema = Type.Intersect(
   [
     querySyntax(amenitiesQueryProperties),
     Type.Object(
       {
-        id: Type.Object(
-          {
-            $in: Type.Array(Type.String()),
-          },
-          { additionalProperties: false }
+        id: Type.Optional(
+          Type.Object(
+            {
+              $in: Type.Array(Type.String()),
+            },
+            { additionalProperties: false }
+          )
         ),
       },
       { additionalProperties: false }
@@ -75,7 +77,7 @@ export const amenitiesQuerySchema = Type.Intersect(
     // Add additional query properties here
     Type.Object({}, { additionalProperties: false }),
   ],
-  { additionalProperties: false }
+  { $id: 'amenitiesQuery', additionalProperties: false }
 );
 export type AmenitiesQuery = Static<typeof amenitiesQuerySchema>;
 export const amenitiesQueryValidator = getValidator(amenitiesQuerySchema, queryValidator);
