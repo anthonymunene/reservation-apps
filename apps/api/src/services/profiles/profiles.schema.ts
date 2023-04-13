@@ -32,7 +32,6 @@ export const profilesExternalResolver = resolve<Profiles, HookContext>({
   updatedAt: async () => undefined,
   updatedBy: async () => undefined,
   id: async () => undefined,
-  userId: async () => undefined,
 });
 
 // Schema for creating new entries
