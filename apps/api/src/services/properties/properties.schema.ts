@@ -5,7 +5,6 @@ import type { Static } from '@feathersjs/typebox';
 
 import type { HookContext } from '../../declarations';
 import { dataValidator, queryValidator } from '../../validators';
-import { usersDataSchema } from '../users/users.schema';
 import { randomUUID } from 'crypto';
 
 // Main data model schema
@@ -22,44 +21,24 @@ export const propertiesSchema = Type.Object(
     host: Type.String({ format: 'uuid' }),
     propertyTypeId: Type.String(),
     propertyType: Type.String(),
-    ownedBy: Type.String(),
+    ownedBy: Type.Array(Type.String()),
     amenities: Type.Array(Type.String()),
     createdAt: Type.String({ format: 'date-time' }),
     updatedAt: Type.String({ format: 'date-time' }),
     updatedBy: Type.String({ format: 'date-time' }),
   },
-  { $id: 'Properties', additionalProperties: false }
+  { $id: 'Properties', additionalProperties: true }
 );
 export type Properties = Static<typeof propertiesSchema>;
-type Users = Static<typeof usersDataSchema>;
 export const propertiesResolver = resolve<Properties, HookContext>({
   ownedBy: virtual(async (property, context) => {
-    const user: Users = await context.app.service('users').get(property.host);
-    return `${user.id}`;
-  }),
-  amenities: virtual(async (property, context) => {
-    const amenities = await context.app
-      .service('propertyAmenities')
-      .find({
-        query: {
-          propertyId: property.id,
-          $select: ['amenityId'],
-        },
-      })
-      .then(propertyAmenities => propertyAmenities.data.map(propertyAmenity => propertyAmenity.amenityId))
-      .then(async amenityIds => {
-        const amenities = await context.app.service('amenities').find({
-          query: {
-            id: {
-              $in: amenityIds,
-            },
-          },
-        });
-        return amenities;
-      });
-    const propertyAmenities = amenities.data.map(amenity => amenity.name);
-
-    return propertyAmenities;
+    const { data } = await context.app.service('profiles').find({
+      query: {
+        userId: property.host,
+      },
+    });
+    const profile = data.map(result => `${result.firstName} ${result.surname}`);
+    return profile;
   }),
   propertyType: virtual(async (property, context) => {
     const propertyType = await context.app.service('propertyTypes').find({
@@ -84,7 +63,7 @@ export const propertiesExternalResolver = resolve<Properties, HookContext>({
 // Schema for creating new entries
 export const propertiesDataSchema = Type.Pick(
   propertiesSchema,
-  ['id', 'title', 'description', 'city', 'countryCode', 'bedrooms', 'beds'],
+  ['title', 'description', 'city', 'countryCode', 'propertyTypeId', 'host'],
   {
     $id: 'PropertiesData',
   }
@@ -115,18 +94,9 @@ export const propertiesPatchResolver = resolve<Properties, HookContext>({
 
 // Schema for allowed query properties
 export const propertiesQueryProperties = Type.Pick(propertiesSchema, ['id']);
-export const propertiesQuerySchema = Type.Intersect(
-  [
-    querySyntax(propertiesQueryProperties),
-    // Add additional query properties here
-    // Type.Object({
-
-    //   'munene': Type.String()
-    // },
-    // { additionalProperties: false })
-  ],
-  { additionalProperties: false }
-);
+export const propertiesQuerySchema = Type.Intersect([querySyntax(propertiesQueryProperties)], {
+  additionalProperties: false,
+});
 export type PropertiesQuery = Static<typeof propertiesQuerySchema>;
 export const propertiesQueryValidator = getValidator(propertiesQuerySchema, queryValidator);
 export const propertiesQueryResolver = resolve<PropertiesQuery, HookContext>({});
