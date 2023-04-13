@@ -49,12 +49,14 @@ export async function up(knex: Knex): Promise<void> {
       table.uuid('id').unique().primary().notNullable();
       table.uuid('propertyId').unsigned().references('Property.id').onDelete('cascade');
       table.uuid('amenityId').unsigned().references('Amenity.id').onDelete('cascade');
+      table.timestamps(false, true, true);
     })
     .createTable('Review', table => {
       table.uuid('id').unique().primary().notNullable();
       table.uuid('propertyId').unsigned().references('Property.id').onDelete('cascade');
       table.uuid('userId').unsigned().references('User.id').onDelete('cascade');
       table.text('comment');
+      table.timestamps(false, true, true);
     });
 
   await knex.schema.table('User', table => {

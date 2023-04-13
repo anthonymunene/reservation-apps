@@ -61,6 +61,8 @@ export type PropertyAmenity = {
   id: string;
   propertyId: string | null;
   amenityId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type PropertyType = {
@@ -75,6 +77,8 @@ export type Review = {
   propertyId: string | null;
   userId: string | null;
   comment: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type User = {
