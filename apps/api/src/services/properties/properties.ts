@@ -17,6 +17,7 @@ import {
 
 import type { Application } from '../../declarations';
 import { PropertiesService, getOptions } from './properties.class';
+import { insertAmenity } from './properties.hooks';
 
 export * from './properties.class';
 export * from './properties.schema';
@@ -34,6 +35,7 @@ export const properties = (app: Application) => {
   app.service('properties').hooks({
     around: {
       all: [schemaHooks.resolveExternal(propertiesExternalResolver), schemaHooks.resolveResult(propertiesResolver)],
+      create: [insertAmenity],
     },
     before: {
       all: [schemaHooks.validateQuery(propertiesQueryValidator), schemaHooks.resolveQuery(propertiesQueryResolver)],
