@@ -28,5 +28,6 @@ export const getOptions = (app: Application): KnexAdapterOptions => {
     paginate: app.get('paginate'),
     Model: app.get('postgresqlClient'),
     name: 'PropertyAmenity',
+    multi: ['create'],
   };
 };

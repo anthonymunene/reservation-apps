@@ -5,12 +5,14 @@ import type { Static } from '@feathersjs/typebox';
 
 import type { HookContext } from '../../declarations';
 import { dataValidator, queryValidator } from '../../validators';
+import { randomUUID } from 'crypto';
 
 // Main data model schema
 export const propertyAmenitiesSchema = Type.Object(
   {
-    propertyId: Type.String(),
-    amenityId: Type.String(),
+    id: Type.String({ format: 'uuid' }),
+    propertyId: Type.String({ format: 'uuid' }),
+    amenityId: Type.String({ format: 'uuid' }),
     createdAt: Type.String({ format: 'date-time' }),
     updatedAt: Type.String({ format: 'date-time' }),
     updatedBy: Type.String({ format: 'date-time' }),
@@ -34,6 +36,9 @@ export const propertyAmenitiesDataSchema = Type.Pick(propertyAmenitiesSchema, ['
 export type PropertyAmenitiesData = Static<typeof propertyAmenitiesDataSchema>;
 export const propertyAmenitiesDataValidator = getValidator(propertyAmenitiesDataSchema, dataValidator);
 export const propertyAmenitiesDataResolver = resolve<PropertyAmenities, HookContext>({
+  id: async () => {
+    return randomUUID();
+  },
   createdAt: async () => {
     return new Date().toISOString();
   },
