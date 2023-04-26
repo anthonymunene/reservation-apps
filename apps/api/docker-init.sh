@@ -12,11 +12,12 @@ echo "starting docker containers of the $profile profile"
 
 if [ $reset ]; then
   echo "resetting docker volumes/containers"
-  if [ "$(containerExists postgres-knex-$profile)" ]; then
-    docker compose --profile=$profile down
+  if [ "$(containerExists postgres-knex_$profile)" ]; then
+    docker compose --profile=$profile down --remove-orphans
   fi
-  if [ "$(volumeExists api_db_knex-$profile)" ]; then
-    docker volume rm api_db_knex-$profile
+  if [ "$(volumeExists api_db_knex_$profile)" ]; then
+    echo "volumes exists...."
+    docker volume rm api_db_knex_$profile
   fi
   docker compose --profile=$profile up -d
 else
