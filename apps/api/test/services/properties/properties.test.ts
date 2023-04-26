@@ -12,16 +12,20 @@ describe('properties service', () => {
   });
   // TODO: fix resolver error
 
-  // it('creates a new property', async () => {
-  //   const property = await app.service('properties').create({
-  //     id: randomUUID(),
-  //     title: faker.word.adjective(7),
-  //     description: faker.lorem.sentences(),
-  //     city: faker.address.city(),
-  //     countryCode: faker.address.countryCode(),
-  //     bedrooms: faker.helpers.arrayElement([1, 2, 3]),
-  //     beds: faker.helpers.arrayElement([1, 2, 3]),
-  //   });
-  //   assert.ok(property, 'Success Created User');
-  // });
+  it('creates a new property', async () => {
+    const amenities = await app.service('amenities').find();
+    const selectedAmenities = amenities.data.map(amenity => amenity.id);
+
+    const propertyType = await app.service('propertyTypes').find({ query: { $limit: 1 } });
+    const user = await app.service('users').find({ query: { $limit: 1 } });
+    const property = await app.service('properties').create({
+      title: faker.word.adjective(7),
+      description: faker.lorem.sentences(),
+      city: faker.address.city(),
+      host: user.data[0].id,
+      countryCode: faker.address.countryCode(),
+      propertyTypeId: propertyType.data[0].id,
+    });
+    assert.ok(property, 'Success Created User');
+  });
 });

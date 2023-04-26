@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { HookContext, NextFunction } from '../../declarations';
 
 export const insertAmenity = async (context: HookContext, next: NextFunction) => {
@@ -10,27 +8,11 @@ export const insertAmenity = async (context: HookContext, next: NextFunction) =>
     // Code before `await next()` runs before the main function
     context.data = data;
     await next();
-    const amenityData = amenities.map(amenity => ({
+    const amenityData = amenities.map((amenity: any) => ({
       propertyId: context?.result?.id,
       amenityId: amenity,
     }));
 
-    const propertyAmenities = await context.app.service('propertyAmenities').create(amenityData);
-    if (context.result) {
-      const amenityIds = propertyAmenities.map(propertyAmenity => propertyAmenity.amenityId);
-      const amenityNames = await context.app
-        .service('amenities')
-        .find({
-          query: {
-            id: {
-              $in: amenityIds,
-            },
-            $select: ['name'],
-          },
-        })
-        .then(result => result.data.map(result => result.name));
-      const { result } = context;
-      context.result = { ...result, ...{ amenities: amenityNames } };
-    }
+    await context.app.service('propertyAmenities').create(amenityData);
   }
 };
