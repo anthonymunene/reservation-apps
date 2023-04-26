@@ -12,7 +12,7 @@ export interface PropertiesParams extends KnexAdapterParams<PropertiesQuery> {}
 export class PropertiesService<ServiceParams extends Params = PropertiesParams> extends KnexService<
   Properties,
   PropertiesData,
-  ServiceParams,
+  PropertiesParams,
   PropertiesPatch
 > {}
 
