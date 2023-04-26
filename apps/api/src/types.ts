@@ -2,23 +2,23 @@
 // Do not touch them, or risk, your modifications being lost.
 
 export enum Table {
-  Amenity = "Amenity",
-  Profile = "Profile",
-  Property = "Property",
-  PropertyAmenity = "PropertyAmenity",
-  PropertyType = "PropertyType",
-  Review = "Review",
-  User = "User",
+  Amenity = 'Amenity',
+  Profile = 'Profile',
+  Property = 'Property',
+  PropertyAmenity = 'PropertyAmenity',
+  PropertyType = 'PropertyType',
+  Review = 'Review',
+  User = 'User',
 }
 
 export type Tables = {
-  "Amenity": Amenity,
-  "Profile": Profile,
-  "Property": Property,
-  "PropertyAmenity": PropertyAmenity,
-  "PropertyType": PropertyType,
-  "Review": Review,
-  "User": User,
+  Amenity: Amenity;
+  Profile: Profile;
+  Property: Property;
+  PropertyAmenity: PropertyAmenity;
+  PropertyType: PropertyType;
+  Review: Review;
+  User: User;
 };
 
 export type Amenity = {
@@ -90,4 +90,3 @@ export type User = {
   updatedAt: Date;
   lastLogin: Date | null;
 };
-
