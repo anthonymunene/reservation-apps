@@ -1,94 +1,61 @@
-import { component$, Resource } from "@builder.io/qwik";
-import { RequestHandler, useEndpoint } from "@builder.io/qwik-city";
+import { component$ } from '@builder.io/qwik';
+import { routeLoader$ } from '@builder.io/qwik-city';
+import { api } from '../../client';
+
+export const useGetProperties = routeLoader$(async () => {
+  const { data } = await api.service('properties').find({ query: { $limit: -1 } });
+  return data;
+});
 
 export default component$(() => {
-  const propertyData = useEndpoint<typeof onGet>();
-
+  const properties = useGetProperties();
   return (
-    <div>
-      <Resource
-        value={propertyData}
-        onResolved={(propertys) => {
-          return (
-            <>
-              <ul>
-                {propertys.data.map((property) => (
-                  <li>
-                    <div>
-                      <p><img src={`images/properties/${property.defaultImage}`} /></p>
-                    </div>
-                    <div>
-                      <p>{property.title}</p>
-                    </div>
-                    <div>
-                      <p>{property.description} </p>
-                    </div>
-                    <div>
-                      <p>{property.city}</p>
-                    </div>
-                    <div>
-                      <p>{property.country}</p>
-                    </div>
-                    <div>
-                      <p>{property.bedrooms}</p>
-                    </div>
-                    <div>
-                      <p>{property.beds}</p>
-                    </div>
-                    <div>
-                      <p>{property.baths}</p>
-                    </div>
-                    <div>
-                      <ul>
-                        {property.amenities.map((amenity) => (
-                          <li>
-                            <p>{amenity}</p>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div>
-                      <p>{property.bedrooms}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </>
-          );
-        }}
-      />
-    </div>
+    <>
+      <ul>
+        {/* {properties.value.map((property, key) => (
+          <li key={key}>
+            <p>{property.title}</p>
+            <p>{property.description}</p>
+          </li>
+        ))} */}
+      </ul>
+    </>
   );
 });
 
-export const onGet: RequestHandler<EndpointData> = async () => {
+export const fetchUsers = routeLoader$(async () => {
   try {
-    const properties = await fetch("http://localhost:3030/properties").then(
-      (response) => response.json()
-    );
-    return properties;
+    const users = await fetch('http://localhost:3030/users').then(response => response.json());
+    return users;
   } catch (error) {
     console.log(error);
   }
-};
+});
 
-interface property {
+interface UserProperties {
+  [index: number]: { id: number };
+}
+
+interface UserProfile {
   id: number;
-  title: string;
-  description: string;
-  city: string;
-  country: string;
-  bedrooms: number;
-  beds: number;
-  baths: number;
-  entirePlace: boolean;
-  defaultImage: string;
-  amenities: Array<string>;
+  bio: string;
+  defaultProfilePic: string;
+  profilePic: string;
+  accountId: string;
+  superHost: boolean;
+}
+interface User {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  properties: UserProperties;
+  profile: UserProfile;
 }
 
 interface EndpointData {
   total: number;
   skip: number;
   limit: number;
-  data: Array<property>;
+  data: Array<User>;
 }

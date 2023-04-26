@@ -1,48 +1,43 @@
-import { component$, Resource } from "@builder.io/qwik";
-import { RequestHandler, useEndpoint } from "@builder.io/qwik-city";
+import { component$ } from '@builder.io/qwik';
+import { routeLoader$ } from '@builder.io/qwik-city';
+import { api } from '../../client';
+
+export const getUsers = routeLoader$(async requestEvent => {
+  const queryBuilder = requestEvent.query;
+  const defaultLimit = queryBuilder.get('limit') ? queryBuilder.get('limit') : requestEvent.env.get('LIMIT');
+  
+  const { data } = await api.service('users').find({ query: { $limit: Number(defaultLimit) } });
+
+  return data;
+});
 
 export default component$(() => {
-  const userData = useEndpoint<typeof onGet>();
-
+  const users = getUsers();
   return (
-    <div>
-      <Resource
-        value={userData}
-        onResolved={(users) => {
-          return (
-            <>
-              <ul>
-                {users.data.map((user) => (
-                  <li>
-                    <p>{user.id}</p>
-                    <p>{user.firstName}</p>
-                    <p>{user.lastName} </p>
-                    <p>{user.profile.bio}</p>
-                    <p>
-                      <img src={`images/users/${user.profile.defaultProfilePic}`} />
-                     </p>
-                    <p>{user.profile.superHost}</p>
-                  </li>
-                ))}
-              </ul>
-            </>
-          );
-        }}
-      />
+    <div class={'something'}>
+      <ul>
+        {users.value.map((user, index) => (
+          <li key={index}>
+            <p>{user.email}</p>
+            <p>{user.profile.firstName}</p>
+            <p>{user.profile.surname}</p>
+            <p>{user.profile.bio}</p>
+            <p></p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 });
 
-export const onGet: RequestHandler<EndpointData> = async () => {
+export const fetchUsers = routeLoader$(async () => {
   try {
-    const users = await fetch("http://localhost:3030/users").then((response) =>
-      response.json()
-    );
+    const users = await fetch('http://localhost:3030/users').then(response => response.json());
     return users;
   } catch (error) {
     console.log(error);
   }
-};
+});
 
 interface UserProperties {
   [index: number]: { id: number };
@@ -51,7 +46,7 @@ interface UserProperties {
 interface UserProfile {
   id: number;
   bio: string;
-  defaultProfilePic: string
+  defaultProfilePic: string;
   profilePic: string;
   accountId: string;
   superHost: boolean;
