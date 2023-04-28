@@ -5,11 +5,7 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:qwik/recommended',
-  ],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'plugin:qwik/recommended'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     tsconfigRootDir: __dirname,
@@ -38,4 +34,5 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error'],
     '@typescript-eslint/consistent-type-imports': 'warn',
   },
+  ignorePatterns: ['playwright.config.ts'],
 };
