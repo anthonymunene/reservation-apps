@@ -23,7 +23,7 @@ export default component$(() => {
   );
 });
 
-export const fetchUsers = routeLoader$(async () => {
+export const useFetchUsers = routeLoader$(async () => {
   try {
     const users = await fetch('http://localhost:3030/users').then(response => response.json());
     return users;
