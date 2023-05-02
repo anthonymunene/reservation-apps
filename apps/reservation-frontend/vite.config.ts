@@ -53,5 +53,8 @@ export default defineConfig(({ mode }) => {
         'Cache-Control': 'public, max-age=600',
       },
     },
+    server: {
+      port: process.env.PORT,
+    },
   };
 });

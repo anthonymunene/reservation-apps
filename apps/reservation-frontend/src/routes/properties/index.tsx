@@ -3,7 +3,7 @@ import { routeLoader$ } from '@builder.io/qwik-city';
 import { api } from '../../client';
 
 export const useGetProperties = routeLoader$(async () => {
-  const { data } = await api.service('properties').find({ query: { $limit: -1 } });
+  const { data } = await api.service('properties').find();
   return data;
 });
 
