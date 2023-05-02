@@ -23,6 +23,7 @@ export const propertyTypesValidator = getValidator(propertyTypesSchema, dataVali
 export const propertyTypesResolver = resolve<PropertyTypes, HookContext>({});
 
 export const propertyTypesExternalResolver = resolve<PropertyTypes, HookContext>({
+  id: async () => undefined,
   createdAt: async () => undefined,
   updatedAt: async () => undefined,
   updatedBy: async () => undefined,
@@ -57,7 +58,7 @@ export const propertyTypesPatchResolver = resolve<PropertyTypes, HookContext>({
 });
 
 // Schema for allowed query properties
-export const propertyTypesQueryProperties = Type.Pick(propertyTypesSchema, ['id', 'name']);
+export const propertyTypesQueryProperties = Type.Pick(propertyTypesSchema, ['id']);
 export const propertyTypesQuerySchema = Type.Intersect(
   [
     querySyntax(propertyTypesQueryProperties),

@@ -1,4 +1,3 @@
-//@ts-nocheck
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import { resolve, virtual } from '@feathersjs/schema';
 import { Type, getDataValidator, getValidator, querySyntax } from '@feathersjs/typebox';
@@ -7,8 +6,6 @@ import type { Static } from '@feathersjs/typebox';
 import type { HookContext } from '../../declarations';
 import { dataValidator, queryValidator } from '../../validators';
 import { randomUUID } from 'crypto';
-import { amenitiesSchema } from '../amenities/amenities.schema';
-import { propertyTypesSchema } from '../propertyTypes/propertyTypes.schema';
 
 // Main data model schema
 export const propertiesSchema = Type.Object(
@@ -23,9 +20,9 @@ export const propertiesSchema = Type.Object(
     images: Type.Array(Type.Object({ image: Type.String() })),
     host: Type.String({ format: 'uuid' }),
     propertyTypeId: Type.String(),
-    propertyType: Type.Ref(propertyTypesSchema),
-    ownedBy: Type.Array(Type.String()),
-    amenities: Type.Array(Type.Ref(amenitiesSchema)),
+    propertyType: Type.String(),
+    ownedBy: Type.String(),
+    amenities: Type.Array(Type.String()),
     createdAt: Type.String({ format: 'date-time' }),
     updatedAt: Type.String({ format: 'date-time' }),
     updatedBy: Type.String({ format: 'date-time' }),
@@ -40,22 +37,19 @@ export const propertiesResolver = resolve<Properties, HookContext>({
         userId: property.host,
       },
     });
-    const profile = data.map(result => `${result.firstName} ${result.surname}`);
-    return profile;
-  }),
-  propertyType: virtual(async (property, context) => {
-    const propertyType = await context.app
-      .service('propertyTypes')
-      .find({
-        query: {
-          id: property.propertyTypeId,
-        },
-      })
-      .then(result => {
-        return result.data.map(result => result.name);
-      });
 
-    return propertyType;
+    const profile = data.map(result => `${result.firstName} ${result.surname}`);
+    return profile.toString();
+  }),
+
+  propertyType: virtual(async (property, context) => {
+    const propertyType = await context.app.service('propertyTypes').find({
+      query: {
+        id: property.propertyTypeId,
+      },
+    });
+
+    return propertyType.data[0].name;
   }),
   amenities: virtual(async (property, context) => {
     const propertyAmenities = await context.app.service('propertyAmenities').find({
@@ -65,16 +59,10 @@ export const propertiesResolver = resolve<Properties, HookContext>({
       },
     });
 
-    // const propertyAmenityIds = propertyAmenities.data.map(propertyAmenity => propertyAmenity.amenityId);
-    // TODO: figure out why the $in filter method errors
-    // const amenities = await context.app.service('amenities').find({ query: { id: { $in: propertyAmenityIds } } });
+    const propertyAmenityIds = propertyAmenities.data.map(propertyAmenity => propertyAmenity.amenityId);
+    const amenities = await context.app.service('amenities').find({ query: { id: { $in: propertyAmenityIds } } });
 
-    const amenities = await Promise.all(
-      propertyAmenities.data.map(amenity => context.app.service('amenities').find({ query: { id: amenity.amenityId } }))
-    ).then(result => {
-      return result.map(result => result.data[0].name);
-    });
-    return amenities;
+    return amenities.data.map(amenity => amenity.name);
   }),
 });
 
