@@ -11,7 +11,6 @@ import { logError } from './hooks/log-error';
 import { postgresql } from './postgresql';
 import { services } from './services/index';
 import { channels } from './channels';
-import { disablePagination } from 'feathers-hooks-common';
 
 const app: Application = express(feathers());
 
@@ -45,7 +44,7 @@ app.hooks({
   around: {
     all: [logError],
   },
-  before: { find: disablePagination() },
+  before: {},
   after: {},
   error: {},
 });
