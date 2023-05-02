@@ -23,6 +23,7 @@ export const amenitiesValidator = getValidator(amenitiesSchema, dataValidator);
 export const amenitiesResolver = resolve<Amenities, HookContext>({});
 
 export const amenitiesExternalResolver = resolve<Amenities, HookContext>({
+  id: async () => undefined,
   createdAt: async () => undefined,
   updatedAt: async () => undefined,
   updatedBy: async () => undefined,
