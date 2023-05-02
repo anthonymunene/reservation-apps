@@ -25,9 +25,9 @@ export default component$(() => {
     <div class={'something'}>
       <div>
         <Form id="add-user" action={login}>
-          <input type="email" name="email" placeholder="email" />
-          <input type="password" name="password" />
-          <button type="submit">Save</button>
+          <input data-testid="email" type="email" name="email" placeholder="email" />
+          <input data-testid="password"  type="password" name="password" />
+          <button data-testid="submit" type="submit">Save</button>
         </Form>
       </div>
       <ul id="users:list">
