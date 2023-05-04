@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('user', () => {
+test.describe('users', () => {
   let form;
   let email;
   let password;
@@ -10,7 +10,7 @@ test.describe('user', () => {
     form = page.locator('#add-user');
     email = form.getByTestId('email');
     password = form.getByTestId('password');
-    userList = page.locator('#users:list');
+    userList = page.locator('#users-list');
   });
   test.afterEach(async ({ page }) => {
     form = null;
@@ -19,10 +19,10 @@ test.describe('user', () => {
     userList = null;
   });
 
-  test('adding a user ', async ({ page }) => {
-    await page.getByTestId('email').fill('mail.com');
-    await page.getByTestId('password').fill('password');
-    await expect(await email.inputValue()).toContain('mail.com');
-    await expect(await password.inputValue()).toContain('password');
+  test('list users ', async ({ page }) => {
+
+    //not returning the count
+    const userListcount = await page.getByRole('listitem').count();
+    await expect(await page.getByRole('listitem').count()).toBeGreaterThan(1)
   });
 });

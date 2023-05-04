@@ -1,5 +1,5 @@
 import { component$ } from '@builder.io/qwik';
-import { Form, routeLoader$, routeAction$ } from '@builder.io/qwik-city';
+import {routeLoader$, routeAction$ } from '@builder.io/qwik-city';
 import { api } from '../../client';
 
 export const useUserUpdate = routeLoader$(async requestEvent => {
@@ -20,17 +20,9 @@ export const useLoginAction = routeAction$(async (data, ctx) => {
 
 export default component$(() => {
   const users = useUserUpdate();
-  const login = useLoginAction();
   return (
     <div class={'something'}>
-      <div>
-        <Form id="add-user" action={login}>
-          <input data-testid="email" type="email" name="email" placeholder="email" />
-          <input data-testid="password"  type="password" name="password" />
-          <button data-testid="submit" type="submit">Save</button>
-        </Form>
-      </div>
-      <ul id="users:list">
+      <ul id="userlist">
         {users.value.map((user, index) => (
           <li key={index}>
             <p>{user.email}</p>
