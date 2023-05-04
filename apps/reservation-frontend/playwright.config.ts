@@ -37,7 +37,8 @@ const config: PlaywrightTestConfig = {
 
   webServer: {
     command: 'npm run preview',
-    port: 4173,
+    url:`${process.env.PUBLIC_BASE_URL}:${process.env.PORT}`,
+    reuseExistingServer: !process.env.CI
   },
 };
 export default defineConfig(config);
