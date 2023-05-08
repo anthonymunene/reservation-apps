@@ -147,11 +147,6 @@ const createReviews = async (dbClient: Knex): Promise<void> => {
 };
 
 export async function seed(knex: Knex): Promise<void> {
-  // Deletes ALL existing entries
-  // await knex('Amenity').del();
-  // await knex('PropertyType').del();
-  // await knex('Property').del();
-  // await knex('PropertyAmenity').del();
   await createAmenities(knex);
   await createPropertyTypes(knex);
   await createProperties(knex);

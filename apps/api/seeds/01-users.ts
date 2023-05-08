@@ -115,5 +115,4 @@ export async function seed(knex: Knex): Promise<void> {
   // Deletes ALL existing entries
   // await knex('User').del();
   await createUsers(knex);
-  await createReviews(knex);
 }
