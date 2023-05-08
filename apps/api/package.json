@@ -36,13 +36,13 @@
   "main": "lib/client",
   "scripts": {
     "dev": "nodemon -x ts-node src/index.ts",
-    "dev:reset": "npm run docker:dev && npm run migrate && npm run seed && npm run lint && npm run dev",
+    "dev:reset": "npm run docker:dev -- dev true && npm run migrate && npm run seed && npm run dev",
     "compile": "shx rm -rf lib/ && tsc",
     "start": "node lib/",
     "lint": "npx eslint src/. test/. --config ../../.eslintrc.json",
     "prettier-format": "npx prettier --config ../../.prettierrc \"src/**/*.ts\" \"test/**/*.ts\"  --write",
     "mocha": "cross-env NODE_ENV=test mocha test/ --require ts-node/register --recursive --extension .ts --watch --watch-files src/**/*.ts,test/**/*.ts",
-    "test": "export NODE_ENV=test; npm run docker:test && npm run migrate && npm run seed && npm run mocha",
+    "test": "export NODE_ENV=test; npm run docker:test -- test true && npm run migrate && npm run seed && npm run mocha",
     "bundle:client": "npm run compile && npm pack --pack-destination ./public",
     "migrate": "knex migrate:latest && ts-node generate-types.ts",
     "migrate:make": "knex migrate:make",
@@ -52,8 +52,8 @@
     "migrate:list": "knex migrate:list",
     "migrate:down": "knex migrate:down",
     "generate:types": "ts-node generate-types.ts",
-    "docker:dev": "./docker-init.sh dev true",
-    "docker:test": "./docker-init.sh test true"
+    "docker:dev": "./docker-init.sh",
+    "docker:test": "./docker-init.sh"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
