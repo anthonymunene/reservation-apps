@@ -1,7 +1,7 @@
 import { component$, Slot } from '@builder.io/qwik';
 import { routeLoader$ } from '@builder.io/qwik-city';
-
-import Header from '~/components/starter/header/header';
+import type { DocumentHead } from '@builder.io/qwik-city';
+import Header from '~/components/sidebar';
 import Footer from '~/components/starter/footer/footer';
 
 export const useServerTimeLoader = routeLoader$(() => {
@@ -12,16 +12,20 @@ export const useServerTimeLoader = routeLoader$(() => {
 
 export default component$(() => {
   return (
-    <div class="page">
-      <main>
-        <Header />
-        <Slot />
-      </main>
-      <div class="section dark">
-        <div class="container">
-          <Footer />
-        </div>
+    <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <Header />
+      <div class="lg:pl-72">
+        <main class="py-10">
+          <Slot />
+        </main>
+        <Footer />
       </div>
     </div>
   );
 });
+
+export const head: DocumentHead = ({ head }) => {
+  return {
+    title: `Reservations - ${head.title}`,
+  };
+};

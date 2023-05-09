@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-import  defaultTheme from  'tailwindcss/defaultTheme';
+import defaultTheme from 'tailwindcss/defaultTheme';
 module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
@@ -12,5 +12,5 @@ module.exports = {
   container: {
     center: true,
   },
-  plugins: [require('@tailwindcss/forms')],
+  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/aspect-ratio')],
 };

@@ -41,19 +41,21 @@ export const TextInput = component$(({ label, value, error, ...props }: TextInpu
   return (
     <div class={clsx('px-8 lg:px-10', props.class)}>
       <InputLabel name={name} label={label} required={required} />
-      <input
-        {...props}
-        class={clsx(
-          'h-14 w-full rounded-2xl border-2 bg-white px-5 outline-none placeholder:text-slate-500 dark:bg-gray-900 md:h-16 md:text-lg lg:h-[70px] lg:px-6 lg:text-xl',
-          error
-            ? 'border-red-600/50 dark:border-red-400/50'
-            : 'border-slate-200 hover:border-slate-300 focus:border-sky-600/50 dark:border-slate-800 dark:hover:border-slate-700 dark:focus:border-sky-400/50'
-        )}
-        id={name}
-        value={input.value}
-        aria-invalid={!!error}
-        aria-errormessage={`${name}-error`}
-      />
+      <div class="mt-2">
+        <input
+          {...props}
+          class={clsx(
+            'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6',
+            error
+              ? 'focus:ring-inset focus:ring-red-500 '
+              : 'border-slate-200 hover:border-slate-300 focus:border-sky-600/50 dark:border-slate-800 dark:hover:border-slate-700 dark:focus:border-sky-400/50'
+          )}
+          id={name}
+          value={input.value}
+          aria-invalid={!!error}
+          aria-errormessage={`${name}-error`}
+        />
+      </div>
       <InputError name={name} error={error} />
     </div>
   );

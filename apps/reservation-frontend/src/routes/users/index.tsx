@@ -1,6 +1,7 @@
 import { component$ } from '@builder.io/qwik';
-import {routeLoader$, routeAction$ } from '@builder.io/qwik-city';
+import { routeLoader$, routeAction$ } from '@builder.io/qwik-city';
 import { api } from '../../client';
+import type { DocumentHead } from '@builder.io/qwik-city';
 
 export const useUserUpdate = routeLoader$(async requestEvent => {
   const queryBuilder = requestEvent.query;
@@ -21,18 +22,33 @@ export const useLoginAction = routeAction$(async (data, ctx) => {
 export default component$(() => {
   const users = useUserUpdate();
   return (
-    <div class={'something'}>
-      <ul id="userlist">
+    <div class="px-4 sm:px-6 lg:px-8">
+      <ul role="list" id="userlist" class="divide-y divide-gray-100">
         {users.value.map((user, index) => (
-          <li key={index}>
-            <p>{user.email}</p>
-            <p>{user.profile.firstName}</p>
-            <p>{user.profile.surname}</p>
-            <p>{user.profile.bio}</p>
-            <p></p>
+          <li class="flex justify-between gap-x-6 py-5" key={index}>
+            <div class="flex gap-x-4">
+              <img
+                class="h-12 w-12 flex-none rounded-full bg-gray-50"
+                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                alt=""
+              ></img>
+              <div>
+                <p class="text-sm font-semibold leading-6 text-gray-900">
+                  {user.profile.firstName} {user.profile.surname}
+                </p>
+                <p class="mt-1 truncate text-xs leading-5 text-gray-500">{user.email}</p>
+                <p class="hidden">{user.profile.bio}</p>
+              </div>
+            </div>
           </li>
         ))}
       </ul>
     </div>
   );
 });
+
+export const head: DocumentHead = () => {
+  return {
+    title: `users`,
+  };
+};

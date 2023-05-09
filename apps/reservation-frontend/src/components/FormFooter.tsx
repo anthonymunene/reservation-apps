@@ -15,9 +15,9 @@ type FormFooterProps = {
 export function FormFooter({ of: formStore, resetAction, form }: FormFooterProps) {
   const ResetForm = resetAction ? Form : Fragment;
   return (
-    <footer class="flex space-x-6 px-8 md:space-x-8 lg:hidden">
-      <ActionButton variant="primary" label="Submit" type="submit" form={form} />
-      <ResetForm action={resetAction!}>
+    <footer class="flex space-x-6 px-8 md:space-x-8">
+      <ActionButton variant="primary" label="Sign in" type="submit" form={form} />
+      {/* <ResetForm action={resetAction!}>
         <ActionButton
           variant="secondary"
           label="Reset"
@@ -25,7 +25,7 @@ export function FormFooter({ of: formStore, resetAction, form }: FormFooterProps
           preventdefault:click
           onClick$={() => reset(formStore)}
         />
-      </ResetForm>
+      </ResetForm> */}
     </footer>
   );
 }
