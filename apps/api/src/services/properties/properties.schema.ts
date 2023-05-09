@@ -43,23 +43,28 @@ export const propertiesResolver = resolve<Properties, HookContext>({
   }),
 
   propertyType: virtual(async (property, context) => {
-    const propertyType = await context.app.service('propertyTypes').find({
-      query: {
-        id: property.propertyTypeId,
-      },
-    });
+    const propertyType = await context.app
+      .service('propertyTypes')
+      .find({
+        paginate: false,
+        query: {
+          id: property.propertyTypeId,
+        },
+      })
+      .then(data => data[0].name);
 
-    return propertyType.data[0].name;
+    return propertyType;
   }),
   amenities: virtual(async (property, context) => {
     const propertyAmenities = await context.app.service('propertyAmenities').find({
+      paginate: false,
       query: {
         propertyId: property.id,
         $select: ['amenityId'],
       },
     });
 
-    const propertyAmenityIds = propertyAmenities.data.map(propertyAmenity => propertyAmenity.amenityId);
+    const propertyAmenityIds = propertyAmenities.map(propertyAmenity => propertyAmenity.amenityId);
     const amenities = await context.app.service('amenities').find({ query: { id: { $in: propertyAmenityIds } } });
 
     return amenities.data.map(amenity => amenity.name);
@@ -82,6 +87,7 @@ export const propertiesDataSchema = Type.Pick(
     $id: 'PropertiesData',
   }
 );
+
 export type PropertiesData = Static<typeof propertiesDataSchema>;
 export const propertiesDataValidator = getDataValidator(propertiesDataSchema, dataValidator);
 export const propertiesDataResolver = resolve<Properties, HookContext>({
@@ -102,6 +108,7 @@ export const propertiesPatchResolver = resolve<Properties, HookContext>({
   updatedAt: async () => {
     return new Date().toISOString();
   },
+
   updatedBy: async (_value, _document, context: HookContext) => context.params.user.id,
 });
 
