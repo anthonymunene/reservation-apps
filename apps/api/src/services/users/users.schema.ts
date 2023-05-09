@@ -25,23 +25,14 @@ export const usersSchema = Type.Object(
 export type Users = Static<typeof usersSchema>;
 export const usersResolver = resolve<Users, HookContext>({
   profile: virtual(async (user, context) => {
-    const { data } = await context.app.service('profiles').find({
+    const data = await context.app.service('profiles').find({
+      paginate: false,
       query: {
         userId: user.id,
       },
     });
     const [profile] = data.map(profile => profile);
     return profile;
-  }),
-  profileId: virtual(async (user, context) => {
-    const { data } = await context.app.service('profiles').find({
-      query: {
-        $select: ['id'],
-        userId: user.id,
-      },
-    });
-    const [profileId] = data.map(profile => profile.id);
-    return profileId;
   }),
 });
 
@@ -55,7 +46,7 @@ export const usersExternalResolver = resolve<Users, HookContext>({
 });
 
 // Schema for creating new entries
-export const usersDataSchema = Type.Pick(usersSchema, [ 'email', 'password'], {
+export const usersDataSchema = Type.Pick(usersSchema, ['email', 'password'], {
   $id: 'UsersData',
 });
 export type UsersData = Static<typeof usersDataSchema>;
