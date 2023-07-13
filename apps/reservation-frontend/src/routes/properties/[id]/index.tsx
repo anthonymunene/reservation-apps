@@ -1,11 +1,11 @@
 import { component$ } from '@builder.io/qwik';
-import { routeLoader$, routeAction$, z } from '@builder.io/qwik-city';
+import { routeLoader$, z } from '@builder.io/qwik-city';
 import { api } from '../../../client';
 import type { DocumentHead } from '@builder.io/qwik-city';
 import { paths } from '~/utils/paths';
-import { DetailCard } from '../../../components/cards/user/detailed-description';
+import { DetailCard } from '../../../components/cards/properties/detailed-description';
 
-export const useUserUpdate = routeLoader$(async requestEvent => {
+export const usePropertyUpdate = routeLoader$(async requestEvent => {
   const { params } = requestEvent;
   const parseResult = z.object({ id: z.coerce.string().uuid() }).safeParse(params);
 
@@ -13,10 +13,10 @@ export const useUserUpdate = routeLoader$(async requestEvent => {
     throw requestEvent.redirect(302, paths.notFound);
   }
 
-  const userId = parseResult.data.id;
-  const { data } = await api.service('users').find({
+  const propertyId = parseResult.data.id;
+  const { data } = await api.service('properties').find({
     query: {
-      id: userId,
+      id: propertyId,
     },
   });
 
@@ -24,11 +24,11 @@ export const useUserUpdate = routeLoader$(async requestEvent => {
 });
 
 export default component$(() => {
-  const user = useUserUpdate();
+  const property = usePropertyUpdate();
   return (
     <>
       <div class="px-4 sm:px-6 lg:px-8">
-      <DetailCard user={user.value} />
+        <DetailCard property={property.value} />
         {/* <div role="list" id="userlist" class="divide-y divide-gray-100">
         <div class="flex justify-between gap-x-6 py-5">
         <div class="flex gap-x-4">
