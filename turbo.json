@@ -24,30 +24,12 @@
       ],
       "outputs": []
     },
-    "dev:api:docker": {
-      "cache": false
-    },
-    "dev:api": {
-      "dependsOn": [
-        "dev:api:docker"
-      ],
-      "cache": false
-    },
     "dev": {
-      "dependsOn": [
-        "dev:api:docker",
-        "dev:api"
-      ],
       "cache": false
     },
-    "dev:seed": {
-      "dependsOn": [
-        "dev:api:docker:seed",
-        "dev:api"
-      ],
+    "dev:reset": {
       "cache": false
     },
-
     "clean": {
       "cache": false
     }
