@@ -4,7 +4,7 @@ import { KnexService } from '@feathersjs/knex';
 import type { KnexAdapterParams, KnexAdapterOptions } from '@feathersjs/knex';
 
 import type { Application } from '../../declarations';
-import type { Properties, PropertiesData, PropertiesPatch, PropertiesQuery } from './properties.schema';
+import { Properties, PropertiesData, PropertiesPatch, PropertiesQuery } from './properties.schema';
 export type { Properties, PropertiesData, PropertiesPatch, PropertiesQuery };
 export interface PropertiesParams extends KnexAdapterParams<PropertiesQuery> {}
 
@@ -12,7 +12,7 @@ export interface PropertiesParams extends KnexAdapterParams<PropertiesQuery> {}
 export class PropertiesService<ServiceParams extends Params = PropertiesParams> extends KnexService<
   Properties,
   PropertiesData,
-  PropertiesParams,
+  ServiceParams,
   PropertiesPatch
 > {}
 
