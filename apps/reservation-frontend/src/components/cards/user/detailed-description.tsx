@@ -1,7 +1,17 @@
 import { component$ } from '@builder.io/qwik';
+//@ts-ignore
+import { getClientService } from '@kalisio/feathers-s3';
+import { io } from 'socket.io-client';
+import { feathers } from '@feathersjs/client';
+import { z } from 'zod';
+import { type InitialValues, useForm, zodForm$, Form, Field } from '@modular-forms/qwik';
+import { FileInput } from '~/components';
+
+
 type Props = {
   user: {
     email: string;
+    id: string;
     profile: {
       firstName: string;
       surname: string;
@@ -11,7 +21,8 @@ type Props = {
 };
 
 export const DetailCard = component$((props: Props) => {
-  const {user} = props;
+  const { user } = props;
+  console.log(props.user)
   return (
     <div class="overflow-hidden bg-white shadow sm:rounded-lg">
       <div class="px-4 py-6 sm:px-6">
@@ -36,6 +47,39 @@ export const DetailCard = component$((props: Props) => {
             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{user.email}</dd>
             <dt class="text-sm font-medium text-gray-900">About</dt>
             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{user.profile.bio}</dd>
+          </div>
+        </dl>
+        <dl class="divide-y divide-gray-100">
+          <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <Form id="user-profile-upload" class="profile-upload">
+              <Field name="profile-upload" type='File'>
+                {(field, props) => (
+                 
+                  <FileInput
+                    {...props}
+                    value={field.value}
+                  error={field.error}
+                  label="Password"
+                  // data-testid="p"
+                  />
+                )}
+              </Field>
+
+            </Form>
+            <input id="file" type="file" />
+            <button
+              type="button"
+              class="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Upload file
+              <svg class="-mr-0.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
           </div>
         </dl>
       </div>
