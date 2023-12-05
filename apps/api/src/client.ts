@@ -73,5 +73,6 @@ export const createClient = <Configuration = any>(
   client.configure(amenitiesClient);
   client.configure(propertyAmenitiesClient);
   client.configure(propertyTypesClient);
+  // client.configure(uploadsClient);
   return client;
 };

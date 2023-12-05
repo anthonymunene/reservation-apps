@@ -10,7 +10,6 @@ import { randomiseArray, randomiseInt } from '../src/utils/randomise';
 import { Properties } from '../src/services/properties/properties.schema';
 import { Amenity, PropertyType } from '../src/types';
 import { randomUUID } from 'crypto';
-import reviews from './data/reviews.json';
 
 //TYPES-TO-COLLATE:
 type PropertyId = Pick<Properties, 'id'>;
@@ -128,27 +127,9 @@ export const createAmenities = async (dbClient: Knex): Promise<void> => {
   return amenities.length ? amenities : await dbClient.insert(amenityData, ['id']).into('Amenity');
 };
 
-const createReviews = async (dbClient: Knex): Promise<void> => {
-  const users = await dbClient.select('id').from('User');
-  const properties = await dbClient.select('id').from('Property');
-  const allReviews = [...reviews.positive, ...reviews.negative, ...reviews.mixed];
-  for (let index = 0; index < properties.length; index++) {
-    const userId = users[randomiseInt(users.length)].id;
-    const review = allReviews[randomiseInt(allReviews.length)];
-    await dbClient
-      .insert({
-        id: randomUUID(),
-        propertyId: properties[index].id,
-        userId: userId,
-        comment: review,
-      })
-      .into('Review');
-  }
-};
 
 export async function seed(knex: Knex): Promise<void> {
   await createAmenities(knex);
   await createPropertyTypes(knex);
   await createProperties(knex);
-  await createReviews(knex);
 }

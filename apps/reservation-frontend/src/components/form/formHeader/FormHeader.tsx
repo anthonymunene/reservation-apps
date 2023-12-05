@@ -1,7 +1,7 @@
 import { Fragment } from '@builder.io/qwik';
 import { type ActionStore, Form } from '@builder.io/qwik-city';
 import { reset, type FormStore } from '@modular-forms/qwik';
-import { ActionButton } from './ActionButton';
+import { ActionButton } from '../../ActionButton';
 
 type FormHeaderProps = {
   of: FormStore<any, any>;

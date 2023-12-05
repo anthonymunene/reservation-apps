@@ -90,3 +90,4 @@ export type User = {
   updatedAt: Date;
   lastLogin: Date | null;
 };
+

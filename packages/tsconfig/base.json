@@ -2,22 +2,15 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Default",
   "compilerOptions": {
-    "allowJs": true,
-    "composite": false,
-    "declaration": true,
-    "declarationMap": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "inlineSources": false,
-    "moduleResolution": "node",
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "preserveWatchOutput": true,
-    "skipLibCheck": true,
+    "lib": [
+      "es2023"
+    ],
+    "module": "Node16",
+    "target": "es2022",
     "strict": true,
-    "resolveJsonModule": true
-  },
-  "exclude": [
-    "node_modules"
-  ]
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "Node16"
+  }
 }

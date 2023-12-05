@@ -1,3 +1,4 @@
+import { uploads } from './uploads/uploads';
 import { propertyTypes } from './propertyTypes/propertyTypes';
 import { propertyAmenities } from './propertyAmenities/propertyAmenities';
 import { amenities } from './amenities/amenities';
@@ -9,6 +10,7 @@ import { users } from './users/users';
 import type { Application } from '../declarations';
 
 export const services = (app: Application) => {
+  app.configure(uploads);
   app.configure(propertyTypes);
   app.configure(propertyAmenities);
   app.configure(amenities);

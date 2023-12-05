@@ -48,8 +48,6 @@ services:
       GUNICORN_ACCESS_LOGFILE: '/dev/null'
     ports:
       - '16544:80'
-    depends_on:
-      - db
     volumes:
       - pgadmin:/var/lib/pgadmin
     logging:

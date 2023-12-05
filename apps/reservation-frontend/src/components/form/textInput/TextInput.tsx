@@ -7,8 +7,8 @@ import {
   type QwikFocusEvent,
 } from '@builder.io/qwik';
 import clsx from 'clsx';
-import { InputError } from './InputError';
-import { InputLabel } from './InputLabel';
+import { InputError } from '../inputError/InputError';
+import { InputLabel } from '../inputLabel/InputLabel';
 
 type TextInputProps = {
   ref: PropFunction<(element: Element) => void>;
