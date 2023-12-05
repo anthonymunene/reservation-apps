@@ -4,9 +4,6 @@ import type { TransportConnection, Application } from '@feathersjs/feathers';
 import authenticationClient from '@feathersjs/authentication-client';
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client';
 
-import { uploadsClient } from './services/uploads/uploads.shared';
-export type { Uploads, UploadsData, UploadsQuery, UploadsPatch } from './services/uploads/uploads.shared';
-
 import { propertyTypesClient } from './services/propertyTypes/propertyTypes.shared';
 export type {
   PropertyTypes,
