@@ -1,10 +1,10 @@
-import { faker } from '@faker-js/faker';
-type RandomisedItem = { id: number };
+const { faker } = require("@faker-js/faker")
+type RandomisedItem = { id: number }
 // interface RandomisedItems extends Array<RandomisedItem> { }
 export const randomiseArray = (items: Array<RandomisedItem>, count?: number) => {
-  return count ? faker.helpers.uniqueArray(items, count) : faker.helpers.arrayElement(items);
-};
+  return count ? faker.helpers.uniqueArray(items, count) : faker.helpers.arrayElement(items)
+}
 
 export function randomiseInt(max: number) {
-  return Math.floor(Math.random() * max);
+  return Math.floor(Math.random() * max)
 }
