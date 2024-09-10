@@ -32,10 +32,6 @@
       "error",
       "single"
     ],
-    "semi": [
-      "error",
-      "always"
-    ],
     "no-console": 1,       // Means warning
     "prettier/prettier": 2, // Means error
     "@typescript-eslint/no-explicit-any": "off",
