@@ -1,6 +1,6 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/log-error.html
-import type { HookContext, NextFunction } from '../declarations'
-import { logger } from '../logger'
+import type { HookContext, NextFunction } from "../declarations"
+import { logger } from "../logger"
 
 export const logError = async (context: HookContext, next: NextFunction) => {
   try {
@@ -10,7 +10,7 @@ export const logError = async (context: HookContext, next: NextFunction) => {
 
     // Log validation errors
     if (error.data) {
-      logger.error('Data: %O', error.data)
+      logger.error("Data: %O", error.data)
     }
 
     throw error
