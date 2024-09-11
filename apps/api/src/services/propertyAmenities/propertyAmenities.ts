@@ -1,24 +1,24 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 
-import { hooks as schemaHooks } from '@feathersjs/schema';
+import { hooks as schemaHooks } from "@feathersjs/schema"
 
 import {
+  propertyAmenitiesDataResolver,
   propertyAmenitiesDataValidator,
+  propertyAmenitiesExternalResolver,
+  propertyAmenitiesPatchResolver,
   propertyAmenitiesPatchValidator,
+  propertyAmenitiesQueryResolver,
   propertyAmenitiesQueryValidator,
   propertyAmenitiesResolver,
-  propertyAmenitiesExternalResolver,
-  propertyAmenitiesDataResolver,
-  propertyAmenitiesPatchResolver,
-  propertyAmenitiesQueryResolver,
-} from './propertyAmenities.schema';
+} from "./propertyAmenities.schema"
 
-import type { Application } from '../../declarations';
-import { PropertyAmenitiesService, getOptions } from './propertyAmenities.class';
-import { propertyAmenitiesPath, propertyAmenitiesMethods } from './propertyAmenities.shared';
+import type { Application } from "../../declarations"
+import { getOptions, PropertyAmenitiesService } from "./propertyAmenities.class"
+import { propertyAmenitiesMethods, propertyAmenitiesPath } from "./propertyAmenities.shared"
 
-export * from './propertyAmenities.class';
-export * from './propertyAmenities.schema';
+export * from "./propertyAmenities.class"
+export * from "./propertyAmenities.schema"
 
 // A configure function that registers the service and its hooks via `app.configure`
 export const propertyAmenities = (app: Application) => {
@@ -28,7 +28,7 @@ export const propertyAmenities = (app: Application) => {
     methods: propertyAmenitiesMethods,
     // You can add additional custom events to be sent to clients here
     events: [],
-  });
+  })
   // Initialize hooks
   app.service(propertyAmenitiesPath).hooks({
     around: {
@@ -60,12 +60,12 @@ export const propertyAmenities = (app: Application) => {
     error: {
       all: [],
     },
-  });
-};
+  })
+}
 
 // Add this service to the service type index
-declare module '../../declarations' {
+declare module "../../declarations" {
   interface ServiceTypes {
-    [propertyAmenitiesPath]: PropertyAmenitiesService;
+    [propertyAmenitiesPath]: PropertyAmenitiesService
   }
 }

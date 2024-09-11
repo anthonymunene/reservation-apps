@@ -1,24 +1,24 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 
-import { hooks as schemaHooks } from '@feathersjs/schema';
+import { hooks as schemaHooks } from "@feathersjs/schema"
 
 import {
+  amenitiesDataResolver,
   amenitiesDataValidator,
+  amenitiesExternalResolver,
+  amenitiesPatchResolver,
   amenitiesPatchValidator,
+  amenitiesQueryResolver,
   amenitiesQueryValidator,
   amenitiesResolver,
-  amenitiesExternalResolver,
-  amenitiesDataResolver,
-  amenitiesPatchResolver,
-  amenitiesQueryResolver,
-} from './amenities.schema';
+} from "./amenities.schema"
 
-import type { Application } from '../../declarations';
-import { AmenitiesService, getOptions } from './amenities.class';
-import { amenitiesPath, amenitiesMethods } from './amenities.shared';
+import type { Application } from "../../declarations"
+import { AmenitiesService, getOptions } from "./amenities.class"
+import { amenitiesMethods, amenitiesPath } from "./amenities.shared"
 
-export * from './amenities.class';
-export * from './amenities.schema';
+export * from "./amenities.class"
+export * from "./amenities.schema"
 
 // A configure function that registers the service and its hooks via `app.configure`
 export const amenities = (app: Application) => {
@@ -28,7 +28,7 @@ export const amenities = (app: Application) => {
     methods: amenitiesMethods,
     // You can add additional custom events to be sent to clients here
     events: [],
-  });
+  })
   // Initialize hooks
   app.service(amenitiesPath).hooks({
     around: {
@@ -48,12 +48,12 @@ export const amenities = (app: Application) => {
     error: {
       all: [],
     },
-  });
-};
+  })
+}
 
 // Add this service to the service type index
-declare module '../../declarations' {
+declare module "../../declarations" {
   interface ServiceTypes {
-    [amenitiesPath]: AmenitiesService;
+    [amenitiesPath]: AmenitiesService
   }
 }

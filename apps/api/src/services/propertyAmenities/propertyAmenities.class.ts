@@ -1,17 +1,17 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.class.html#database-services
-import type { Params } from '@feathersjs/feathers';
-import { KnexService } from '@feathersjs/knex';
-import type { KnexAdapterParams, KnexAdapterOptions } from '@feathersjs/knex';
+import type { Params } from "@feathersjs/feathers"
+import type { KnexAdapterOptions, KnexAdapterParams } from "@feathersjs/knex"
+import { KnexService } from "@feathersjs/knex"
 
-import type { Application } from '../../declarations';
+import type { Application } from "../../declarations"
 import type {
   PropertyAmenities,
   PropertyAmenitiesData,
   PropertyAmenitiesPatch,
   PropertyAmenitiesQuery,
-} from './propertyAmenities.schema';
+} from "./propertyAmenities.schema"
 
-export type { PropertyAmenities, PropertyAmenitiesData, PropertyAmenitiesPatch, PropertyAmenitiesQuery };
+export type { PropertyAmenities, PropertyAmenitiesData, PropertyAmenitiesPatch, PropertyAmenitiesQuery }
 
 export interface PropertyAmenitiesParams extends KnexAdapterParams<PropertyAmenitiesQuery> {}
 
@@ -25,9 +25,9 @@ export class PropertyAmenitiesService<ServiceParams extends Params = PropertyAme
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
   return {
-    paginate: app.get('paginate'),
-    Model: app.get('postgresqlClient'),
-    name: 'PropertyAmenity',
-    multi: ['create'],
-  };
-};
+    paginate: app.get("paginate"),
+    Model: app.get("postgresqlClient"),
+    name: "PropertyAmenity",
+    multi: ["create"],
+  }
+}

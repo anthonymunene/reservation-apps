@@ -1,11 +1,11 @@
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import { resolve } from "@feathersjs/schema"
-import { Type, getDataValidator, getValidator, querySyntax } from "@feathersjs/typebox"
 import type { Static } from "@feathersjs/typebox"
+import { getDataValidator, getValidator, querySyntax, Type } from "@feathersjs/typebox"
 
 import type { HookContext } from "../../declarations"
 import { dataValidator, queryValidator } from "../../validators"
-import { randomUUID } from "crypto"
+import { randomUUID } from "crypto" // Main data model schema
 
 // Main data model schema
 export const profilesSchema = Type.Object(

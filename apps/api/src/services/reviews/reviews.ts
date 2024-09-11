@@ -1,35 +1,35 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 
-import { hooks as schemaHooks } from '@feathersjs/schema';
+import { hooks as schemaHooks } from "@feathersjs/schema"
 
 import {
+  reviewsDataResolver,
   reviewsDataValidator,
+  reviewsExternalResolver,
+  reviewsPatchResolver,
   reviewsPatchValidator,
+  reviewsQueryResolver,
   reviewsQueryValidator,
   reviewsResolver,
-  reviewsExternalResolver,
-  reviewsDataResolver,
-  reviewsPatchResolver,
-  reviewsQueryResolver,
-} from './reviews.schema';
+} from "./reviews.schema"
 
-import type { Application } from '../../declarations';
-import { ReviewsService, getOptions } from './reviews.class';
+import type { Application } from "../../declarations"
+import { getOptions, ReviewsService } from "./reviews.class"
 
-export * from './reviews.class';
-export * from './reviews.schema';
+export * from "./reviews.class"
+export * from "./reviews.schema"
 
 // A configure function that registers the service and its hooks via `app.configure`
 export const reviews = (app: Application) => {
   // Register our service on the Feathers application
-  app.use('reviews', new ReviewsService(getOptions(app)), {
+  app.use("reviews", new ReviewsService(getOptions(app)), {
     // A list of all methods this service exposes externally
-    methods: ['find', 'get', 'create', 'patch', 'remove'],
+    methods: ["find", "get", "create", "patch", "remove"],
     // You can add additional custom events to be sent to clients here
     events: [],
-  });
+  })
   // Initialize hooks
-  app.service('reviews').hooks({
+  app.service("reviews").hooks({
     around: {
       all: [schemaHooks.resolveExternal(reviewsExternalResolver), schemaHooks.resolveResult(reviewsResolver)],
     },
@@ -47,12 +47,12 @@ export const reviews = (app: Application) => {
     error: {
       all: [],
     },
-  });
-};
+  })
+}
 
 // Add this service to the service type index
-declare module '../../declarations' {
+declare module "../../declarations" {
   interface ServiceTypes {
-    reviews: ReviewsService;
+    reviews: ReviewsService
   }
 }
