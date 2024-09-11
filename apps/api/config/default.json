@@ -12,5 +12,14 @@
   "postgresql": {
     "client": "postgres",
     "connection": "postgres://postgres:postgres@0.0.0.0:5432/reservation_knex_dev"
+  },
+  "storage": {
+    "s3Client": {
+      "endpoint": "s3.eu-west-2.amazonaws.com",
+      "region": "eu-west-2",
+      "signatureVersion": "v4",
+      "bucket": "dl-reservation-app-assets",
+      "prefix": "users"
+    }
   }
 }

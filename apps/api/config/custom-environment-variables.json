@@ -7,12 +7,7 @@
   "storage": {
     "s3Client": {
       "accessKeyId": "ACCESS_KEY_ID",
-      "secretAccessKey": "SECRET_ACCESS_KEY",
-      "endpoint": "process.env.S3_ENDPOINT",
-      "region": "eu-west-2",
-      "signatureVersion": "v4",
-      "bucket": "dl-reservation-app-assets",
-      "prefix": "feathers-s3-example"
+      "secretAccessKey": "SECRET_ACCESS_KEY"
     }
   }
 }
