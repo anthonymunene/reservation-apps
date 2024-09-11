@@ -33,7 +33,8 @@
   "files": [
     "lib/client.js",
     "lib/**/*.d.ts",
-    "lib/**/*.shared.js"
+    "lib/**/*.shared.js",
+    "lib/utils/s3/lib/*.js"
   ],
   "main": "lib/client",
   "scripts": {
