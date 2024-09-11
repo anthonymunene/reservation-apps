@@ -37,7 +37,7 @@
   ],
   "main": "lib/client",
   "scripts": {
-    "dev": "nodemon -x ts-node src/index.ts",
+    "dev": "infisical run --env=dev --path=/Apps/reservation-apps/api -- nodemon -x ts-node src/index.ts",
     "dev:reset": "npm run docker:dev -- dev true && npm run migrate && npm run seed && npm run dev",
     "compile": "shx rm -rf lib/ && tsc",
     "start": "node lib/",
@@ -61,6 +61,7 @@
     "@faker-js/faker": "^9.0.0",
     "@feathersjs/cli": "^5.0.30",
     "@feathersjs/rest-client": "^5.0.30",
+    "@infisical/sdk": "^2.3.5",
     "@types/mocha": "^10.0.7",
     "@types/node": "^22.5.4",
     "axios": "^1.7.7",
