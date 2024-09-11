@@ -1,16 +1,16 @@
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
-import { resolve, virtual } from '@feathersjs/schema';
-import { Type, getDataValidator, getValidator, querySyntax } from '@feathersjs/typebox';
-import type { Static } from '@feathersjs/typebox';
+import { resolve, virtual } from "@feathersjs/schema"
+import type { Static } from "@feathersjs/typebox"
+import { getDataValidator, getValidator, querySyntax, Type } from "@feathersjs/typebox"
 
-import type { HookContext } from '../../declarations';
-import { dataValidator, queryValidator } from '../../validators';
-import { randomUUID } from 'crypto';
+import type { HookContext } from "../../declarations"
+import { dataValidator, queryValidator } from "../../validators"
+import { randomUUID } from "crypto"
 
 // Main data model schema
 export const propertiesSchema = Type.Object(
   {
-    id: Type.String({ format: 'uuid' }),
+    id: Type.String({ format: "uuid" }),
     title: Type.String(),
     description: Type.String(),
     city: Type.String(),
@@ -18,58 +18,58 @@ export const propertiesSchema = Type.Object(
     bedrooms: Type.Number(),
     beds: Type.Number(),
     images: Type.Array(Type.Object({ image: Type.String() })),
-    host: Type.String({ format: 'uuid' }),
+    host: Type.String({ format: "uuid" }),
     propertyTypeId: Type.String(),
     propertyType: Type.String(),
     ownedBy: Type.String(),
     amenities: Type.Array(Type.String()),
-    createdAt: Type.String({ format: 'date-time' }),
-    updatedAt: Type.String({ format: 'date-time' }),
-    updatedBy: Type.String({ format: 'date-time' }),
+    createdAt: Type.String({ format: "date-time" }),
+    updatedAt: Type.String({ format: "date-time" }),
+    updatedBy: Type.String({ format: "date-time" }),
   },
-  { $id: 'Properties', additionalProperties: true }
-);
-export type Properties = Static<typeof propertiesSchema>;
+  { $id: "Properties", additionalProperties: true }
+)
+export type Properties = Static<typeof propertiesSchema>
 export const propertiesResolver = resolve<Properties, HookContext>({
   ownedBy: virtual(async (property, context) => {
-    const { data } = await context.app.service('profiles').find({
+    const { data } = await context.app.service("profiles").find({
       query: {
         userId: property.host,
       },
-    });
+    })
 
-    const profile = data.map(result => `${result.firstName} ${result.surname}`);
-    return profile.toString();
+    const profile = data.map(result => `${result.firstName} ${result.surname}`)
+    return profile.toString()
   }),
 
   propertyType: virtual(async (property, context) => {
     const propertyType = await context.app
-      .service('propertyTypes')
+      .service("propertyTypes")
       .find({
         paginate: false,
         query: {
           id: property.propertyTypeId,
         },
       })
-      .then(data => data[0].name);
+      .then(data => data[0].name)
 
-    return propertyType;
+    return propertyType
   }),
   amenities: virtual(async (property, context) => {
-    const propertyAmenities = await context.app.service('propertyAmenities').find({
+    const propertyAmenities = await context.app.service("propertyAmenities").find({
       paginate: false,
       query: {
         propertyId: property.id,
-        $select: ['amenityId'],
+        $select: ["amenityId"],
       },
-    });
+    })
 
-    const propertyAmenityIds = propertyAmenities.map(propertyAmenity => propertyAmenity.amenityId);
-    const amenities = await context.app.service('amenities').find({ query: { id: { $in: propertyAmenityIds } } });
+    const propertyAmenityIds = propertyAmenities.map(propertyAmenity => propertyAmenity.amenityId)
+    const amenities = await context.app.service("amenities").find({ query: { id: { $in: propertyAmenityIds } } })
 
-    return amenities.data.map(amenity => amenity.name);
+    return amenities.data.map(amenity => amenity.name)
   }),
-});
+})
 
 export const propertiesExternalResolver = resolve<Properties, HookContext>({
   host: async () => undefined,
@@ -77,49 +77,49 @@ export const propertiesExternalResolver = resolve<Properties, HookContext>({
   createdAt: async () => undefined,
   updatedAt: async () => undefined,
   updatedBy: async () => undefined,
-});
+})
 
 // Schema for creating new entries
 export const propertiesDataSchema = Type.Pick(
   propertiesSchema,
-  ['title', 'description', 'city', 'countryCode', 'propertyTypeId', 'host'],
+  ["title", "description", "city", "countryCode", "propertyTypeId", "host"],
   {
-    $id: 'PropertiesData',
+    $id: "PropertiesData",
   }
-);
+)
 
-export type PropertiesData = Static<typeof propertiesDataSchema>;
-export const propertiesDataValidator = getDataValidator(propertiesDataSchema, dataValidator);
+export type PropertiesData = Static<typeof propertiesDataSchema>
+export const propertiesDataValidator = getDataValidator(propertiesDataSchema, dataValidator)
 export const propertiesDataResolver = resolve<Properties, HookContext>({
   id: async () => {
-    return randomUUID();
+    return randomUUID()
   },
   createdAt: async () => {
-    return new Date().toISOString();
+    return new Date().toISOString()
   },
-});
+})
 // Schema for updating existing entries
 export const propertiesPatchSchema = Type.Partial(propertiesSchema, {
-  $id: 'PropertiesPatch',
-});
-export type PropertiesPatch = Static<typeof propertiesPatchSchema>;
-export const propertiesPatchValidator = getDataValidator(propertiesPatchSchema, dataValidator);
+  $id: "PropertiesPatch",
+})
+export type PropertiesPatch = Static<typeof propertiesPatchSchema>
+export const propertiesPatchValidator = getDataValidator(propertiesPatchSchema, dataValidator)
 export const propertiesPatchResolver = resolve<Properties, HookContext>({
   updatedAt: async () => {
-    return new Date().toISOString();
+    return new Date().toISOString()
   },
 
   updatedBy: async (_value, _document, context: HookContext) => context.params.user.id,
-});
+})
 
 // Schema for allowed query properties
-export const propertiesQueryProperties = Type.Pick(propertiesSchema, ['id']);
+export const propertiesQueryProperties = Type.Pick(propertiesSchema, ["id"])
 export const propertiesQuerySchema = Type.Intersect([querySyntax(propertiesQueryProperties)], {
   additionalProperties: false,
-});
-export type PropertiesQuery = Static<typeof propertiesQuerySchema>;
-export const propertiesQueryValidator = getValidator(propertiesQuerySchema, queryValidator);
-export const propertiesQueryResolver = resolve<PropertiesQuery, HookContext>({});
+})
+export type PropertiesQuery = Static<typeof propertiesQuerySchema>
+export const propertiesQueryValidator = getValidator(propertiesQuerySchema, queryValidator)
+export const propertiesQueryResolver = resolve<PropertiesQuery, HookContext>({})
 
 // Resolver for the data that is being returned
-export const propertiesResultResolver = resolve<Properties, HookContext>({});
+export const propertiesResultResolver = resolve<Properties, HookContext>({})
