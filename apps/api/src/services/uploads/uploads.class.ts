@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { Service } from '@kalisio/feathers-s3';
+import type { Application } from "../../declarations"
 
 const S3Options = {
   s3Client: {
@@ -10,11 +10,11 @@ const S3Options = {
     },
     endpoint: process.env.S3_ENDPOINT,
     region: process.env.S3_REGION,
-    signatureVersion: 'v4',
+    signatureVersion: "v4",
   },
   bucket: process.env.S3_BUCKET,
-  prefix: 'feathers-s3-example',
-};
+  prefix: "feathers-s3-example",
+}
 
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.class.html#custom-services
 // import type { Id, NullableId, Params, ServiceInterface } from '@feathersjs/feathers';
@@ -92,5 +92,5 @@ const S3Options = {
 // }
 
 export const getOptions = (app: Application) => {
-  return { app, ...S3Options };
-};
+  return { app, ...S3Options }
+}
