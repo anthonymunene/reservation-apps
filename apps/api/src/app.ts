@@ -8,7 +8,7 @@ import { configurationValidator } from "./configuration"
 import type { Application } from "./declarations"
 import { logError } from "./hooks/log-error"
 import { postgresql } from "./postgresql"
-import { services } from "./services/index"
+import { services } from "./services"
 import { channels } from "./channels"
 
 const app: Application = koa(feathers())
