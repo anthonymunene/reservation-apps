@@ -18,7 +18,7 @@
   <script src="https://unpkg.com/socket.io-client@4.5.3/dist/socket.io.min.js"></script>
   <!--script type="module" src="/feathers-s3/client.js"></script-->
   <script type="module">
-    import { getClientService } from '/s3/lib/client.js'
+    import  * as getClientService from '/s3/lib/client.js'
     // Create the client Feathers app
     const app = feathers()
     // Configure the transport using socket.io
@@ -48,9 +48,10 @@
       try {
         // upload the selected file
         const file = files[0]
+        console.log(file)
         const response = await s3Service.upload(file.name, file)
-        document.getElementById('download').disabled = false
-        console.log(response.json())
+        // document.getElementById('download').disabled = false
+        // console.log(response.json())
       } catch (error) {
         console.error(error)
       }
