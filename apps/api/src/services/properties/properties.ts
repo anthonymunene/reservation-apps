@@ -17,6 +17,7 @@ import {
 import type { Application } from "../../declarations"
 import { getOptions, PropertiesService } from "./properties.class"
 import { insertAmenity } from "./properties.hooks"
+import { propertiesMethods, propertiesPath } from "./properties.shared"
 
 export * from "./properties.class"
 export * from "./properties.schema"
@@ -24,14 +25,14 @@ export * from "./properties.schema"
 // A configure function that registers the service and its hooks via `app.configure`
 export const properties = (app: Application) => {
   // Register our service on the Feathers application
-  app.use("properties", new PropertiesService(getOptions(app)), {
+  app.use(propertiesPath, new PropertiesService(getOptions(app)), {
     // A list of all methods this service exposes externally
-    methods: ["find", "get", "create", "patch", "remove"],
+    methods: propertiesMethods,
     // You can add additional custom events to be sent to clients here
     events: [],
   })
   // Initialize hooks
-  app.service("properties").hooks({
+  app.service(propertiesPath).hooks({
     around: {
       all: [schemaHooks.resolveExternal(propertiesExternalResolver), schemaHooks.resolveResult(propertiesResolver)],
       create: [insertAmenity],

@@ -15,6 +15,7 @@ import {
 
 import type { Application } from "../../declarations"
 import { getOptions, ProfilesService } from "./profiles.class"
+import { profilesPath, profilesMethods } from "./profiles.shared"
 
 export * from "./profiles.class"
 export * from "./profiles.schema"
@@ -22,14 +23,14 @@ export * from "./profiles.schema"
 // A configure function that registers the service and its hooks via `app.configure`
 export const profiles = (app: Application) => {
   // Register our service on the Feathers application
-  app.use("profiles", new ProfilesService(getOptions(app)), {
+  app.use(profilesPath, new ProfilesService(getOptions(app)), {
     // A list of all methods this service exposes externally
-    methods: ["find", "get", "create", "patch", "remove"],
+    methods: profilesMethods,
     // You can add additional custom events to be sent to clients here
     events: [],
   })
   // Initialize hooks
-  app.service("profiles").hooks({
+  app.service(profilesPath).hooks({
     around: {
       all: [schemaHooks.resolveExternal(profilesExternalResolver), schemaHooks.resolveResult(profilesResolver)],
     },
