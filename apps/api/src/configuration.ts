@@ -1,5 +1,5 @@
-import { Type, getValidator, defaultAppConfiguration } from "@feathersjs/typebox"
 import type { Static } from "@feathersjs/typebox"
+import { defaultAppConfiguration, getValidator, Type } from "@feathersjs/typebox"
 
 import { dataValidator } from "./validators"
 
@@ -10,14 +10,17 @@ export const configurationSchema = Type.Intersect([
     port: Type.Number(),
     public: Type.String(),
     storage: Type.Object({
-      s3Client: Type.Object({
-        accessKeyId: Type.String(),
-        secretAccessKey: Type.String(),
-        endpoint: Type.String(),
-        region: Type.String(),
-        signatureVersion: Type.String(),
-        bucket: Type.String(),
-        prefix: Type.String(),
+      s3: Type.Object({
+        s3Client: Type.Object({
+          credentials: Type.Object({
+            accessKeyId: Type.String(),
+            secretAccessKey: Type.String(),
+          }),
+          region: Type.String(),
+          signatureVersion: Type.String(),
+          bucket: Type.String(),
+          prefix: Type.String(),
+        }),
       }),
     }),
   }),

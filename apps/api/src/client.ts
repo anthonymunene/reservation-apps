@@ -1,52 +1,60 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/client.html
-import { feathers } from '@feathersjs/feathers';
-import type { TransportConnection, Application } from '@feathersjs/feathers';
-import authenticationClient from '@feathersjs/authentication-client';
-import type { AuthenticationClientOptions } from '@feathersjs/authentication-client';
+import { feathers } from "@feathersjs/feathers"
+import type { TransportConnection, Application } from "@feathersjs/feathers"
+import authenticationClient from "@feathersjs/authentication-client"
+import type { AuthenticationClientOptions } from "@feathersjs/authentication-client"
 
-import { propertyTypesClient } from './services/propertyTypes/propertyTypes.shared';
+import { presignurlClient } from "./services/presignurl/presignurl.shared"
+export type {
+  Presignurl,
+  PresignurlData,
+  PresignurlQuery,
+  PresignurlPatch,
+} from "./services/presignurl/presignurl.shared"
+
+import { propertyTypesClient } from "./services/propertyTypes/propertyTypes.shared"
 export type {
   PropertyTypes,
   PropertyTypesData,
   PropertyTypesQuery,
   PropertyTypesPatch,
-} from './services/propertyTypes/propertyTypes.shared';
+} from "./services/propertyTypes/propertyTypes.shared"
 
-import { propertyAmenitiesClient } from './services/propertyAmenities/propertyAmenities.shared';
+import { propertyAmenitiesClient } from "./services/propertyAmenities/propertyAmenities.shared"
 export type {
   PropertyAmenities,
   PropertyAmenitiesData,
   PropertyAmenitiesQuery,
   PropertyAmenitiesPatch,
-} from './services/propertyAmenities/propertyAmenities.shared';
+} from "./services/propertyAmenities/propertyAmenities.shared"
 
-import { amenitiesClient } from './services/amenities/amenities.shared';
-export type { Amenities, AmenitiesData, AmenitiesQuery, AmenitiesPatch } from './services/amenities/amenities.shared';
+import { amenitiesClient } from "./services/amenities/amenities.shared"
+export type { Amenities, AmenitiesData, AmenitiesQuery, AmenitiesPatch } from "./services/amenities/amenities.shared"
 
-import { reviewsClient } from './services/reviews/reviews.shared';
-export type { Reviews, ReviewsData, ReviewsQuery, ReviewsPatch } from './services/reviews/reviews.shared';
+import { reviewsClient } from "./services/reviews/reviews.shared"
+export type { Reviews, ReviewsData, ReviewsQuery, ReviewsPatch } from "./services/reviews/reviews.shared"
 
-import { propertiesClient } from './services/properties/properties.shared';
+import { propertiesClient } from "./services/properties/properties.shared"
 export type {
   Properties,
   PropertiesData,
   PropertiesQuery,
   PropertiesPatch,
-} from './services/properties/properties.shared';
+} from "./services/properties/properties.shared"
 
-import { profilesClient } from './services/profiles/profiles.shared';
-export type { Profiles, ProfilesData, ProfilesQuery, ProfilesPatch } from './services/profiles/profiles.shared';
+import { profilesClient } from "./services/profiles/profiles.shared"
+export type { Profiles, ProfilesData, ProfilesQuery, ProfilesPatch } from "./services/profiles/profiles.shared"
 
-import { usersClient } from './services/users/users.shared';
-export type { Users, UsersData, UsersQuery, UsersPatch } from './services/users/users.shared';
+import { usersClient } from "./services/users/users.shared"
+export type { Users, UsersData, UsersQuery, UsersPatch } from "./services/users/users.shared"
 
 export interface Configuration {
-  connection: TransportConnection<ServiceTypes>;
+  connection: TransportConnection<ServiceTypes>
 }
 
 export interface ServiceTypes {}
 
-export type ClientApplication = Application<ServiceTypes, Configuration>;
+export type ClientApplication = Application<ServiceTypes, Configuration>
 
 /**
  * Returns a typed client for the test-app app.
@@ -60,18 +68,19 @@ export const createClient = <Configuration = any>(
   connection: TransportConnection<ServiceTypes>,
   authenticationOptions: Partial<AuthenticationClientOptions> = {}
 ) => {
-  const client: ClientApplication = feathers();
+  const client: ClientApplication = feathers()
 
-  client.configure(connection);
-  client.configure(authenticationClient(authenticationOptions));
-  client.set('connection', connection);
+  client.configure(connection)
+  client.configure(authenticationClient(authenticationOptions))
+  client.set("connection", connection)
 
-  client.configure(usersClient);
-  client.configure(profilesClient);
-  client.configure(propertiesClient);
-  client.configure(reviewsClient);
-  client.configure(amenitiesClient);
-  client.configure(propertyAmenitiesClient);
-  client.configure(propertyTypesClient);
-  return client;
-};
+  client.configure(usersClient)
+  client.configure(profilesClient)
+  client.configure(propertiesClient)
+  client.configure(reviewsClient)
+  client.configure(amenitiesClient)
+  client.configure(propertyAmenitiesClient)
+  client.configure(propertyTypesClient)
+  client.configure(presignurlClient)
+  return client
+}

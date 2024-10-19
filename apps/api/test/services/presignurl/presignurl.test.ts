@@ -4,7 +4,7 @@ import { app } from "../../../src/app"
 
 describe("presignurl service", () => {
   it("registered the service", () => {
-    const service = app.service("uploads")
+    const service = app.service("presignurl")
 
     assert.ok(service, "Registered the service")
   })

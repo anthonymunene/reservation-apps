@@ -79,6 +79,7 @@
     "vitest": "^2.0.5"
   },
   "dependencies": {
+    "@aws-sdk/s3-request-presigner": "^3.673.0",
     "@feathersjs/adapter-commons": "^5.0.30",
     "@feathersjs/authentication": "^5.0.30",
     "@feathersjs/authentication-client": "^5.0.30",

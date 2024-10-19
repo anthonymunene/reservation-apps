@@ -5,9 +5,11 @@
   },
   "host": "HOSTNAME",
   "storage": {
-    "s3Client": {
-      "accessKeyId": "ACCESS_KEY_ID",
-      "secretAccessKey": "SECRET_ACCESS_KEY"
+    "s3": {
+      "s3Client": {
+        "accessKeyId": "ACCESS_KEY_ID",
+        "secretAccessKey": "SECRET_ACCESS_KEY"
+      }
     }
   }
 }

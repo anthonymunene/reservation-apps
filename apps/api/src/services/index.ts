@@ -1,22 +1,22 @@
-import { uploads } from './uploads/uploads';
-import { propertyTypes } from './propertyTypes/propertyTypes';
-import { propertyAmenities } from './propertyAmenities/propertyAmenities';
-import { amenities } from './amenities/amenities';
-import { reviews } from './reviews/reviews';
-import { profiles } from './profiles/profiles';
-import { properties } from './properties/properties';
-import { users } from './users/users';
+import { presignurl } from "./presignurl/presignurl"
+import { propertyTypes } from "./propertyTypes/propertyTypes"
+import { propertyAmenities } from "./propertyAmenities/propertyAmenities"
+import { amenities } from "./amenities/amenities"
+import { reviews } from "./reviews/reviews"
+import { profiles } from "./profiles/profiles"
+import { properties } from "./properties/properties"
+import { users } from "./users/users"
 // For more information about this file see https://dove.feathersjs.com/guides/cli/application.html#configure-functions
-import type { Application } from '../declarations';
+import type { Application } from "../declarations"
 
 export const services = (app: Application) => {
-  app.configure(uploads);
-  app.configure(propertyTypes);
-  app.configure(propertyAmenities);
-  app.configure(amenities);
-  app.configure(reviews);
-  app.configure(profiles);
-  app.configure(properties);
-  app.configure(users);
+  app.configure(presignurl)
+  app.configure(propertyTypes)
+  app.configure(propertyAmenities)
+  app.configure(amenities)
+  app.configure(reviews)
+  app.configure(profiles)
+  app.configure(properties)
+  app.configure(users)
   // All services will be registered here
-};
+}

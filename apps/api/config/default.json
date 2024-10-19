@@ -14,12 +14,17 @@
     "connection": "postgres://postgres:postgres@0.0.0.0:5432/reservation_knex_dev"
   },
   "storage": {
-    "s3Client": {
-      "endpoint": "s3.eu-west-2.amazonaws.com",
-      "region": "eu-west-2",
-      "signatureVersion": "v4",
-      "bucket": "dl-reservation-app-assets",
-      "prefix": "users"
+    "s3": {
+      "s3Client": {
+        "credentials": {
+          "accessKeyId": "ACCESS_KEY_ID",
+          "secretAccessKey": "SECRET_ACCESS_KEY"
+        },
+        "region": "eu-west-2",
+        "signatureVersion": "v4",
+        "bucket": "reservation-app.d3ployed.com",
+        "prefix": "images"
+      }
     }
   }
 }
