@@ -7,8 +7,10 @@
   "storage": {
     "s3": {
       "s3Client": {
-        "accessKeyId": "ACCESS_KEY_ID",
-        "secretAccessKey": "SECRET_ACCESS_KEY"
+        "credentials": {
+          "accessKeyId": "ACCESS_KEY_ID",
+          "secretAccessKey": "SECRET_ACCESS_KEY"
+        }
       }
     }
   }

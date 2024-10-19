@@ -16,10 +16,6 @@
   "storage": {
     "s3": {
       "s3Client": {
-        "credentials": {
-          "accessKeyId": "ACCESS_KEY_ID",
-          "secretAccessKey": "SECRET_ACCESS_KEY"
-        },
         "region": "eu-west-2",
         "signatureVersion": "v4",
         "bucket": "reservation-app.d3ployed.com",
