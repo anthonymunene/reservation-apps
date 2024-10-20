@@ -1,5 +1,5 @@
 {
-  "name": "reservation-apps",
+  "name": "reservation-app",
   "version": "1.0.0",
   "description": "reservation application",
   "main": "index.js",
