@@ -1,4 +1,5 @@
 import { NoSerialize } from "@builder.io/qwik"
+import { logError } from "~/utils/logError"
 
 type UploadData = (
   data: NoSerialize<File>,
@@ -23,22 +24,27 @@ const getSignedURL: SignedURL = async (name, path) => {
     })
     return response.json()
   } catch (error) {
-    console.log("error", error)
+    if (error instanceof Error) {
+      logError(error)
+    }
   }
 }
 const upload: UploadData = async function (data, options) {
   const { name } = data
+
   if (!options.path) throw new Error('create: missing "missing options.path" parameter')
   const { path } = options
 
-  const { signedUrl }: string = await getSignedURL(name, path)
   try {
+    const { signedUrl }: string = await getSignedURL(name, path)
     return await fetch(signedUrl, {
       method: "PUT",
       body: data,
     })
   } catch (error) {
-    console.log("error", error)
+    if (error instanceof Error) {
+      logError(error)
+    }
   }
 }
 

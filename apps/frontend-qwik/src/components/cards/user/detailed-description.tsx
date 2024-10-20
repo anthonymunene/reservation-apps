@@ -1,27 +1,33 @@
-import { component$ } from '@builder.io/qwik';
+import { component$ } from "@builder.io/qwik"
 //@ts-ignore
-import { getClientService } from '@kalisio/feathers-s3';
-import { io } from 'socket.io-client';
-import { feathers } from '@feathersjs/client';
-import { z } from 'zod';
-import { type InitialValues, useForm, zodForm$, Form, Field } from '@modular-forms/qwik';
-import { FileInput } from '~/components';
-
+import { getClientService } from "@kalisio/feathers-s3"
+import { io } from "socket.io-client"
+import { feathers } from "@feathersjs/client"
+import { z } from "zod"
+import { type InitialValues, useForm, zodForm$, Form, Field } from "@modular-forms/qwik"
+import { FileInput } from "~/components"
+import { UserForm, SpecialForm } from "~/routes/users/[id]"
 
 type Props = {
   user: {
-    email: string;
-    id: string;
+    email: string
+    id: string
     profile: {
-      firstName: string;
-      surname: string;
-      bio?: string;
-    };
-  };
-};
+      firstName: string
+      surname: string
+      bio?: string
+    }
+  }
+  Form: SpecialForm
+  Field: SpecialForm
+}
 
 export const DetailCard = component$((props: Props) => {
-  const { user } = props;
+  const {
+    user: { profile },
+    Form,
+    Field,
+  } = props
   console.log(props.user)
   return (
     <div class="overflow-hidden bg-white shadow sm:rounded-lg">
@@ -41,7 +47,7 @@ export const DetailCard = component$((props: Props) => {
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-900">Full name</dt>
             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {user.profile.firstName} {user.profile.surname}
+              {profile.firstName} {profile.surname}
             </dd>
             <dt class="text-sm font-medium text-gray-900">Email address</dt>
             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{user.email}</dd>
@@ -51,21 +57,6 @@ export const DetailCard = component$((props: Props) => {
         </dl>
         <dl class="divide-y divide-gray-100">
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <Form id="user-profile-upload" class="profile-upload">
-              <Field name="profile-upload" type='File'>
-                {(field, props) => (
-                 
-                  <FileInput
-                    {...props}
-                    value={field.value}
-                  error={field.error}
-                  label="Password"
-                  // data-testid="p"
-                  />
-                )}
-              </Field>
-
-            </Form>
             <input id="file" type="file" />
             <button
               type="button"
@@ -84,5 +75,5 @@ export const DetailCard = component$((props: Props) => {
         </dl>
       </div>
     </div>
-  );
-});
+  )
+})
