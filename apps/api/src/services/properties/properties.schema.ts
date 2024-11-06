@@ -44,7 +44,7 @@ export const propertiesResolver = resolve<Properties, HookContext>({
 
   propertyType: virtual(async (property, context) => {
     const propertyType = await context.app
-      .service("propertyTypes")
+      .service("propertytypes")
       .find({
         paginate: false,
         query: {
@@ -56,7 +56,7 @@ export const propertiesResolver = resolve<Properties, HookContext>({
     return propertyType
   }),
   amenities: virtual(async (property, context) => {
-    const propertyAmenities = await context.app.service("propertyAmenities").find({
+    const propertyAmenities = await context.app.service("propertyamenities").find({
       paginate: false,
       query: {
         propertyId: property.id,

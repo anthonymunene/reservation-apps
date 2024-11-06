@@ -16,7 +16,7 @@ export type PropertyTypesClientService = Pick<
   (typeof propertyTypesMethods)[number]
 >
 
-export const propertyTypesPath = "propertyTypes"
+export const propertyTypesPath = "propertytypes"
 
 export const propertyTypesMethods = ["find", "get", "create", "patch", "remove"] as const
 

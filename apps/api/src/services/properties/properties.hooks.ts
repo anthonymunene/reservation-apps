@@ -15,6 +15,6 @@ export const insertAmenity = async (context: HookContext, next: NextFunction) =>
       amenityId: amenity,
     }))
 
-    await context.app.service("propertyAmenities").create(amenityData)
+    await context.app.service("propertyamenities").create(amenityData)
   }
 }
