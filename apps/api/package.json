@@ -38,8 +38,8 @@
   ],
   "main": "lib/client",
   "scripts": {
-    "dev": "infisical run --env=dev --path=/Apps/reservation-apps/api -- nodemon -x ts-node src/index.ts",
-    "dev:reset": "npm run docker:dev -- dev true && npm run migrate && npm run seed && npm run dev",
+    "dev": "npm run bundle:client && infisical run --env=dev --path=/Apps/reservation-apps/api -- nodemon -x ts-node src/index.ts",
+    "dev:reset": "infisical run --env=dev --path=/Apps/reservation-apps/api --command \"npm run docker:dev -- dev true && npm run migrate && npm run seed && npm run dev\"",
     "compile": "shx rm -rf lib/ && tsc",
     "start": "node lib/",
     "lint": "npx eslint src/. test/. --config ../../.eslintrc.json",
