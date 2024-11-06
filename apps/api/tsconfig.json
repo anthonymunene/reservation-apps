@@ -7,8 +7,8 @@
   "compilerOptions": {
     "target": "es2020",
     "outDir": "./lib",
-    "rootDir": "./src",
+    "rootDir": ".",
   },
-  "include": ["src"],
+  "include": ["src", "seeds"],
   "exclude": ["test"]
 }
