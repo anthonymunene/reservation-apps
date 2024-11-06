@@ -9,20 +9,20 @@ export const configurationSchema = Type.Intersect([
     host: Type.String(),
     port: Type.Number(),
     public: Type.String(),
-    storage: Type.Object({
-      s3: Type.Object({
-        s3Client: Type.Object({
-          credentials: Type.Object({
-            accessKeyId: Type.String(),
-            secretAccessKey: Type.String(),
-          }),
-          region: Type.String(),
-          signatureVersion: Type.String(),
-          bucket: Type.String(),
-          prefix: Type.String(),
-        }),
-      }),
-    }),
+    // storage: Type.Object({
+    //   s3: Type.Object({
+    //     s3Client: Type.Object({
+    //       credentials: Type.Object({
+    //         accessKeyId: Type.String(),
+    //         secretAccessKey: Type.String(),
+    //       }),
+    //       region: Type.String(),
+    //       signatureVersion: Type.String(),
+    //       bucket: Type.String(),
+    //       prefix: Type.String(),
+    //     }),
+    //   }),
+    // }),
   }),
 ])
 
