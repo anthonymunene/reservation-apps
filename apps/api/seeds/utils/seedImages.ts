@@ -1,12 +1,11 @@
-// import { glob } from 'glob';
+//ts-nocheck
 import { downloadImage } from "./downloadImage"
-// import { unlink } from 'fs/promises';
-import { promises, existsSync, mkdirSync } from "fs"
+import { existsSync, mkdirSync, promises } from "fs"
 import * as crypto from "crypto"
 import { getImages } from "./getUnsplashImages"
-import { randomiseInt } from "../../src/utils/randomise"
+import { type SeederOpts } from "./shared"
+
 const { faker } = require("@faker-js/faker")
-import { count, error } from "console"
 
 const saveImage = async (buffer: string | Buffer, fileName: string, dir: string) => {
   const hashSum = crypto.createHash("md5")
@@ -39,20 +38,14 @@ export const createIfNotExist = (filepath: string) => {
   }
 }
 
-type seederOpts = {
-  type: "users" | "properties"
-  name: string
-  imageCount?: number
-}
-
 export const imageSeeder = async () => {
   const imageTypes = {
     properties: await getImages({ query: "house exterior", size: "regular" }),
     users: await getImages({ query: "profile picture", size: "regular" }),
   }
 
-  const init = async (opts: seederOpts) => {
-    const { type, name, imageCount = 1 } = opts
+  return async (opts: SeederOpts) => {
+    const { type, id, imageCount = 1 } = opts
     const seedImageDir = `${process.cwd()}/seeds/images/${type}`
     const images: string[] = []
     const removePath = (imagePath: string) => imagePath?.split(`${seedImageDir}/`)[1]
@@ -63,16 +56,18 @@ export const imageSeeder = async () => {
 
     // TODO: consolidate duplicates
     for (let i = 0; i < imageCount; i++) {
-      const randomImage = faker.helpers.arrayElement(imageTypes[type])
-      await downloadImage(randomImage).then(async image => {
-        await saveImage(image, name, seedImageDir).then(fileName => {
-          images.push(fileName)
+      try {
+        const randomImage = faker.helpers.arrayElement(imageTypes[type])
+        await downloadImage(randomImage).then(async image => {
+          await saveImage(image, id, seedImageDir).then(fileName => {
+            images.push(fileName)
+          })
         })
-      })
+      } catch (e) {
+        console.log(e)
+      }
     }
 
     return imageCount > 1 ? images : images[0]
   }
-
-  return init
 }

@@ -61,7 +61,7 @@ const createProfilePictures = async (users: UserId[], { getImages = imageSeeder 
   }
 }
 const getFreeProperty = async (dbClient: Knex, { fetchUnownedProperties = getAllPropertiesWithoutOwner } = {}) => {
-  const unownedProperties = await getAllPropertiesWithoutOwner(dbClient)
+  const unownedProperties = await fetchUnownedProperties(dbClient)
   return getRandomisedPropertyIds(unownedProperties)
 }
 
