@@ -1,1 +1,1 @@
-export const STANDARD_FORMAT = 'FF';
+export const STANDARD_FORMAT = "FF"
