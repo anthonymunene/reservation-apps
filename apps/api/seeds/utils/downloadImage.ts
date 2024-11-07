@@ -1,18 +1,12 @@
-export const downloadImage = async (imageURL: string): Promise<Buffer | string> => {
-  try {
-    const response = await fetch(imageURL)
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`)
-    }
-
-    const blob = await response.blob()
-    const arrayBuffer = await blob.arrayBuffer()
-    return Buffer.from(arrayBuffer)
-  } catch (error) {
-    if (error instanceof Error) {
-      return error.message
-    }
-    return "An unknown error occurred"
-  }
+export const downloadImage = async (imageURL: string) => {
+  return await fetch(imageURL)
+    .then(async response => {
+      const blob = await response.blob()
+      const arrayBuffer = await blob.arrayBuffer()
+      return Buffer.from(arrayBuffer)
+    })
+    .catch(error => {
+      console.log(error)
+      return (error as Error).message
+    })
 }

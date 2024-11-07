@@ -1,22 +1,28 @@
 //@ts-nocheck
-const IMAGE_URL = 'https://api.unsplash.com/search/photos';
-const ACCESS = 'fQCTr6MeEUhXbXGWRoieLlpdrBGLHoEmstOBBSytxIo';
-const extractImageLink = (data: any, size: string) => data.map(image => image.urls[size]);
+import { UNSPLASH_ACCESS_KEY } from "./shared"
+
+const IMAGE_URL = "https://api.unsplash.com/search/photos"
+const CLIENT_ACCESS_KEY = UNSPLASH_ACCESS_KEY
+const extractImageLink = (data: any, size: string) =>
+  data.map((image: { urls: { [x: string]: any } }) => image.urls[size])
 
 type ImageOpts = {
-  query: string;
-  size: string;
-  imagesCount?: number;
-};
+  query: string
+  size: string
+  imagesCount?: number
+}
 export const getImages = async (opts: ImageOpts) => {
-  const { query, size, imagesCount = 10 } = opts;
-  const response: string[] = await fetch(
-    `${IMAGE_URL}?client_id=${ACCESS}&query=${encodeURIComponent(query)}&per_page=${imagesCount}`
-  ).then(async data => {
-    const { results } = await data.json();
+  if (!CLIENT_ACCESS_KEY) throw new Error("missing CLIENT_ACCESS_KEY")
+  const { query, size, imagesCount = 10 } = opts
+  const response: void | string[] = await fetch(
+    `${IMAGE_URL}?client_id=${CLIENT_ACCESS_KEY}&query=${encodeURIComponent(query)}&per_page=${imagesCount}`
+  )
+    .then(async data => {
+      const { results } = await data.json()
 
-    return extractImageLink(results, size);
-  });
+      return extractImageLink(results, size)
+    })
+    .catch(e => console.log(e))
 
-  return response;
-};
+  return response
+}

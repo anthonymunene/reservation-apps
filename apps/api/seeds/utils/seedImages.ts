@@ -1,11 +1,10 @@
-//ts-nocheck
 import { downloadImage } from "./downloadImage"
 import { existsSync, mkdirSync, promises } from "fs"
 import * as crypto from "crypto"
 import { getImages } from "./getUnsplashImages"
 import { type SeederOpts } from "./shared"
-
-const { faker } = require("@faker-js/faker")
+//@ts-ignore
+import { faker } from "@faker-js/faker"
 
 const saveImage = async (buffer: string | Buffer, fileName: string, dir: string) => {
   const hashSum = crypto.createHash("md5")
@@ -39,33 +38,62 @@ export const createIfNotExist = (filepath: string) => {
 }
 
 export const imageSeeder = async () => {
-  const imageTypes = {
-    properties: await getImages({ query: "house exterior", size: "regular" }),
-    users: await getImages({ query: "profile picture", size: "regular" }),
+  // Initialize image types with proper error handling
+  const imageTypeConfigs = {
+    properties: { query: "modern house", size: "regular" },
+    users: { query: "headshot", size: "regular" },
+  } as const
+
+  const getImageTypes = async (type: keyof typeof imageTypeConfigs) => {
+    const config = imageTypeConfigs[type]
+    if (!config) {
+      throw new Error(`Invalid image type: ${type}`)
+    }
+
+    const images = await getImages(config)
+    return images
   }
 
   return async (opts: SeederOpts) => {
     const { type, id, imageCount = 1 } = opts
+
+    // Validate inputs
+    if (!type || !id) {
+      throw new Error("Type and ID are required parameters")
+    }
+
     const seedImageDir = `${process.cwd()}/seeds/images/${type}`
     const images: string[] = []
-    const removePath = (imagePath: string) => imagePath?.split(`${seedImageDir}/`)[1]
+    // const removePath = (imagePath: string) => imagePath?.split(`${seedImageDir}/`)[1]
+
     createIfNotExist(seedImageDir)
 
     // await clearImageFolder(`${seedUserImageDir}/*.png`)
     //   .then((deletedFiles) => console.log('done! deleted files:', deletedFiles))
 
     // TODO: consolidate duplicates
-    for (let i = 0; i < imageCount; i++) {
+    const downloadPromises = Array.from({ length: imageCount }, async () => {
       try {
-        const randomImage = faker.helpers.arrayElement(imageTypes[type])
-        await downloadImage(randomImage).then(async image => {
-          await saveImage(image, id, seedImageDir).then(fileName => {
-            images.push(fileName)
-          })
-        })
-      } catch (e) {
-        console.log(e)
+        const randomImages = await getImageTypes(type)
+        //@ts-ignore
+        const randomImage = faker.helpers.arrayElement(randomImages)
+        if (!randomImage) {
+          throw new Error(`No images available for type: ${type}`)
+        }
+        //@ts-ignore
+        const image = await downloadImage(randomImage)
+        return await saveImage(image, id, seedImageDir)
+      } catch (error) {
+        console.error(`Failed to process image: ${error.message}`)
+        return null
       }
+    })
+
+    const results = await Promise.all(downloadPromises)
+    images.push(...results.filter(Boolean))
+
+    if (images.length === 0) {
+      throw new Error("Failed to generate any valid images")
     }
 
     return imageCount > 1 ? images : images[0]
