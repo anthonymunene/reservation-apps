@@ -166,6 +166,20 @@ const createReviews = async (dbClient: Knex): Promise<void> => {
   )
 }
 
+const updateDefaultPic = async (dbClient: Knex, id: string, fileName: string) => {
+  try {
+    await dbClient("Profile")
+      .where("userId", id)
+      .update({
+        defaultPic: JSON.stringify({
+          url: fileName,
+        }),
+      })
+      .update({ updatedAt: dbClient.fn.now() })
+  } catch (e) {
+    console.log(e)
+  }
+}
 const updateDefaultProfilePictures = async (
   dbClient: Knex,
   dependencies = { getUsers, upload, getMatchingFile: getMatchingFile }
@@ -179,7 +193,10 @@ const updateDefaultProfilePictures = async (
         const matchingFile = await getMatchingFile(user.id)
         if (!matchingFile) return
         const [name, content] = matchingFile
-        if (name && content) await upload(name, content)
+        if (name && content)
+          await upload(name, content).then(async () => {
+            await updateDefaultPic(dbClient, user.id, name)
+          })
       })
     )
   } catch (error) {
