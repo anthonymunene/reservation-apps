@@ -54,6 +54,8 @@ services:
       driver: none
     networks:
       - reservation
+    profiles:
+      - 'dev'
 
 volumes:
   node_modules_cache:
