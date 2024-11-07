@@ -47,7 +47,7 @@
     "mocha": "cross-env NODE_ENV=test mocha test/ --require ts-node/register --recursive --extension .ts --watch --watch-files src/**/*.ts,test/**/*.ts",
     "test": "export NODE_ENV=test; npm run docker:test -- test true && npm run migrate && npm run seed && npm run mocha",
     "bundle:client": "npm run compile && npm pack --pack-destination ./public",
-    "migrate": "knex migrate:latest && ts-node generate-types.ts",
+    "migrate": "knex migrate:latest && ts-node generate-types.ts && npm run prettier-format",
     "migrate:make": "knex migrate:make",
     "migrate:seed": "knex seed:make",
     "seed": "knex seed:run",
