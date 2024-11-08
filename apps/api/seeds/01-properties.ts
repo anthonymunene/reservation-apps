@@ -1,102 +1,84 @@
 // 👇️ ts-nocheck disables type checking for entire file
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 
-const { faker } = require("@faker-js/faker")
+//@ts-ignore
+import { faker } from "@faker-js/faker"
 import { Knex } from "knex"
 import { PROPERTY } from "../src/utils/variables"
 import { randomiseArray } from "../src/utils/randomise"
 // import { createIfNotExist, seedImages, clearImageFolder } from '../utils/seedImages';
 import { Properties } from "../src/services/properties/properties.schema"
-import { Amenity, PropertyType } from "../src/types"
+import { Amenity, PropertyType, Table } from "../src/types"
 import { randomUUID } from "crypto"
 
+interface PropertyId extends Pick<Properties, "id"> {}
+
+interface PropertyTypeData extends Pick<PropertyType, "id" | "name"> {}
+
+interface AmenityData extends Pick<Amenity, "id" | "name"> {}
+
+const ROOMS_RANGE = [1, 2, 3] as const
+const NUM_PROPERTIES = 10
+const NUM_AMENITIES_PER_PROPERTY = 3
 //TYPES-TO-COLLATE:
-type PropertyId = Pick<Properties, "id">
-type PropertyTypeData = Pick<PropertyType, "id" | "name">
 
-type AmenityData = Pick<Amenity, "id" | "name">
+export const getAmenitiesById = async (dbClient: Knex): Promise<AmenityData[]> =>
+  await dbClient.select("id", "name").from(Table.Amenity)
 
-export const getAmenitiesById = async (dbClient: Knex): Pick<AmenityData, "id">[] => {
-  const amenities: AmenityData[] = await dbClient.select("id", "name").from("Amenity")
-  return amenities
+export const getAllPropertyTypes = async (dbClient: Knex): Promise<PropertyTypeData[]> =>
+  await dbClient.select("id", "name").from(Table.PropertyType)
+
+const addAmenities = async (dbClient: Knex, amenities: AmenityData[], property: PropertyId): Promise<void> => {
+  const amenityRecords = amenities.map(amenity => ({
+    id: randomUUID(),
+    amenityId: amenity.id,
+    propertyId: property.id,
+  }))
+
+  await dbClient(Table.PropertyAmenity).insert(amenityRecords)
 }
 
-export const getAllPropertyTypes = async (dbClient: Knex): PropertyTypeData[] => {
-  const propertyTypes: PropertyTypeData[] = await dbClient.select("id", "name").from("PropertyType")
-  return propertyTypes
-}
-
-// export const getPropertyTypeById = (dbClient: PrismaClient, id: number) => {
-
-//   return dbClient.propertyType.findMany({
-//     where: id
-//   });
-
-// };
-// export const getAllProperties = (dbClient: PrismaClient) =>
-//   dbClient.property.findMany({
-//     select: {
-//       id: true,
-//     },
-//   });
-// export const getMultipleRandomisedAmenityTypes = (amenities: string[]) =>
-//   faker.helpers.arrayElements(amenities, 2);
-
-export const createProperties = async (dbClient: Knex): Promise<void> => {
-  const amenities = await getAmenitiesById(dbClient)
-  const propertyTypes = await getAllPropertyTypes(dbClient)
-
-  const properties = Array.from({ length: 10 }).map(() => {
-    return {
-      id: randomUUID(),
-      description: faker.lorem.sentences(),
-      city: faker.location.city(),
-      countryCode: faker.location.countryCode(),
-      bedrooms: faker.helpers.arrayElement([1, 2, 3]),
-      beds: faker.helpers.arrayElement([1, 2, 3]),
-      images: {},
-      // entirePlace: faker.helpers.arrayElement([true, false])
-    }
-  })
-
-  // const connectAmenities = (data: []) =>
-  //   data.map((item) => ({ amenity: { connect: item } }));
-
-  // const propertiesImageDir = `${process.cwd()}/src/db/seed/images/properties`;
-  // await clearImageFolder(`${propertiesImageDir}/*.png`)
-  //   .then((deletedFiles) => console.log('done! deleted files:', deletedFiles));
-  const addAmenities = (amenities: AmenityData[], property: PropertyId): void => {
-    amenities.map(async (amenity: AmenityData) => {
-      await dbClient("PropertyAmenity").insert({
-        id: randomUUID(),
-        amenityId: amenity.id,
-        propertyId: property.id,
-      })
-    })
+const generateProperty = () => ({
+  id: randomUUID(),
+  description: faker.lorem.sentences(),
+  city: faker.location.city(),
+  countryCode: faker.location.countryCode(),
+  bedrooms: faker.helpers.arrayElement(ROOMS_RANGE),
+  beds: faker.helpers.arrayElement(ROOMS_RANGE),
+  images: {},
+  // entirePlace: faker.helpers.arrayElement([true, false])
+})
+export const createProperties = async (
+  dbClient: Knex,
+  dependencies = {
+    getAmenitiesById,
+    getAllPropertyTypes,
   }
+): Promise<void> => {
+  const { getAmenitiesById, getAllPropertyTypes } = dependencies
+  const [amenities, propertyTypes] = await Promise.all([getAmenitiesById(dbClient), getAllPropertyTypes(dbClient)])
+  if (!amenities.length || !propertyTypes.length) {
+    throw new Error("No amenities or property types found in database")
+  }
+  const properties = Array.from({ length: NUM_PROPERTIES }, generateProperty)
+
   await Promise.all(
     properties.map(async property => {
       const assignedPropertyType: PropertyTypeData = randomiseArray(propertyTypes)
-      const assignedAmenities: AmenityData[] = randomiseArray(amenities, 3)
+      const assignedAmenities: AmenityData[] = randomiseArray(amenities, NUM_AMENITIES_PER_PROPERTY)
       const title = `${faker.word.adjective(7)} ${assignedPropertyType.name}`
 
-      // createIfNotExist(propertiesImageDir);
-      // const propertyImage = await seedImages('house', {
-      //   dir: propertiesImageDir,
-      //   property: { title }
-      // });
-      const propertyId: PropertyId[] = await dbClient("Property").insert(
+      const [propertyId]: PropertyId[] = await dbClient(Table.Property).insert(
         {
           id: randomUUID(),
-          title: title,
+          title,
           ...property,
           propertyTypeId: assignedPropertyType.id,
         },
         ["id"]
       )
 
-      addAmenities(assignedAmenities, propertyId[0])
+      await addAmenities(dbClient, assignedAmenities, propertyId)
     })
   )
 }
@@ -111,8 +93,8 @@ export const createPropertyTypes = async (dbClient: Knex): Promise<void> => {
     })
   )
 
-  const propertyTypes = await dbClient("PropertyType").whereIn("name", PROPERTY_TYPES)
-  return propertyTypes.length ? propertyTypes : await dbClient.insert(propertyTypeData, ["id"]).into("PropertyType")
+  const existingPropertyTypes = await dbClient(Table.PropertyType).whereIn("name", PROPERTY_TYPES)
+  if (!existingPropertyTypes.length) await dbClient.insert(propertyTypeData, ["id"]).into(Table.PropertyType)
 }
 
 export const createAmenities = async (dbClient: Knex): Promise<void> => {
@@ -124,13 +106,17 @@ export const createAmenities = async (dbClient: Knex): Promise<void> => {
       name: amenity,
     })
   )
-  const amenities = await dbClient("Amenity").whereIn("name", AMENITIES)
-
-  return amenities.length ? amenities : await dbClient.insert(amenityData, ["id"]).into("Amenity")
+  const existingAmenities = await dbClient(Table.Amenity).whereIn("name", AMENITIES)
+  if (!existingAmenities.length) await dbClient.insert(amenityData, ["id"]).into(Table.Amenity)
 }
 
 export async function seed(knex: Knex): Promise<void> {
-  await createAmenities(knex)
-  await createPropertyTypes(knex)
-  await createProperties(knex)
+  try {
+    await createAmenities(knex)
+    await createPropertyTypes(knex)
+    await createProperties(knex)
+  } catch (error) {
+    console.error("Error seeding database:", error)
+    throw error
+  }
 }
