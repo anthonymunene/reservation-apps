@@ -1,4 +1,5 @@
 import { Knex } from "knex"
+import { ImageDefaults } from "../seeds/utils/imageDefaults"
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema
@@ -16,8 +17,7 @@ export async function up(knex: Knex): Promise<void> {
       table.string("otherNames")
       table.text("bio")
       table.boolean("isSuperHost").notNullable().defaultTo(false) // should belong in property rentaltable
-      table.jsonb("defaultPic").nullable().defaultTo({})
-      table.jsonb("profilePics").nullable().defaultTo({})
+      table.jsonb("images").nullable().defaultTo(ImageDefaults.createDefaultJson())
       table.uuid("userId").unsigned().references("id").inTable("User").onDelete("cascade")
       table.timestamps(false, true, true)
     })
@@ -34,7 +34,7 @@ export async function up(knex: Knex): Promise<void> {
       table.string("countryCode")
       table.integer("bedrooms").unsigned()
       table.integer("beds").unsigned()
-      table.jsonb("images").defaultTo([{ image: "no_image" }])
+      table.jsonb("images").nullable().defaultTo(ImageDefaults.createDefaultJson())
       table.uuid("host").unsigned().references("id").inTable("User").onDelete("cascade")
       table.uuid("propertyTypeId").unsigned().references("PropertyType.id").onDelete("cascade")
       table.timestamps(false, true, true)
@@ -60,6 +60,7 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 const tables = ["User", "Amenity", "Profile", "Review", "PropertyType", "Property", "PropertyAmenity"]
+
 export async function down(knex: Knex): Promise<void[]> {
   return Promise.all(
     tables.map(async function (table) {
