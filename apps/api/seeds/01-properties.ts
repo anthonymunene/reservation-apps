@@ -5,11 +5,13 @@
 import { faker } from "@faker-js/faker"
 import { Knex } from "knex"
 import { PROPERTY } from "../src/utils/variables"
-import { randomiseArray } from "../src/utils/randomise"
+import { randomiseMany, randomiseOne } from "../src/utils/randomise"
 // import { createIfNotExist, seedImages, clearImageFolder } from '../utils/seedImages';
 import { Properties } from "../src/services/properties/properties.schema"
 import { Amenity, PropertyType, Table } from "../src/types"
 import { randomUUID } from "crypto"
+import { generateImages, getMatchingFile, replacePrimaryImageForEntity, uploadToS3 } from "./utils/shared"
+import { PROPERTIES_IMAGE_DIR } from "./utils/variables"
 
 interface PropertyId extends Pick<Properties, "id"> {}
 
@@ -54,7 +56,7 @@ export const createProperties = async (
     getAmenitiesById,
     getAllPropertyTypes,
   }
-): Promise<void> => {
+): Promise<PropertyId[]> => {
   const { getAmenitiesById, getAllPropertyTypes } = dependencies
   const [amenities, propertyTypes] = await Promise.all([getAmenitiesById(dbClient), getAllPropertyTypes(dbClient)])
   if (!amenities.length || !propertyTypes.length) {
@@ -62,10 +64,10 @@ export const createProperties = async (
   }
   const properties = Array.from({ length: NUM_PROPERTIES }, generateProperty)
 
-  await Promise.all(
+  return await Promise.all(
     properties.map(async property => {
-      const assignedPropertyType: PropertyTypeData = randomiseArray(propertyTypes)
-      const assignedAmenities: AmenityData[] = randomiseArray(amenities, NUM_AMENITIES_PER_PROPERTY)
+      const assignedPropertyType: PropertyTypeData = randomiseOne(propertyTypes)
+      const assignedAmenities: AmenityData[] = randomiseMany(amenities, { count: NUM_AMENITIES_PER_PROPERTY })
       const title = `${faker.word.adjective(7)} ${assignedPropertyType.name}`
 
       const [propertyId]: PropertyId[] = await dbClient(Table.Property).insert(
@@ -79,6 +81,7 @@ export const createProperties = async (
       )
 
       await addAmenities(dbClient, assignedAmenities, propertyId)
+      return propertyId
     })
   )
 }
@@ -109,12 +112,44 @@ export const createAmenities = async (dbClient: Knex): Promise<void> => {
   const existingAmenities = await dbClient(Table.Amenity).whereIn("name", AMENITIES)
   if (!existingAmenities.length) await dbClient.insert(amenityData, ["id"]).into(Table.Amenity)
 }
+const getProperties = async (knex: Knex) => await knex.select("id").from(Table.Property)
+
+const updatePropertyPictures = async (
+  dbClient: Knex,
+  dependencies = {
+    getProperties,
+    uploadToS3,
+    getMatchingFile,
+  }
+) => {
+  const { getProperties, uploadToS3, getMatchingFile } = dependencies
+  try {
+    const properties = await getProperties(dbClient)
+
+    await Promise.all(
+      properties.map(async property => {
+        const matchingFile = await getMatchingFile(property.id, PROPERTIES_IMAGE_DIR)
+        if (!matchingFile) return
+        const [fileName, content] = matchingFile
+        if (fileName && content)
+          await uploadToS3(fileName, content, "properties").then(async response => {
+            const result = response
+            await replacePrimaryImageForEntity(dbClient, property.id, fileName, Table.Property)
+          })
+      })
+    )
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 export async function seed(knex: Knex): Promise<void> {
   try {
     await createAmenities(knex)
     await createPropertyTypes(knex)
-    await createProperties(knex)
+    const propertyData = await createProperties(knex)
+    await generateImages(propertyData, "properties")
+    await updatePropertyPictures(knex)
   } catch (error) {
     console.error("Error seeding database:", error)
     throw error
