@@ -2,7 +2,7 @@ import { downloadImage } from "./downloadImage"
 import { existsSync, mkdirSync, promises } from "fs"
 import * as crypto from "crypto"
 import { getImages } from "./getUnsplashImages"
-import { type SeederOpts } from "./shared"
+import { type SeederOpts } from "./types"
 //@ts-ignore
 import { faker } from "@faker-js/faker"
 
@@ -50,8 +50,7 @@ export const imageSeeder = async () => {
       throw new Error(`Invalid image type: ${type}`)
     }
 
-    const images = await getImages(config)
-    return images
+    return await getImages(config)
   }
 
   return async (opts: SeederOpts) => {
@@ -75,14 +74,13 @@ export const imageSeeder = async () => {
     const downloadPromises = Array.from({ length: imageCount }, async () => {
       try {
         const randomImages = await getImageTypes(type)
-        //@ts-ignore
-        const randomImage = faker.helpers.arrayElement(randomImages)
-        if (!randomImage) {
+        if (randomImages) {
+          const randomImage = faker.helpers.arrayElement(randomImages)
+          const image = await downloadImage(randomImage)
+          return await saveImage(image, id, seedImageDir)
+        } else {
           throw new Error(`No images available for type: ${type}`)
         }
-        //@ts-ignore
-        const image = await downloadImage(randomImage)
-        return await saveImage(image, id, seedImageDir)
       } catch (error) {
         console.error(`Failed to process image: ${error.message}`)
         return null
