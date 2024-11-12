@@ -3,7 +3,7 @@
 import assert from "assert"
 import { app } from "../../../src/app"
 const { faker } = require("@faker-js/faker")
-import { randomiseArray } from "../../../src/utils/randomise"
+import { randomiseMany } from "../../../src/utils/randomise"
 
 describe("properties service", () => {
   it("registered the service", () => {
@@ -19,7 +19,7 @@ describe("properties service", () => {
       amenity => amenity.id
     )
 
-    const randomAmenities = randomiseArray(amenities, 3)
+    const randomAmenities = randomiseMany(amenities, 3)
 
     const user = await app.service("users").find({ query: { $limit: 1 } })
     const property = await app.service("properties").create({
