@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { UNSPLASH_ACCESS_KEY } from "./shared"
+import { UNSPLASH_ACCESS_KEY } from "./variables"
 
 const IMAGE_URL = "https://api.unsplash.com/search/photos"
 const CLIENT_ACCESS_KEY = UNSPLASH_ACCESS_KEY
