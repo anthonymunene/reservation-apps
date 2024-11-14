@@ -1,8 +1,9 @@
-import type { Properties } from "../../src/services/properties/properties.schema"
-import type { Users } from "../../src/services/users/users.schema"
-import type { Profiles } from "../../src/services/profiles/profiles.schema"
-import { PROPERTIES_IMAGE_DIR, USERS_IMAGE_DIR } from "./variables"
-import { Table } from "../../src/types"
+import type { Properties } from "@services/properties/properties.schema"
+import type { Users } from "@services/users/users.schema"
+import type { Profiles } from "@services/profiles/profiles.schema"
+import { PROPERTIES_IMAGE_DIR, USERS_IMAGE_DIR } from "@seeds/utils/variables"
+import { Table } from "@database-generated-types"
+import { type Knex } from "knex"
 
 export type PropertyId = Pick<Properties, "id">
 export type UserId = Pick<Users, "id">

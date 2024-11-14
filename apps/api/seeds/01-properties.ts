@@ -4,14 +4,14 @@
 //@ts-ignore
 import { faker } from "@faker-js/faker"
 import { Knex } from "knex"
-import { PROPERTY } from "../src/utils/variables"
-import { randomiseMany, randomiseOne } from "../src/utils/randomise"
+import { PROPERTY } from "@utils/variables"
+import { randomiseMany, randomiseOne } from "@utils/randomise"
 // import { createIfNotExist, seedImages, clearImageFolder } from '../utils/seedImages';
-import { Properties } from "../src/services/properties/properties.schema"
-import { Amenity, PropertyType, Table } from "../src/types"
+import { Properties } from "@services/properties/properties.schema"
+import { Amenity, PropertyType, Table } from "@database-generated-types"
 import { randomUUID } from "crypto"
-import { generateImages, getMatchingFile, replacePrimaryImageForEntity, uploadToS3 } from "./utils/shared"
-import { PROPERTIES_IMAGE_DIR } from "./utils/variables"
+import { generateImages, getMatchingFile, replacePrimaryImageForEntity, uploadToS3 } from "@seeds/utils/shared"
+import { PROPERTIES_IMAGE_DIR } from "@seeds/utils/variables"
 
 interface PropertyId extends Pick<Properties, "id"> {}
 

@@ -2,13 +2,36 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "tsconfig/base.json",
   "ts-node": {
-    "files": true
+    "files": true,
+    "require": ["tsconfig-paths/register"]
   },
   "compilerOptions": {
     "target": "es2020",
     "outDir": "./lib",
     "rootDir": ".",
+    "baseUrl": "./",
+    "paths": {
+      "@seeds/*": [
+        "seeds/*"
+      ],
+      "@services/*": [
+        "src/services/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@database-generated-types": [
+        "src/types"
+      ]
+    }
   },
-  "include": ["src", "seeds"],
-  "exclude": ["test"]
+  "include": [
+    "src",
+    "seeds"
+  ],
+  "exclude": [
+    "test",
+    "lib",
+    "node_modules"
+  ]
 }

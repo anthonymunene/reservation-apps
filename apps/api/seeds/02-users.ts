@@ -2,15 +2,22 @@
 import { type Knex } from "knex"
 import { type Users } from "../src/services/users/users.schema"
 import { randomUUID } from "crypto"
-import { Table } from "../src/types"
+import { Table } from "@database-generated-types"
 
-import { randomiseInt } from "../src/utils/randomise"
-import * as reviews from "./data/reviews.json"
-import { generateImages, getMatchingFile, replacePrimaryImageForEntity, uploadToS3 } from "./utils/shared"
-import { ProfileData, PropertyId, UserId } from "./utils/types"
+import { randomiseInt } from "@utils/randomise"
+import * as reviews from "@seeds/data/reviews.json"
+import { generateImages, getMatchingFile, replacePrimaryImageForEntity, uploadToS3 } from "@seeds/utils/shared"
+import {
+  ProfileData,
+  PropertyId,
+  UserAccountDependencies,
+  UserDataGenerator,
+  UserId,
+  UserProfileDependencies,
+} from "@seeds/utils/types"
 //@ts-ignore
 import { faker } from "@faker-js/faker"
-import { USERS_IMAGE_DIR } from "./utils/variables"
+import { USERS_IMAGE_DIR } from "@seeds/utils/variables"
 
 const generateUserAccounts = (
   userCount: number = 1,
