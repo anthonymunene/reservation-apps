@@ -49,3 +49,23 @@ export type SeederOpts = {
   imageCount?: number
 }
 export type ImageType = SeederOpts["type"]
+
+export type UserDataGenerator = {
+  generateUserAccount: () => Pick<Users, "id" | "email" | "password">
+  generateProfile: (userId: string) => Omit<ProfileData, "defaultPic">
+}
+
+type Database = {
+  query: Knex | null
+}
+type DatabaseDependency = {
+  database: Database
+}
+
+export type UserProfileDependencies = DatabaseDependency & {
+  dataGenerator: UserDataGenerator["generateProfile"]
+}
+
+export type UserAccountDependencies = DatabaseDependency & {
+  dataGenerator: UserDataGenerator["generateUserAccount"]
+}

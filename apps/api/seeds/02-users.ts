@@ -1,6 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-import { type Knex } from "knex"
-import { type Users } from "../src/services/users/users.schema"
+import { Knex } from "knex"
 import { randomUUID } from "crypto"
 import { Table } from "@database-generated-types"
 
@@ -19,16 +18,30 @@ import {
 import { faker } from "@faker-js/faker"
 import { USERS_IMAGE_DIR } from "@seeds/utils/variables"
 
-const generateUserAccounts = (
-  userCount: number = 1,
-  { dataGenerator = faker, generateRandomId = randomUUID } = {}
-): Array<Pick<Users, "id" | "email" | "password">> =>
-  Array.from({ length: userCount }, () => ({
-    id: generateRandomId(),
-    email: dataGenerator.internet.email(),
-    password: dataGenerator.internet.password(),
-  }))
+const createDefaultUserDataGenerator: UserDataGenerator = {
+  generateUserAccount: () => ({
+    id: faker.string.uuid(),
+    email: faker.internet.email(),
+    password: faker.internet.password(),
+  }),
+  generateProfile: userId => ({
+    id: faker.string.uuid(),
+    firstName: faker.person.firstName(),
+    surname: faker.person.lastName(),
+    bio: faker.lorem.sentences(),
+    userId,
+  }),
+}
 
+const createUserAccountDependencies = (overrides: Partial<UserAccountDependencies> = {}): UserAccountDependencies => ({
+  database: overrides.database || { query: null },
+  dataGenerator: overrides.dataGenerator || createDefaultUserDataGenerator.generateUserAccount,
+})
+const createUserAccounts = (userCount: number = 1, dependencies: Partial<UserAccountDependencies> = {}) => {
+  const deps = createUserAccountDependencies(dependencies)
+  const { dataGenerator } = deps
+  return Array.from({ length: userCount }, () => dataGenerator())
+}
 const getRandomisedPropertyIds = (propertyIds: PropertyId[], propertyIdCount = 2, dependencies = { faker }) => {
   const { faker } = dependencies
   return faker.helpers.arrayElements(propertyIds, propertyIdCount)
@@ -45,17 +58,16 @@ const getFreeProperty = async (dbClient: Knex, { fetchUnownedProperties = getAll
   return getRandomisedPropertyIds(unownedProperties)
 }
 
-const createProfiles = async (user: UserId, knex: Knex) => {
+const createUserProfileDependencies = (overrides: Partial<UserProfileDependencies> = {}): UserProfileDependencies => ({
+  database: overrides.database || { query: null },
+  dataGenerator: overrides.dataGenerator || createDefaultUserDataGenerator.generateProfile,
+})
+const createProfiles = async (user: UserId, dependencies: Partial<UserProfileDependencies> = {}) => {
+  const deps = createUserProfileDependencies(dependencies)
+  const { dataGenerator, database } = deps
   const { id } = user
-  const profile: Omit<ProfileData, "defaultPic"> = {
-    id: randomUUID(),
-    firstName: faker.person.firstName(),
-    surname: faker.person.lastName(),
-    bio: faker.lorem.sentences(),
-    userId: id,
-  }
-
-  const userProfile = await knex.insert(profile).into(Table.Profile).returning(["id"])
+  const profile: Omit<ProfileData, "defaultPic"> = dataGenerator(id)
+  const userProfile = await database.query.insert(profile).into(Table.Profile).returning(["id"])
 
   console.log(`Returned profileId ${JSON.stringify(userProfile[0]?.id)}`)
   return userProfile[0]
@@ -79,11 +91,11 @@ const ownProperty = async (properties: PropertyId[], user: UserId, dbClient: Kne
 
 const createUsersAndProfiles = async (
   knex: Knex,
-  dependencies = { generateUserAccounts, createProfiles, getFreeProperty, ownProperty }
+  dependencies = { createUserAccounts, createProfiles, getFreeProperty, ownProperty }
 ): Promise<UserId[]> => {
   console.log(`Creating users...`)
-  const { generateUserAccounts, createProfiles, getFreeProperty, ownProperty } = dependencies
-  const userAccounts = generateUserAccounts(10)
+  const { createUserAccounts, createProfiles, getFreeProperty, ownProperty } = dependencies
+  const userAccounts = createUserAccounts(10)
   const users: UserId[] = []
   // await clearImageFolder(`${seedUserImageDir}/*.png`)
   //   .then((deletedFiles) => console.log('done! deleted files:', deletedFiles))
@@ -93,7 +105,7 @@ const createUsersAndProfiles = async (
   for (const userAccount of userAccounts) {
     const [user]: UserId[] = await knex.insert(userAccount, ["id"]).into(Table.User)
     if (!user) continue
-    await createProfiles(user, knex)
+    await createProfiles(user, { database: { query: knex } })
 
     const propertyToOwn = await getFreeProperty(knex)
 
