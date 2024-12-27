@@ -32,14 +32,26 @@ export const amenities = (app: Application) => {
   // Initialize hooks
   app.service(amenitiesPath).hooks({
     around: {
-      all: [schemaHooks.resolveExternal(amenitiesExternalResolver), schemaHooks.resolveResult(amenitiesResolver)],
+      all: [
+        schemaHooks.resolveExternal(amenitiesExternalResolver),
+        schemaHooks.resolveResult(amenitiesResolver),
+      ],
     },
     before: {
-      all: [schemaHooks.validateQuery(amenitiesQueryValidator), schemaHooks.resolveQuery(amenitiesQueryResolver)],
+      all: [
+        schemaHooks.validateQuery(amenitiesQueryValidator),
+        schemaHooks.resolveQuery(amenitiesQueryResolver),
+      ],
       find: [],
       get: [],
-      create: [schemaHooks.validateData(amenitiesDataValidator), schemaHooks.resolveData(amenitiesDataResolver)],
-      patch: [schemaHooks.validateData(amenitiesPatchValidator), schemaHooks.resolveData(amenitiesPatchResolver)],
+      create: [
+        schemaHooks.validateData(amenitiesDataValidator),
+        schemaHooks.resolveData(amenitiesDataResolver),
+      ],
+      patch: [
+        schemaHooks.validateData(amenitiesPatchValidator),
+        schemaHooks.resolveData(amenitiesPatchResolver),
+      ],
       remove: [],
     },
     after: {

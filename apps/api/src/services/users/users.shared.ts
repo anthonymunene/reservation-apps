@@ -5,7 +5,10 @@ import type { Users, UsersData, UsersPatch, UsersQuery, UsersService } from "./u
 
 export type { Users, UsersData, UsersPatch, UsersQuery }
 
-export type UsersClientService = Pick<UsersService<Params<UsersQuery>>, (typeof usersMethods)[number]>
+export type UsersClientService = Pick<
+  UsersService<Params<UsersQuery>>,
+  (typeof usersMethods)[number]
+>
 
 export const usersPath = "users"
 

@@ -29,10 +29,20 @@ export type {
 } from "./services/propertyAmenities/propertyAmenities.shared"
 
 import { amenitiesClient } from "./services/amenities/amenities.shared"
-export type { Amenities, AmenitiesData, AmenitiesQuery, AmenitiesPatch } from "./services/amenities/amenities.shared"
+export type {
+  Amenities,
+  AmenitiesData,
+  AmenitiesQuery,
+  AmenitiesPatch,
+} from "./services/amenities/amenities.shared"
 
 import { reviewsClient } from "./services/reviews/reviews.shared"
-export type { Reviews, ReviewsData, ReviewsQuery, ReviewsPatch } from "./services/reviews/reviews.shared"
+export type {
+  Reviews,
+  ReviewsData,
+  ReviewsQuery,
+  ReviewsPatch,
+} from "./services/reviews/reviews.shared"
 
 import { propertiesClient } from "./services/properties/properties.shared"
 export type {
@@ -43,7 +53,12 @@ export type {
 } from "./services/properties/properties.shared"
 
 import { profilesClient } from "./services/profiles/profiles.shared"
-export type { Profiles, ProfilesData, ProfilesQuery, ProfilesPatch } from "./services/profiles/profiles.shared"
+export type {
+  Profiles,
+  ProfilesData,
+  ProfilesQuery,
+  ProfilesPatch,
+} from "./services/profiles/profiles.shared"
 
 import { usersClient } from "./services/users/users.shared"
 export type { Users, UsersData, UsersQuery, UsersPatch } from "./services/users/users.shared"

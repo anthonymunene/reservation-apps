@@ -30,11 +30,18 @@ export const propertyAmenitiesExternalResolver = resolve<PropertyAmenities, Hook
 })
 
 // Schema for creating new entries
-export const propertyAmenitiesDataSchema = Type.Pick(propertyAmenitiesSchema, ["propertyId", "amenityId"], {
-  $id: "PropertyAmenitiesData",
-})
+export const propertyAmenitiesDataSchema = Type.Pick(
+  propertyAmenitiesSchema,
+  ["propertyId", "amenityId"],
+  {
+    $id: "PropertyAmenitiesData",
+  }
+)
 export type PropertyAmenitiesData = Static<typeof propertyAmenitiesDataSchema>
-export const propertyAmenitiesDataValidator = getValidator(propertyAmenitiesDataSchema, dataValidator)
+export const propertyAmenitiesDataValidator = getValidator(
+  propertyAmenitiesDataSchema,
+  dataValidator
+)
 export const propertyAmenitiesDataResolver = resolve<PropertyAmenities, HookContext>({
   id: async () => {
     return randomUUID()
@@ -49,7 +56,10 @@ export const propertyAmenitiesPatchSchema = Type.Partial(propertyAmenitiesSchema
   $id: "PropertyAmenitiesPatch",
 })
 export type PropertyAmenitiesPatch = Static<typeof propertyAmenitiesPatchSchema>
-export const propertyAmenitiesPatchValidator = getValidator(propertyAmenitiesPatchSchema, dataValidator)
+export const propertyAmenitiesPatchValidator = getValidator(
+  propertyAmenitiesPatchSchema,
+  dataValidator
+)
 export const propertyAmenitiesPatchResolver = resolve<PropertyAmenities, HookContext>({
   updatedAt: async () => {
     return new Date().toISOString()
@@ -58,7 +68,10 @@ export const propertyAmenitiesPatchResolver = resolve<PropertyAmenities, HookCon
 })
 
 // Schema for allowed query properties
-export const propertyAmenitiesQueryProperties = Type.Pick(propertyAmenitiesSchema, ["propertyId", "amenityId"])
+export const propertyAmenitiesQueryProperties = Type.Pick(propertyAmenitiesSchema, [
+  "propertyId",
+  "amenityId",
+])
 export const propertyAmenitiesQuerySchema = Type.Intersect(
   [
     querySyntax(propertyAmenitiesQueryProperties),
@@ -68,5 +81,8 @@ export const propertyAmenitiesQuerySchema = Type.Intersect(
   { additionalProperties: false }
 )
 export type PropertyAmenitiesQuery = Static<typeof propertyAmenitiesQuerySchema>
-export const propertyAmenitiesQueryValidator = getValidator(propertyAmenitiesQuerySchema, queryValidator)
+export const propertyAmenitiesQueryValidator = getValidator(
+  propertyAmenitiesQuerySchema,
+  queryValidator
+)
 export const propertyAmenitiesQueryResolver = resolve<PropertyAmenitiesQuery, HookContext>({})

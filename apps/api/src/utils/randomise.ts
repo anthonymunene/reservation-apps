@@ -3,7 +3,10 @@ import { faker } from "@faker-js/faker"
 
 type RandomisedItem = { id: string; name: string }
 
-export function randomiseMany<T extends RandomisedItem>(items: T[], options?: { count?: number }): T[] {
+export function randomiseMany<T extends RandomisedItem>(
+  items: T[],
+  options?: { count?: number }
+): T[] {
   return faker.helpers.uniqueArray(items, options.count)
 }
 

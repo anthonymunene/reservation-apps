@@ -36,9 +36,15 @@ export class PresignurlService {
 
     const credentials = options.s3Client.credentials
     if (signatureVersion !== "v4") {
-      throw new Error("feathers-s3:constructor: `options.s3Client.signatureVersion` must be provided and equal to `v4`")
+      throw new Error(
+        "feathers-s3:constructor: `options.s3Client.signatureVersion` must be provided and equal to `v4`"
+      )
     }
-    this.s3Client = new S3Client({ region: options.s3Client.region, signatureVersion, credentials: { ...credentials } })
+    this.s3Client = new S3Client({
+      region: options.s3Client.region,
+      signatureVersion,
+      credentials: { ...credentials },
+    })
     // Check for bucket
     if (!options.s3Client.bucket) {
       throw new Error("feathers-s3:constructor: `options.bucket` must be provided")

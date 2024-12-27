@@ -1,11 +1,20 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.shared.html
 import type { Params } from "@feathersjs/feathers"
 import type { ClientApplication } from "../../client"
-import type { Reviews, ReviewsData, ReviewsPatch, ReviewsQuery, ReviewsService } from "./reviews.class"
+import type {
+  Reviews,
+  ReviewsData,
+  ReviewsPatch,
+  ReviewsQuery,
+  ReviewsService,
+} from "./reviews.class"
 
 export type { Reviews, ReviewsData, ReviewsPatch, ReviewsQuery }
 
-export type ReviewsClientService = Pick<ReviewsService<Params<ReviewsQuery>>, (typeof reviewsMethods)[number]>
+export type ReviewsClientService = Pick<
+  ReviewsService<Params<ReviewsQuery>>,
+  (typeof reviewsMethods)[number]
+>
 
 export const reviewsPath = "reviews"
 

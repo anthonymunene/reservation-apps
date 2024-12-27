@@ -32,14 +32,26 @@ export const reviews = (app: Application) => {
   // Initialize hooks
   app.service(reviewsPath).hooks({
     around: {
-      all: [schemaHooks.resolveExternal(reviewsExternalResolver), schemaHooks.resolveResult(reviewsResolver)],
+      all: [
+        schemaHooks.resolveExternal(reviewsExternalResolver),
+        schemaHooks.resolveResult(reviewsResolver),
+      ],
     },
     before: {
-      all: [schemaHooks.validateQuery(reviewsQueryValidator), schemaHooks.resolveQuery(reviewsQueryResolver)],
+      all: [
+        schemaHooks.validateQuery(reviewsQueryValidator),
+        schemaHooks.resolveQuery(reviewsQueryResolver),
+      ],
       find: [],
       get: [],
-      create: [schemaHooks.validateData(reviewsDataValidator), schemaHooks.resolveData(reviewsDataResolver)],
-      patch: [schemaHooks.validateData(reviewsPatchValidator), schemaHooks.resolveData(reviewsPatchResolver)],
+      create: [
+        schemaHooks.validateData(reviewsDataValidator),
+        schemaHooks.resolveData(reviewsDataResolver),
+      ],
+      patch: [
+        schemaHooks.validateData(reviewsPatchValidator),
+        schemaHooks.resolveData(reviewsPatchResolver),
+      ],
       remove: [],
     },
     after: {

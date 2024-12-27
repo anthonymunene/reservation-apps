@@ -11,12 +11,19 @@ import type {
   PropertyAmenitiesQuery,
 } from "./propertyAmenities.schema"
 
-export type { PropertyAmenities, PropertyAmenitiesData, PropertyAmenitiesPatch, PropertyAmenitiesQuery }
+export type {
+  PropertyAmenities,
+  PropertyAmenitiesData,
+  PropertyAmenitiesPatch,
+  PropertyAmenitiesQuery,
+}
 
 export interface PropertyAmenitiesParams extends KnexAdapterParams<PropertyAmenitiesQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
-export class PropertyAmenitiesService<ServiceParams extends Params = PropertyAmenitiesParams> extends KnexService<
+export class PropertyAmenitiesService<
+  ServiceParams extends Params = PropertyAmenitiesParams,
+> extends KnexService<
   PropertyAmenities,
   PropertyAmenitiesData,
   PropertyAmenitiesParams,

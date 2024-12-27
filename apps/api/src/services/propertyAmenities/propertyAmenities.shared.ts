@@ -9,7 +9,12 @@ import type {
   PropertyAmenitiesService,
 } from "./propertyAmenities.class"
 
-export type { PropertyAmenities, PropertyAmenitiesData, PropertyAmenitiesPatch, PropertyAmenitiesQuery }
+export type {
+  PropertyAmenities,
+  PropertyAmenitiesData,
+  PropertyAmenitiesPatch,
+  PropertyAmenitiesQuery,
+}
 
 export type PropertyAmenitiesClientService = Pick<
   PropertyAmenitiesService<Params<PropertyAmenitiesQuery>>,

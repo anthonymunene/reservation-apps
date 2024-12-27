@@ -34,13 +34,25 @@ export const properties = (app: Application) => {
   // Initialize hooks
   app.service(propertiesPath).hooks({
     around: {
-      all: [schemaHooks.resolveExternal(propertiesExternalResolver), schemaHooks.resolveResult(propertiesResolver)],
+      all: [
+        schemaHooks.resolveExternal(propertiesExternalResolver),
+        schemaHooks.resolveResult(propertiesResolver),
+      ],
       create: [insertAmenity],
     },
     before: {
-      all: [schemaHooks.validateQuery(propertiesQueryValidator), schemaHooks.resolveQuery(propertiesQueryResolver)],
-      create: [schemaHooks.validateData(propertiesDataValidator), schemaHooks.resolveData(propertiesDataResolver)],
-      patch: [schemaHooks.validateData(propertiesPatchValidator), schemaHooks.resolveData(propertiesPatchResolver)],
+      all: [
+        schemaHooks.validateQuery(propertiesQueryValidator),
+        schemaHooks.resolveQuery(propertiesQueryResolver),
+      ],
+      create: [
+        schemaHooks.validateData(propertiesDataValidator),
+        schemaHooks.resolveData(propertiesDataResolver),
+      ],
+      patch: [
+        schemaHooks.validateData(propertiesPatchValidator),
+        schemaHooks.resolveData(propertiesPatchResolver),
+      ],
       remove: [],
     },
     after: {

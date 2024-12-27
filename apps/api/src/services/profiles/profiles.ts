@@ -32,14 +32,26 @@ export const profiles = (app: Application) => {
   // Initialize hooks
   app.service(profilesPath).hooks({
     around: {
-      all: [schemaHooks.resolveExternal(profilesExternalResolver), schemaHooks.resolveResult(profilesResolver)],
+      all: [
+        schemaHooks.resolveExternal(profilesExternalResolver),
+        schemaHooks.resolveResult(profilesResolver),
+      ],
     },
     before: {
-      all: [schemaHooks.validateQuery(profilesQueryValidator), schemaHooks.resolveQuery(profilesQueryResolver)],
+      all: [
+        schemaHooks.validateQuery(profilesQueryValidator),
+        schemaHooks.resolveQuery(profilesQueryResolver),
+      ],
       find: [],
       get: [],
-      create: [schemaHooks.validateData(profilesDataValidator), schemaHooks.resolveData(profilesDataResolver)],
-      patch: [schemaHooks.validateData(profilesPatchValidator), schemaHooks.resolveData(profilesPatchResolver)],
+      create: [
+        schemaHooks.validateData(profilesDataValidator),
+        schemaHooks.resolveData(profilesDataResolver),
+      ],
+      patch: [
+        schemaHooks.validateData(profilesPatchValidator),
+        schemaHooks.resolveData(profilesPatchResolver),
+      ],
       remove: [],
     },
     after: {
