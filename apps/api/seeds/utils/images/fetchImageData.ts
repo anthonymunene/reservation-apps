@@ -3,7 +3,6 @@ import { err, ResultAsync } from "neverthrow"
 import { createError } from "@seeds/utils/createError"
 import { UnsplashSearchResponse } from "@seeds/utils/types/images"
 
-type FetchResult = NetworkError | ParseError
 export const fetchImageData = (url: string) => {
   return ResultAsync.fromPromise<Response, NetworkError>(fetch(url), error =>
     createError(ErrorCode.NETWORK, `${error}`)

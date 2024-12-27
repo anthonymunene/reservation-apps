@@ -10,7 +10,7 @@ const generateHash = (fileName: string, content: StringOrBuffer): Result<string,
       const hash = createHash("md5").update(content).digest("hex").slice(0, 8)
       return `${fileName.toLowerCase().replace(/ /g, "-")}-${hash}.png`
     },
-    error => createError(ErrorCode.HASHING, "Failed to generate hashed filename")
+    () => createError(ErrorCode.HASHING, "Failed to generate hashed filename")
   )(fileName, content)
 }
 
