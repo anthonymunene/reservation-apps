@@ -1,4 +1,4 @@
-import { Image } from "./types"
+import type { Image } from "@seeds/utils/types/images"
 import { randomUUID } from "crypto"
 
 export class ImageDefaults {

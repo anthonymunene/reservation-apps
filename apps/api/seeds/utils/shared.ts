@@ -1,12 +1,19 @@
 import { readdir, readFile, stat } from "node:fs/promises"
 import path, { basename, join } from "node:path"
-import { S3Service } from "../../src/utils/s3/lib"
+import { S3Service } from "@utils/s3/lib"
 import * as defaultConfig from "../../config/default.json"
-import { imageSeeder } from "./seedImages"
-import { EntityType, Image, ImageFolders, PropertyId, S3Path, UserId, ImageType } from "./types"
+import { seedImages } from "./seedImages"
+import { EntityType, S3Path } from "@seeds/utils/types/shared"
+import { Image, ImageFolders, ImageType } from "@seeds/utils/types/images"
+import { PropertyId } from "@seeds/utils/types/properties"
+import { UserId } from "@seeds/utils/types/users"
 import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, ENTITY_CONFIG } from "./variables"
 import type { Knex } from "knex"
 import { ImageDefaults } from "./imageDefaults"
+import { err, Result } from "neverthrow"
+import { createError } from "@seeds/utils/createError"
+import { ErrorCode, ImagesMetaDataError } from "@seeds/utils/types/errors"
+import { SavedImageSuccess } from "@seeds/utils/images"
 
 export const getFiles = async (directoryPath: string): Promise<string[]> => {
   if (!directoryPath) {
@@ -40,7 +47,11 @@ export const getFiles = async (directoryPath: string): Promise<string[]> => {
   }
 }
 
-export const getPresignedUrl = async (fileName: string, path: S3Path, dependencies = { S3Service }) => {
+export const getPresignedUrl = async (
+  fileName: string,
+  path: S3Path,
+  dependencies = { S3Service }
+) => {
   const { S3Service } = dependencies
   const s3Client = new S3Service({
     s3Client: {
@@ -70,19 +81,33 @@ export const getMatchingFile = async (
   return [matchingFile, content]
 }
 
+const processImage = (
+  { id }: UserId | PropertyId,
+  imageType: ImageType,
+  dependencies = { seedImages }
+) => {
+  const { seedImages } = dependencies
+  return seedImages({
+    type: imageType,
+    id,
+  })
+}
+
 export const generateImages = async (
   data: UserId[] | PropertyId[],
   imageType: ImageType,
-  { getImages = imageSeeder } = {}
-): Promise<undefined | Error> => {
-  try {
-    if (!data) return new Error("data missing")
-
-    const seedImages = await getImages()
-    await Promise.all(data.map(({ id }) => seedImages({ type: imageType, id })))
-  } catch (e) {
-    return new Error(e)
+  dependencies = { processImage }
+): Promise<Result<SavedImageSuccess[], ImagesMetaDataError>> => {
+  const { processImage } = dependencies
+  if (!data) {
+    return err(createError(ErrorCode.CONFIGURATION, "data missing"))
   }
+
+  const processImagesPromise: Result<SavedImageSuccess, ImagesMetaDataError>[] = await Promise.all(
+    data.map(id => processImage(id, imageType))
+  )
+
+  return Result.combine(processImagesPromise)
 }
 
 export const uploadToS3 = async (
@@ -115,7 +140,10 @@ export const replacePrimaryImageForEntity = async (
   const config = ENTITY_CONFIG[entityType]
   if (!config) throw new Error(`Invalid entity type: ${entityType}`)
   try {
-    const imageData: Image = ImageDefaults.createNewImageEntry(fileName, { isPrimary: true, order: 0 })
+    const imageData: Image = ImageDefaults.createNewImageEntry(fileName, {
+      isPrimary: true,
+      order: 0,
+    })
     await dbClient(config.table)
       .where(config.idColumn, entityId)
       .update({
