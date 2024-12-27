@@ -65,7 +65,9 @@ export const propertiesResolver = resolve<Properties, HookContext>({
     })
 
     const propertyAmenityIds = propertyAmenities.map(propertyAmenity => propertyAmenity.amenityId)
-    const amenities = await context.app.service("amenities").find({ query: { id: { $in: propertyAmenityIds } } })
+    const amenities = await context.app
+      .service("amenities")
+      .find({ query: { id: { $in: propertyAmenityIds } } })
 
     return amenities.data.map(amenity => amenity.name)
   }),
