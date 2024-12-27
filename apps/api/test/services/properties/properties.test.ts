@@ -15,9 +15,9 @@ describe("properties service", () => {
 
   it("creates a new property", async () => {
     const propertyType = await app.service("propertyTypes").find({ query: { $limit: 1 } })
-    const amenities = (await app.service("amenities").find({ query: { $select: ["id"] } })).data.map(
-      amenity => amenity.id
-    )
+    const amenities = (
+      await app.service("amenities").find({ query: { $select: ["id"] } })
+    ).data.map(amenity => amenity.id)
 
     const randomAmenities = randomiseMany(amenities, 3)
 
