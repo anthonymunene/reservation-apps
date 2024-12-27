@@ -20,8 +20,8 @@
       "@utils/*": [
         "src/utils/*"
       ],
-      "@database-generated-types": [
-        "src/types"
+      "@database-generated-types/*": [
+        "src/types/*"
       ]
     }
   },
