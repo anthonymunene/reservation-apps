@@ -23,7 +23,7 @@ export const createDefaultUserDataGenerator: UserDataGenerator = {
   }),
 }
 
-export const getUsers = async (knex: Knex) => await knex.select("id").from("User")
+export const getUsers = async (dbClient: DatabaseClient) => await dbClient.select("id").from("User")
 
 export const createUserAccountDependencies = (
   overrides: Partial<UserAccountDependencies> = {}
@@ -62,7 +62,7 @@ export const createProfiles = async (
 }
 
 export const createUsersAndProfiles = async (
-  knex: Knex,
+  dbClient: DatabaseClient,
   dependencies = { createUserAccounts, createProfiles, getFreeProperty, ownProperty }
 ): Promise<UserId[]> => {
   console.log(`Creating users...`)
@@ -79,7 +79,7 @@ export const createUsersAndProfiles = async (
     if (!user) continue
     await createProfiles(user, { database: { query: knex } })
 
-    const propertyToOwn = await getFreeProperty(knex)
+      const propertyToOwn = await getFreeProperty(dbClient)
 
     if (propertyToOwn.length) await ownProperty(propertyToOwn, user, knex)
 
@@ -90,7 +90,7 @@ export const createUsersAndProfiles = async (
 }
 
 export const updateProfilePictures = async (
-  dbClient: Knex,
+  dbClient: DatabaseClient,
   dependencies = {
     getUsers,
     uploadToS3,
