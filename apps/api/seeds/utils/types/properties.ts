@@ -1,8 +1,8 @@
-import { Result } from "neverthrow"
+import { Result, ResultAsync } from "neverthrow"
 import { Properties } from "@services/properties/properties.schema"
 import { Amenity, PropertyType } from "@database-generated-types/knex-db"
-import { DatabaseDependency } from "@seeds/utils/types/shared"
-import { ApiError } from "@seeds/utils/types/errors"
+import { DatabaseClient, DatabaseDependency } from "@seeds/utils/types/shared"
+import { ApiError, DatabaseError } from "@seeds/utils/types/errors"
 
 export interface PropertyId extends Pick<Properties, "id"> {}
 
@@ -10,12 +10,26 @@ export interface PropertyTypeData extends Pick<PropertyType, "id" | "name"> {}
 
 export interface AmenityData extends Pick<Amenity, "id" | "name"> {}
 
+export type PropertyQueryFunctions = {
+  getAllPropertiesWithoutOwner: (dbClient: DatabaseClient) => Result<PropertyId[], DatabaseError>
+  getFreeProperty: (dbClient: DatabaseClient) => ResultAsync<PropertyId[], DatabaseError>
+}
 export type PropertyGenerationResult = Result<PropertyId[], ApiError>
 export type PropertyAccountDependencies = DatabaseDependency & {
   dataGenerator: PropertyDataGenerator
-  getAmenitiesById: (dependencies) => Promise<AmenityData[]>
+  propertyQueries: PropertyQueryFunctions
   getAllPropertyTypes: (dependencies) => Promise<PropertyTypeData[]>
-  addAmenities: (amenities: AmenityData[], propertyId: PropertyId, dependencies) => Promise<void>
+  amenityOperations: {
+    getAmenitiesById: (dependencies: DatabaseDependency) => Promise<AmenityData[]>
+    addAmenities: (
+      amenities: AmenityData[],
+      propertyId: PropertyId,
+      dependencies: DatabaseDependency
+    ) => Promise<void>
+  }
+  propertyTypeOperations: {
+    getAllPropertyTypes: (dependencies: DatabaseDependency) => Promise<PropertyTypeData[]>
+  }
 }
 
 export type DefaultPropertyData = Pick<
