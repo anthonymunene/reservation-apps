@@ -1,4 +1,3 @@
-import { Knex } from "knex"
 import { generateImages } from "@seeds/utils/shared"
 import {
   createAmenities,
@@ -6,15 +5,16 @@ import {
   createPropertyTypes,
   updatePropertyPictures,
 } from "@seeds/properties"
+import { DatabaseClient } from "@seeds/utils/types/shared"
 
-export async function seed(knex: Knex): Promise<void> {
+export async function seed(dbClient: DatabaseClient): Promise<void> {
   try {
-    await createAmenities(knex)
-    await createPropertyTypes(knex)
-    const propertyData = await createProperties(knex)
+    await createAmenities(dbClient)
+    await createPropertyTypes(dbClient)
+    const propertyData = await createProperties(dbClient)
     await generateImages(propertyData, "properties").then(async result => {
       if (result.isOk()) {
-        await updatePropertyPictures(knex)
+        await updatePropertyPictures(dbClient)
       } else {
         console.log(result.error)
       }

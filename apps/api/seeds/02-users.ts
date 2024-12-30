@@ -1,20 +1,20 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-import { Knex } from "knex"
 import { generateImages } from "@seeds/utils/shared"
 import { createUsersAndProfiles, updateProfilePictures } from "@seeds/users"
 import { createReviews } from "@seeds/reviews"
+import { DatabaseClient } from "@seeds/utils/types/shared"
 
-export async function seed(knex: Knex): Promise<void> {
+export async function seed(dbClient: DatabaseClient): Promise<void> {
   try {
-    const userData = await createUsersAndProfiles(knex)
+    const userData = await createUsersAndProfiles(dbClient)
     await generateImages(userData, "users").then(async result => {
       if (result.isOk()) {
-        await updateProfilePictures(knex)
+        await updateProfilePictures(dbClient)
       } else {
         console.log(result.error)
       }
     })
-    await createReviews(knex)
+    await createReviews(dbClient)
   } catch (e) {
     console.log(e)
   }
