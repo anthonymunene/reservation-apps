@@ -24,8 +24,8 @@ export const getRandomisedPropertyIds = (
   return faker.helpers.arrayElements(propertyIds, propertyIdCount)
 }
 
-export const getAllPropertiesWithoutOwner = async (knex: Knex): Promise<PropertyId[]> => {
-  const propertiesById: PropertyId[] = await knex
+export const getAllPropertiesWithoutOwner = dbClient => {
+  const getPropertiesWithoutOwner: Promise<PropertyId[]> = dbClient
     .select("id")
     .from(Table.Property)
     .whereNull("host")
@@ -69,14 +69,14 @@ export const ownProperty = async (
   }
 }
 
-export const getAmenitiesById = async (dbClient: Knex): Promise<AmenityData[]> =>
+export const getAmenitiesById = async (dbClient: DatabaseClient): Promise<AmenityData[]> =>
   await dbClient.select("id", "name").from(Table.Amenity)
 
-export const getAllPropertyTypes = async (dbClient: Knex): Promise<PropertyTypeData[]> =>
+export const getAllPropertyTypes = async (dbClient: DatabaseClient): Promise<PropertyTypeData[]> =>
   await dbClient.select("id", "name").from(Table.PropertyType)
 
 export const addAmenities = async (
-  dbClient: Knex,
+  dbClient: DatabaseClient,
   amenities: AmenityData[],
   property: PropertyId
 ): Promise<void> => {
@@ -101,7 +101,7 @@ export const generateProperty = () => ({
 })
 
 export const createProperties = async (
-  dbClient: Knex,
+  dbClient: DatabaseClient,
   dependencies = {
     getAmenitiesById,
     getAllPropertyTypes,
@@ -141,7 +141,7 @@ export const createProperties = async (
   )
 }
 
-export const createPropertyTypes = async (dbClient: Knex): Promise<void> => {
+export const createPropertyTypes = async (dbClient: DatabaseClient): Promise<void> => {
   console.log("CREATING PROPERTY TYPES.....")
   const { PROPERTY_TYPES } = PROPERTY
   const propertyTypeData = PROPERTY_TYPES.map(
@@ -156,7 +156,7 @@ export const createPropertyTypes = async (dbClient: Knex): Promise<void> => {
     await dbClient.insert(propertyTypeData, ["id"]).into(Table.PropertyType)
 }
 
-export const createAmenities = async (dbClient: Knex): Promise<void> => {
+export const createAmenities = async (dbClient: DatabaseClient): Promise<void> => {
   console.log("CREATING AMENITIES.....")
   const { AMENITIES } = PROPERTY
   const amenityData = AMENITIES.map(
@@ -169,10 +169,11 @@ export const createAmenities = async (dbClient: Knex): Promise<void> => {
   if (!existingAmenities.length) await dbClient.insert(amenityData, ["id"]).into(Table.Amenity)
 }
 
-const getProperties = async (knex: Knex) => await knex.select("id").from(Table.Property)
+const getProperties = async (dbClient: DatabaseClient) =>
+  await dbClient.select("id").from(Table.Property)
 
 export const updatePropertyPictures = async (
-  dbClient: Knex,
+  dbClient: DatabaseClient,
   dependencies = {
     getProperties,
     uploadToS3,
