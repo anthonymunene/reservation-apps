@@ -1,7 +1,11 @@
-import { type AmenityData, PropertyId, type PropertyTypeData } from "@seeds/utils/types/properties"
+import {
+  type AmenityData,
+  PropertyId,
+  PropertyQueryFunctions,
+  type PropertyTypeData,
+} from "@seeds/utils/types/properties"
 //@ts-ignore
 import { faker } from "@faker-js/faker"
-import { Knex } from "knex"
 import { Table } from "@database-generated-types/knex-db"
 import { UserId } from "@seeds/utils/types/users"
 import { randomUUID } from "crypto"
@@ -14,6 +18,11 @@ import {
 import { randomiseMany, randomiseOne } from "@utils/randomise"
 import { PROPERTY } from "@utils/variables"
 import { getMatchingFile, replacePrimaryImageForEntity, uploadToS3 } from "@seeds/utils/shared"
+import { DatabaseClient } from "@seeds/utils/types/shared"
+import { err, ok, ResultAsync } from "neverthrow"
+import { createError } from "@seeds/utils/createError"
+import { ErrorCode } from "@seeds/utils/types/errors"
+import { getRandomElement } from "@seeds/utils/getRandomElement"
 
 export const getRandomisedPropertyIds = (
   propertyIds: PropertyId[],
@@ -29,16 +38,28 @@ export const getAllPropertiesWithoutOwner = dbClient => {
     .select("id")
     .from(Table.Property)
     .whereNull("host")
-  console.log(`Properties without owners by Id ${JSON.stringify(propertiesById)}`)
-  return propertiesById
+  return ResultAsync.fromPromise(getPropertiesWithoutOwner, error =>
+    createError(ErrorCode.NETWORK, `something went wrong ${error} `)
+  ).andThen(properties =>
+    properties ? ok(properties) : err(createError(ErrorCode.DATABASE, `could not get properties`))
+  )
 }
 
-export const getFreeProperty = async (
-  dbClient: Knex,
-  { fetchUnownedProperties = getAllPropertiesWithoutOwner } = {}
+export const getFreeProperty: PropertyQueryFunctions["getFreeProperty"] = (
+  dbClient,
+  dependencies = {
+    propertyQueries: { getAllPropertiesWithoutOwner },
+  }
 ) => {
-  const unownedProperties = await fetchUnownedProperties(dbClient)
-  return getRandomisedPropertyIds(unownedProperties)
+  const {
+    propertyQueries: { getAllPropertiesWithoutOwner },
+  } = dependencies
+  return getAllPropertiesWithoutOwner(dbClient).andThen(properties => {
+    return properties
+      ? ok(properties)
+      : err(createError(ErrorCode.DATABASE, "something went wrong"))
+  })
+  //getRandomElement(freeProperties.value, 2)
 }
 
 export const ownProperty = async (
@@ -151,7 +172,10 @@ export const createPropertyTypes = async (dbClient: DatabaseClient): Promise<voi
     })
   )
 
-  const existingPropertyTypes = await dbClient(Table.PropertyType).whereIn("name", PROPERTY_TYPES)
+  const existingPropertyTypes = await dbClient
+    .select("name")
+    .from(Table.PropertyType)
+    .whereIn("name", PROPERTY_TYPES)
   if (!existingPropertyTypes.length)
     await dbClient.insert(propertyTypeData, ["id"]).into(Table.PropertyType)
 }
@@ -165,7 +189,10 @@ export const createAmenities = async (dbClient: DatabaseClient): Promise<void> =
       name: amenity,
     })
   )
-  const existingAmenities = await dbClient(Table.Amenity).whereIn("name", AMENITIES)
+  const existingAmenities = await dbClient
+    .select("name")
+    .from(Table.Amenity)
+    .whereIn("name", AMENITIES)
   if (!existingAmenities.length) await dbClient.insert(amenityData, ["id"]).into(Table.Amenity)
 }
 
