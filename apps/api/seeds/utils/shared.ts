@@ -3,12 +3,11 @@ import path, { basename, join } from "node:path"
 import { S3Service } from "@utils/s3/lib"
 import * as defaultConfig from "../../config/default.json"
 import { seedImages } from "./seedImages"
-import { EntityType, S3Path } from "@seeds/utils/types/shared"
+import { DatabaseClient, EntityType, S3Path } from "@seeds/utils/types/shared"
 import { Image, ImageFolders, ImageType } from "@seeds/utils/types/images"
 import { PropertyId } from "@seeds/utils/types/properties"
 import { UserId } from "@seeds/utils/types/users"
 import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, ENTITY_CONFIG } from "./variables"
-import type { Knex } from "knex"
 import { ImageDefaults } from "./imageDefaults"
 import { err, Result } from "neverthrow"
 import { createError } from "@seeds/utils/createError"
@@ -129,7 +128,7 @@ export const uploadToS3 = async (
 }
 
 export const replacePrimaryImageForEntity = async (
-  dbClient: Knex,
+  dbClient: DatabaseClient,
   entityId: string,
   fileName: string,
   entityType: EntityType

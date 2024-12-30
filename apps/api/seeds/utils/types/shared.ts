@@ -13,9 +13,7 @@ export type DatabaseDependency = {
 }
 
 export type DbResult<T> = Result<T, DatabaseError>
-export type DatabaseClient = {
-  query: Knex
-}
+export type DatabaseClient = Knex
 
 export interface DatabaseOperations {
   getAmenitiesById: (db: DatabaseClient) => Promise<DbResult<AmenityData[]>>
