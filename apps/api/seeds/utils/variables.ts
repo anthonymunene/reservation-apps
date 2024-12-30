@@ -18,6 +18,7 @@ export const PROPERTIES_IMAGE_DIR = `${IMAGE_DIR}/properties`
 
 export const TOTAL_ROOMS = [1, 2, 3] as const
 export const TOTAL_PROPERTIES = 10
+export const TOTAL_PROPERTIES_TO_OWN = 3
 export const TOTAL_AMENITIES_PER_PROPERTY = 3
 export const ENTITY_CONFIG: Record<EntityType, EntityImageConfig> = {
   Property: {

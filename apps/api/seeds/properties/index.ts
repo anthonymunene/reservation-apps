@@ -41,18 +41,32 @@ export const getFreeProperty = async (
   return getRandomisedPropertyIds(unownedProperties)
 }
 
-export const ownProperty = async (properties: PropertyId[], user: UserId, dbClient: Knex) => {
-  await Promise.all(
-    properties.map(async property => {
-      const { id } = user
-      console.log(`User: ${user.id} \n Properties to own: \n ${JSON.stringify(properties)} \n\n`)
-      await dbClient(Table.Property)
-        .where("id", (property as PropertyId)["id"])
-        .update({
-          host: id,
-        })
-    })
-  )
+export const ownProperty = async (
+  properties: PropertyId[],
+  user: UserId,
+  dbClient: DatabaseClient,
+  max: number
+) => {
+  const propertiesToOwn = getRandomElement<PropertyId>(properties, max)
+  if (propertiesToOwn.isOk()) {
+    const propertiesToOwnPromises = await Promise.all(
+      propertiesToOwn.value.map(async property => {
+        const { id } = user
+        console.log(`User: ${user.id} \n Properties to own: \n ${JSON.stringify(properties)} \n\n`)
+        return dbClient(Table.Property)
+          .where("id", (property as PropertyId)["id"])
+          .update({
+            host: id,
+          })
+          .returning("id")
+      })
+    )
+    ok(propertiesToOwnPromises)
+  } else {
+    return err(
+      createError(ErrorCode.DATABASE, `unable to own properties ${propertiesToOwn.error.message}`)
+    )
+  }
 }
 
 export const getAmenitiesById = async (dbClient: Knex): Promise<AmenityData[]> =>
