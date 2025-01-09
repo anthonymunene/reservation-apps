@@ -1,9 +1,10 @@
-// Type for a single review
-type Review = string
+import { Reviews } from "@services/reviews/reviews.schema"
+
+export type ReviewsId = Pick<Reviews, "id">
 
 // Type for the entire reviews structure
-export interface Reviews {
-  positive: Review[]
-  negative: Review[]
-  mixed: Review[]
+export interface ReviewsSeedData {
+  positive: Reviews["comment"][]
+  negative: Reviews["comment"][]
+  mixed: Reviews["comment"][]
 }

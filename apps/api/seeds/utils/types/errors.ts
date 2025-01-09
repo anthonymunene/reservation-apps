@@ -8,6 +8,7 @@ export enum ErrorCode {
   HASHING = "HASHING_ERROR",
   DATABASE = "DATABASE_ERROR",
   UNKNOWN = "UNKNOWN_ERROR",
+  FILE_SYSTEM = "FILE_SYSTEM_ERROR",
 }
 
 export interface ErrorContext {
@@ -101,6 +102,12 @@ export class HashingError extends AppError {
 export class UnknownError extends AppError {
   constructor(message: string, details?: Record<string, unknown>, cause?: Error) {
     super(message, ErrorCode.UNKNOWN, details, cause)
+  }
+}
+
+export class FileSystemError extends AppError {
+  constructor(message: string, details?: Record<string, unknown>, cause?: Error) {
+    super(message, ErrorCode.FILE_SYSTEM, details, cause)
   }
 }
 

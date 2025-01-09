@@ -50,7 +50,7 @@
     "migrate": "knex migrate:latest && ts-node generate-types.ts && npm run prettier-format",
     "migrate:make": "knex migrate:make",
     "migrate:seed": "knex seed:make",
-    "seed": "knex seed:run",
+    "seed": "infisical run --env=dev --path=/Apps/reservation-apps/api --command \"knex seed:run\"",
     "migrate:clear": "knex migrate:down",
     "migrate:list": "knex migrate:list",
     "migrate:down": "knex migrate:down",

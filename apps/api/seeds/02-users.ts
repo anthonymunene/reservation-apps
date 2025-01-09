@@ -3,19 +3,15 @@ import { generateImages } from "@seeds/utils/shared"
 import { createUsersAndProfiles, updateProfilePictures } from "@seeds/users"
 import { createReviews } from "@seeds/reviews"
 import { DatabaseClient } from "@seeds/utils/types/shared"
+import { ResultAsync } from "neverthrow"
 
-export async function seed(dbClient: DatabaseClient): Promise<void> {
-  try {
-    const userData = await createUsersAndProfiles(dbClient)
-    await generateImages(userData, "users").then(async result => {
-      if (result.isOk()) {
-        await updateProfilePictures(dbClient)
-      } else {
-        console.log(result.error)
-      }
-    })
-    await createReviews(dbClient)
-  } catch (e) {
-    console.log(e)
-  }
+export async function seed(dbClient: DatabaseClient) {
+  await createUsersAndProfiles(dbClient).andThen(users => {
+    return ResultAsync.combine([
+      createReviews(dbClient),
+      generateImages(users, "users").andThen(() => {
+        return updateProfilePictures(dbClient)
+      }),
+    ])
+  })
 }

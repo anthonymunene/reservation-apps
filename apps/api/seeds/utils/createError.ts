@@ -6,6 +6,7 @@ import {
   NetworkError,
   NotFoundError,
   ParseError,
+  FileSystemError,
   UnknownError,
 } from "@seeds/utils/types/errors"
 
@@ -29,6 +30,8 @@ export const createError = (
       return new HashingError(message, details, cause)
     case ErrorCode.API:
       return new ApiError(message, status, details, cause)
+    case ErrorCode.FILE_SYSTEM:
+      return new FileSystemError(message, details, cause)
     default:
       return new UnknownError(message, details, cause)
   }

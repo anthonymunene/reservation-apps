@@ -69,3 +69,8 @@ export interface ImageHandler {
   uploadToS3: (fileName: string, content: Buffer, folder: string) => Promise<unknown>
   getMatchingFile: (id: string, directory: string) => Promise<[string, Buffer] | null>
 }
+
+export type UploadResult = {
+  fileName: string
+  status: string
+}

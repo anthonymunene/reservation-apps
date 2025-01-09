@@ -3,54 +3,70 @@ import path, { basename, join } from "node:path"
 import { S3Service } from "@utils/s3/lib"
 import * as defaultConfig from "../../config/default.json"
 import { seedImages } from "./seedImages"
-import { DatabaseClient, EntityType, S3Path } from "@seeds/utils/types/shared"
-import { Image, ImageFolders, ImageType } from "@seeds/utils/types/images"
+import { AllowedTables, EntityType, S3Path, TableData } from "@seeds/utils/types/shared"
+import { Image, ImageFolders, ImageType, UploadResult } from "@seeds/utils/types/images"
 import { PropertyId } from "@seeds/utils/types/properties"
 import { UserId } from "@seeds/utils/types/users"
 import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, ENTITY_CONFIG } from "./variables"
 import { ImageDefaults } from "./imageDefaults"
-import { err, Result } from "neverthrow"
+import { errAsync, ResultAsync } from "neverthrow"
 import { createError } from "@seeds/utils/createError"
-import { ErrorCode, ImagesMetaDataError } from "@seeds/utils/types/errors"
+import {
+  ApiError,
+  ConfigurationError,
+  DatabaseError,
+  ErrorCode,
+  FileSystemError,
+  ImagesMetaDataError,
+} from "@seeds/utils/types/errors"
 import { SavedImageSuccess } from "@seeds/utils/images"
+import { Knex } from "knex"
 
-export const getFiles = async (directoryPath: string): Promise<string[]> => {
+const safeReaddir = ResultAsync.fromThrowable(
+  (path: string) => readdir(path, { withFileTypes: true, recursive: true }),
+  error => createError(ErrorCode.FILE_SYSTEM, `Failed to read directory: ${error}`)
+)
+
+const safeStat = ResultAsync.fromThrowable(stat, error =>
+  createError(ErrorCode.FILE_SYSTEM, `Failed to get file stats: ${error}`)
+)
+
+const safeReadFile = ResultAsync.fromThrowable(
+  (path: string) => readFile(path),
+  error => createError(ErrorCode.FILE_SYSTEM, `Failed to read directory: ${error}`)
+)
+export const getFiles = (
+  directoryPath: string,
+  dependencies = {
+    safeReaddir,
+    path,
+    safeStat,
+  }
+): ResultAsync<string[], FileSystemError | ConfigurationError> => {
+  const { safeReaddir, path, safeStat } = dependencies
   if (!directoryPath) {
     console.error("Directory path is required")
-    return []
+    return errAsync(createError(ErrorCode.CONFIGURATION, "Directory path is required"))
   }
 
   const absolutePath = path.join(process.cwd(), directoryPath)
 
-  try {
-    const files = await readdir(absolutePath)
-    const fileStats = await Promise.all(
-      files.map(async file => {
-        const filePath = join(absolutePath, file)
-        const stats = await stat(filePath)
-        return {
-          name: file,
-          isFile: stats.isFile(),
-        }
-      })
+  return safeReaddir(absolutePath)
+    .andThen(files =>
+      ResultAsync.combine(
+        files.map(file => {
+          const filePath = join(absolutePath, file.name)
+          return safeStat(filePath).map(stats => ({
+            name: file.name,
+            isFile: stats.isFile(),
+          }))
+        })
+      )
     )
-
-    return fileStats.filter(file => file.isFile).map(file => basename(file.name))
-    // return fs
-    //   .readdirSync(absolutePath)
-    //   .filter(file => fs.statSync(path.join(absolutePath, file)).isFile())
-    //   .map(file => path.basename(file))
-  } catch (error) {
-    console.error(`Error reading directory ${absolutePath}:`, error)
-    return []
-  }
+    .map(fileStats => fileStats.filter(file => file.isFile).map(file => basename(file.name)))
 }
 
-export const getPresignedUrl = async (
-  fileName: string,
-  path: S3Path,
-  dependencies = { S3Service }
-) => {
+export const getPresignedUrl = (fileName: string, path: S3Path, dependencies = { S3Service }) => {
   const { S3Service } = dependencies
   const s3Client = new S3Service({
     s3Client: {
@@ -61,30 +77,34 @@ export const getPresignedUrl = async (
       ...defaultConfig.storage.s3.s3Client,
     },
   })
-  return s3Client.getPresignedUrl(fileName, path)
+  return s3Client.getPresignedUrl(fileName, path).map(url => url)
 }
 
-export const getMatchingFile = async (
+export const getMatchingFile = (
   id: string,
   path: ImageFolders,
-  dependencies = { getFiles }
-): Promise<[string, Buffer] | undefined> => {
-  const { getFiles } = dependencies
-  const filesNames = await getFiles(path)
-  if (!filesNames.length || !id) return undefined
+  dependencies = { getFiles, safeReadFile }
+): ResultAsync<{ file: string; content: Buffer }, ConfigurationError | FileSystemError> => {
+  const { getFiles, safeReadFile } = dependencies
+  if (!id) return errAsync(createError(ErrorCode.CONFIGURATION, `missing id parameter`))
+  return getFiles(path).andThen(files => {
+    if (!files.length) return errAsync(createError(ErrorCode.FILE_SYSTEM, `no files found`))
+    const matchingFile = files.find(file => file.includes(id))
+    if (!matchingFile.length)
+      return errAsync(createError(ErrorCode.FILE_SYSTEM, `no matching files found`))
 
-  const matchingFile = filesNames.find(fileName => fileName.includes(id))
-  if (!matchingFile) return undefined
-
-  const content = await readFile(`${process.cwd()}/${path}/${matchingFile}`)
-  return [matchingFile, content]
+    return safeReadFile(`${process.cwd()}/${path}/${matchingFile}`).map(content => ({
+      file: matchingFile,
+      content,
+    }))
+  })
 }
 
 const processImage = (
   { id }: UserId | PropertyId,
   imageType: ImageType,
   dependencies = { seedImages }
-) => {
+): ResultAsync<SavedImageSuccess, ImagesMetaDataError> => {
   const { seedImages } = dependencies
   return seedImages({
     type: imageType,
@@ -92,64 +112,100 @@ const processImage = (
   })
 }
 
-export const generateImages = async (
+export const generateImages = (
   data: UserId[] | PropertyId[],
   imageType: ImageType,
   dependencies = { processImage }
-): Promise<Result<SavedImageSuccess[], ImagesMetaDataError>> => {
+): ResultAsync<SavedImageSuccess[], ImagesMetaDataError> => {
   const { processImage } = dependencies
   if (!data) {
-    return err(createError(ErrorCode.CONFIGURATION, "data missing"))
+    return errAsync(createError(ErrorCode.CONFIGURATION, "data missing"))
   }
 
-  const processImagesPromise: Result<SavedImageSuccess, ImagesMetaDataError>[] = await Promise.all(
-    data.map(id => processImage(id, imageType))
-  )
-
-  return Result.combine(processImagesPromise)
+  return ResultAsync.combine(data.map(id => processImage(id, imageType)))
 }
 
-export const uploadToS3 = async (
+const uploadContent = (url: string, content: Buffer) => {
+  console.log(url)
+  return ResultAsync.fromPromise(
+    fetch(url, {
+      method: "PUT",
+      body: content,
+    }),
+    error => createError(ErrorCode.API, `something went wrong ${error}`)
+  )
+}
+export const uploadToS3 = (
   fileName: string,
   fileData: Buffer,
   path: S3Path,
   dependencies = { getPresignedUrl }
-) => {
-  try {
-    const { getPresignedUrl } = dependencies
-    const presignedUrl = await getPresignedUrl(fileName, path)
-    return await fetch(presignedUrl, {
-      method: "PUT",
-      body: fileData,
+): ResultAsync<UploadResult, ConfigurationError | ApiError> => {
+  const { getPresignedUrl } = dependencies
+  return getPresignedUrl(fileName, path)
+    .andThen(url => {
+      console.log(url)
+      return uploadContent(url, fileData)
     })
-  } catch (e) {
-    return new Error(e)
+    .mapErr(error => {
+      console.log(error)
+      return error
+    })
+    .map(response => {
+      return { fileName, status: response.statusText }
+    })
+}
+const replacePrimaryImageForEntity = <T extends AllowedTables>(
+  dbClient: Knex,
+  entityId: string,
+  fileName: string,
+  entityType: EntityType,
+  config: { table: T; idColumn: string }
+): ResultAsync<{ status: string; result: string[] }, DatabaseError> => {
+  if (!dbClient) {
+    return errAsync(createError(ErrorCode.DATABASE, "Database client is required"))
   }
+  if (!entityId) {
+    return errAsync(createError(ErrorCode.DATABASE, "Entity ID is required"))
+  }
+  if (!fileName) {
+    return errAsync(createError(ErrorCode.DATABASE, "File name is required"))
+  }
+
+  if (!config) return errAsync(createError(ErrorCode.DATABASE, `config is required`))
+
+  const imageData: Image = ImageDefaults.createNewImageEntry(fileName, {
+    isPrimary: true,
+    order: 0,
+  })
+
+  return ResultAsync.fromPromise(
+    dbClient(config.table)
+      .where(config.idColumn, entityId)
+      .update({
+        images: dbClient.raw(
+          `        jsonb_set(
+          images,
+          '{images}',
+          (images->'images') || ?::jsonb
+        )
+      `,
+          [JSON.stringify([imageData])]
+        ),
+        updatedAt: dbClient.fn.now(),
+      } as unknown as Partial<TableData<T>>)
+      .returning("id"),
+    error =>
+      createError(ErrorCode.DATABASE, `Failed to replace primary image for ${entityType}: ${error}`)
+  ).map(result => ({ status: "success", result: result[0] }))
 }
 
-export const replacePrimaryImageForEntity = async (
-  dbClient: DatabaseClient,
+export const updateEntityImage = (
+  dbClient: Knex,
   entityId: string,
   fileName: string,
   entityType: EntityType
 ) => {
-  if (!dbClient) throw new Error("Database client is required")
-  if (!entityId) throw new Error("Entity ID is required")
-  if (!fileName) throw new Error("File name is required")
   const config = ENTITY_CONFIG[entityType]
-  if (!config) throw new Error(`Invalid entity type: ${entityType}`)
-  try {
-    const imageData: Image = ImageDefaults.createNewImageEntry(fileName, {
-      isPrimary: true,
-      order: 0,
-    })
-    await dbClient(config.table)
-      .where(config.idColumn, entityId)
-      .update({
-        images: JSON.stringify(imageData),
-        updatedAt: dbClient.fn.now(),
-      })
-  } catch (error) {
-    throw new Error(`Failed to replace primary image for ${entityType}: ${error.message}`)
-  }
+  return replacePrimaryImageForEntity(dbClient, entityId, fileName, entityType, config)
 }

@@ -6,22 +6,21 @@ import {
   UserDataGenerator,
   UserId,
 } from "@seeds/utils/types/users"
-import { ProfilesData, UserProfileDependencies } from "@seeds/utils/types/profiles"
+import { ProfilesData, ProfilesId, UserProfileDependencies } from "@seeds/utils/types/profiles"
 import { Table } from "@database-generated-types/knex-db"
-import { getFreeProperty, ownProperty } from "@seeds/properties"
+import { getFreeProperty, ownProperty } from "@seeds/properties/shared"
 import {
   TOTAL_PROPERTIES_TO_OWN,
   TOTAL_USER_ACCOUNTS,
   USERS_IMAGE_DIR,
 } from "@seeds/utils/variables"
-import { getMatchingFile, replacePrimaryImageForEntity, uploadToS3 } from "@seeds/utils/shared"
+import { getMatchingFile, updateEntityImage, uploadToS3 } from "@seeds/utils/shared"
 import { DatabaseClient } from "@seeds/utils/types/shared"
-import { err, ok, ResultAsync } from "neverthrow"
+import { err, errAsync, ok, okAsync, ResultAsync } from "neverthrow"
 import { createError } from "@seeds/utils/createError"
 import { DatabaseError, ErrorCode } from "@seeds/utils/types/errors"
 import { Users } from "@services/users/users.schema"
 import { Knex } from "knex"
-import { Profiles } from "@services/profiles/profiles.schema"
 
 export const createDefaultUserDataGenerator: UserDataGenerator = {
   generateUserAccount: () => ({
@@ -38,7 +37,14 @@ export const createDefaultUserDataGenerator: UserDataGenerator = {
   }),
 }
 
-export const getUsers = async (dbClient: DatabaseClient) => await dbClient.select("id").from("User")
+export const getUsers = (dbClient: DatabaseClient) => {
+  const query: Knex.QueryBuilder<Users, UserId[]> = dbClient.select("id").from("User")
+  return ResultAsync.fromPromise(query, error =>
+    createError(ErrorCode.DATABASE, `something went wrong ${error}`)
+  ).andThen(user =>
+    user?.length ? ok(user) : err(createError(ErrorCode.DATABASE, "something went wrong"))
+  )
+}
 
 export const createUserAccountDependencies = (
   overrides: Partial<UserAccountDependencies> = {}
@@ -50,6 +56,7 @@ export const createUserAccounts = (
   userCount: number = 1,
   dependencies: Partial<UserAccountDependencies> = {}
 ) => {
+  console.log(`Creating users...`)
   const deps = createUserAccountDependencies(dependencies)
   const { dataGenerator } = deps
   return Array.from({ length: userCount }, () => dataGenerator())
@@ -65,24 +72,20 @@ export const createUserProfileDependencies = (
 export const createProfiles = (
   user: UserId,
   dependencies: Partial<UserProfileDependencies> = {}
-): ResultAsync<ProfilesData, DatabaseError> => {
+): ResultAsync<ProfilesId, DatabaseError> => {
   const deps = createUserProfileDependencies(dependencies)
   const { dataGenerator, database } = deps
   const { id } = user
   const profile: Omit<ProfilesData, "defaultPic"> = dataGenerator(id)
-  const query: Knex.QueryBuilder<Profiles, ProfilesData[]> = database.query
-    .insert(profile)
-    .into(Table.Profile)
-    .returning("id")
-
+  const query = database.query.insert(profile).into(Table.Profile).returning("id")
   return ResultAsync.fromPromise(query, error =>
     createError(ErrorCode.DATABASE, `something went wrong ${error}`)
   ).andThen(profile => {
-    if (profile) {
-      console.log(`Returned profileId ${JSON.stringify(profile[0]?.id)}`)
-      ok(profile[0])
-    } else {
+    if (!profile) {
       return err(createError(ErrorCode.DATABASE, `something went wrong creating profile`))
+    } else {
+      //console.log(`Returned profileId ${JSON.stringify(profile[0]?.id)}`)
+      return ok(profile[0])
     }
   })
 }
@@ -100,38 +103,79 @@ export const createAccount = (
     return user?.length ? ok(user[0]) : err(createError(ErrorCode.DATABASE, `something went wrong`))
   })
 }
-export const createUsersAndProfiles = async (
+export const createUsersAndProfiles = (
   dbClient: DatabaseClient,
   dependencies = { createUserAccounts, createProfiles, getFreeProperty, ownProperty }
-): Promise<UserId[]> => {
-  console.log(`Creating users...`)
+): ResultAsync<UserId[], DatabaseError> => {
   const { createUserAccounts, createProfiles, getFreeProperty, ownProperty } = dependencies
   const userAccounts = createUserAccounts(TOTAL_USER_ACCOUNTS)
   const users: UserId[] = []
-  // await clearImageFolder(`${seedUserImageDir}/*.png`)
-  //   .then((deletedFiles) => console.log('done! deleted files:', deletedFiles))
 
-  //   .catch(error => console.log(`something went wrong deleting files:\n${error}`));
+  const processUser = (
+    trx: DatabaseClient,
+    userAccount: UserAccount
+  ): ResultAsync<UserId, DatabaseError> =>
+    createAccount(trx, userAccount).andThen(userId =>
+      createProfiles(userId, { database: { query: trx } })
+        .andThen(() => getFreeProperty(trx))
+        .andThen(propertyToOwn => ownProperty(propertyToOwn, userId, trx, TOTAL_PROPERTIES_TO_OWN))
+        .map(() => {
+          users.push(userId)
+          return userId
+        })
+    )
 
-  for (const userAccount of userAccounts) {
-    const user = await createAccount(dbClient, userAccount)
-    if (user.isOk()) {
-      await createProfiles(user.value, { database: { query: dbClient } })
+  const processAccounts = (trx: DatabaseClient): ResultAsync<UserId[], DatabaseError> => {
+    let result = okAsync<void, DatabaseError>(undefined)
 
-      const propertyToOwn = await getFreeProperty(dbClient)
-
-      if (propertyToOwn.isOk() && propertyToOwn.value.length) {
-        await ownProperty(propertyToOwn.value, user.value, dbClient, TOTAL_PROPERTIES_TO_OWN)
-      }
-
-      users.push(user.value)
+    for (const userAccount of userAccounts) {
+      result = result.andThen(() =>
+        processUser(trx, userAccount)
+          .orElse(error => {
+            console.error(`Failed to process user account:`, error)
+            return okAsync(null) // Continue with next user instead of failing
+          })
+          .map(userId => {
+            if (userId) {
+              console.log(`Successfully processed user: ${userId.id}`)
+            }
+            return userId
+          })
+      )
     }
+
+    return result.map(() => users)
   }
 
-  return users
+  const validateResults = (users: UserId[]): ResultAsync<UserId[], DatabaseError> =>
+    users.length > 0
+      ? okAsync(users)
+      : errAsync(createError(ErrorCode.DATABASE, "No users were created during the transaction"))
+
+  const handleTransaction = (trx: DatabaseClient): ResultAsync<UserId[], DatabaseError> =>
+    processAccounts(trx)
+      .andThen(validateResults)
+      .map(users => {
+        console.log(`Successfully processed ${users.length} users`)
+        return users
+      })
+      .orElse(error => {
+        console.error("Transaction processing failed:", error)
+        return okAsync([])
+      })
+
+  return ResultAsync.fromPromise(
+    dbClient.transaction(trx =>
+      handleTransaction(trx).match(
+        success => success,
+        () => [] // Should never reach here as orElse handles all errors
+      )
+    ),
+    error => createError(ErrorCode.DATABASE, `Transaction infrastructure failed: ${error}`)
+  )
 }
 
-export const updateProfilePictures = async (
+export const updateProfilePictures = (
   dbClient: DatabaseClient,
   dependencies = {
     getUsers,
@@ -140,21 +184,14 @@ export const updateProfilePictures = async (
   }
 ) => {
   const { getUsers, uploadToS3, getMatchingFile } = dependencies
-  try {
-    const users = await getUsers(dbClient)
-
-    await Promise.all(
-      users.map(async user => {
-        const matchingFile = await getMatchingFile(user.id, USERS_IMAGE_DIR)
-        if (!matchingFile) return
-        const [fileName, content] = matchingFile
-        if (fileName && content)
-          await uploadToS3(fileName, content, "users").then(async () => {
-            await replacePrimaryImageForEntity(dbClient, user.id, fileName, Table.Profile)
-          })
-      })
-    )
-  } catch (error) {
-    console.log(error)
-  }
+  return getUsers(dbClient).andThen(user => {
+    const operations = user.map(user => {
+      return getMatchingFile(user.id, USERS_IMAGE_DIR).andThen(({ file, content }) =>
+        uploadToS3(file, content, "users").andThen(({ fileName }) => {
+          return updateEntityImage(dbClient, user.id, fileName, Table.Profile)
+        })
+      )
+    })
+    return ResultAsync.combine(operations)
+  })
 }

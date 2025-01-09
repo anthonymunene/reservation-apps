@@ -7,20 +7,23 @@ import {
 } from "@seeds/properties"
 import { DatabaseClient } from "@seeds/utils/types/shared"
 
-export async function seed(dbClient: DatabaseClient): Promise<void> {
-  try {
-    await createAmenities(dbClient)
-    await createPropertyTypes(dbClient)
-    const propertyData = await createProperties(dbClient)
-    await generateImages(propertyData, "properties").then(async result => {
-      if (result.isOk()) {
-        await updatePropertyPictures(dbClient)
-      } else {
-        console.log(result.error)
-      }
+export async function seed(dbClient: DatabaseClient) {
+  await createAmenities(dbClient)
+    .andThen(() => createPropertyTypes(dbClient))
+    .andThen(() => createProperties(dbClient))
+    .andThen(propertyData =>
+      generateImages(propertyData, "properties")
+        .andThen(() => {
+          return updatePropertyPictures(dbClient)
+        })
+        .map(result => console.log(result))
+        .mapErr(error => {
+          console.log(error)
+          return error
+        })
+    )
+    .mapErr(error => {
+      console.error("Error during seeding:", error)
+      return error
     })
-  } catch (error) {
-    console.error("Error seeding database:", error)
-    throw error
-  }
 }
