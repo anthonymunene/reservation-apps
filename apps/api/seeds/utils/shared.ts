@@ -184,13 +184,17 @@ const replacePrimaryImageForEntity = <T extends AllowedTables>(
       .where(config.idColumn, entityId)
       .update({
         images: dbClient.raw(
-          `        jsonb_set(
-          images,
-          '{images}',
-          (images->'images') || ?::jsonb
-        )
-      `,
-          [JSON.stringify([imageData])]
+          `(
+            CASE
+              WHEN images IS NULL OR images = '[]'::jsonb OR (images @> '[{"id": null}]'::jsonb)
+              THEN ?::jsonb
+              ELSE COALESCE(images, '[]'::jsonb) || ?::jsonb
+            END
+          )`,
+          [
+            JSON.stringify([imageData]), // Replace placeholder completely
+            JSON.stringify([imageData]), // Append to existing valid images
+          ]
         ),
         updatedAt: dbClient.fn.now(),
       } as unknown as Partial<TableData<T>>)
