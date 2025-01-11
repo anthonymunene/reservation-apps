@@ -35,7 +35,7 @@ export type Profile = {
   otherNames: string | null
   bio: string | null
   isSuperHost: boolean
-  images: Record<string, unknown> | null
+  images: unknown[] | null
   userId: string | null
   createdAt: Date
   updatedAt: Date
@@ -49,7 +49,7 @@ export type Property = {
   countryCode: string | null
   bedrooms: number | null
   beds: number | null
-  images: Record<string, unknown> | null
+  images: unknown[] | null
   host: string | null
   propertyTypeId: string | null
   createdAt: Date

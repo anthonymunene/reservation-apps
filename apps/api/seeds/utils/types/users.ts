@@ -7,7 +7,7 @@ export type UserAccount = Pick<Users, "id" | "email" | "password">
 export type UserDataGenerator = {
   generateUserAccount: () => UserAccount
   // eslint-disable-next-line no-unused-vars
-  generateProfile: (userId: string) => Omit<ProfilesData, "defaultPic">
+  generateProfile: (userId: string) => Omit<ProfilesData, "images">
 }
 
 export type UserAccountDependencies = DatabaseDependency & {

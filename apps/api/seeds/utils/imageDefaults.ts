@@ -1,13 +1,22 @@
-import type { Image } from "@seeds/utils/types/images"
 import { randomUUID } from "crypto"
+import { Image } from "@seeds/utils/types/images"
 
 export class ImageDefaults {
   static createDefaultJson(): string {
-    return JSON.stringify({
-      version: 1,
-      updatedAt: new Date().toISOString(),
-      images: [],
-    })
+    return JSON.stringify([
+      {
+        id: null,
+        url: null,
+        caption: null,
+        altText: null,
+        metadata: {
+          uploadedAt: null,
+          status: "inactive",
+          isPrimaryImage: false,
+          displayOrder: 0,
+        },
+      },
+    ])
   }
 
   static createNewImageEntry(

@@ -5,7 +5,7 @@ import { UserDataGenerator } from "@seeds/utils/types/users"
 export type ProfilesId = Pick<Profiles, "id">
 export type ProfilesData = Pick<
   Profiles,
-  "id" | "userId" | "firstName" | "surname" | "bio" | "defaultPic"
+  "id" | "userId" | "firstName" | "surname" | "bio" | "images"
 >
 
 export type UserProfileDependencies = DatabaseDependency & {

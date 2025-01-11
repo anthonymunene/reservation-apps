@@ -15,8 +15,24 @@ export const profilesSchema = Type.Object(
     firstName: Type.String(),
     surname: Type.String(),
     isSuperHost: Type.Boolean({ default: false }),
-    defaultPic: Type.Object({}),
-    profilePics: Type.Object({}),
+    images: Type.Array(
+      Type.Object({
+        id: Type.String(),
+        url: Type.String(),
+        metadata: Type.Object({
+          status: Type.Union([
+            Type.Literal("pending"),
+            Type.Literal("active"),
+            Type.Literal("deleted"),
+          ]),
+          uploadedAt: Type.String(),
+          displayOrder: Type.Number(),
+          isPrimaryImage: Type.Boolean(),
+        }),
+        updatedAt: Type.String(),
+        version: Type.Number(),
+      })
+    ),
     userId: Type.String({ format: "uuid" }),
     createdAt: Type.String({ format: "date-time" }),
     updatedAt: Type.String({ format: "date-time" }),
