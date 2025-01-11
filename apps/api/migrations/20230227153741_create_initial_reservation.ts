@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<void> {
       table.string("otherNames")
       table.text("bio")
       table.boolean("isSuperHost").notNullable().defaultTo(false) // should belong in property rentaltable
-      table.jsonb("images").nullable().defaultTo(ImageDefaults.createDefaultJson())
+      table.jsonb("images").nullable().defaultTo("[]")
       table.uuid("userId").unsigned().references("id").inTable("User").onDelete("cascade")
       table.timestamps(false, true, true)
     })
@@ -59,7 +59,15 @@ export async function up(knex: Knex): Promise<void> {
     })
 }
 
-const tables = ["User", "Amenity", "Profile", "Review", "PropertyType", "Property", "PropertyAmenity"]
+const tables = [
+  "User",
+  "Amenity",
+  "Profile",
+  "Review",
+  "PropertyType",
+  "Property",
+  "PropertyAmenity",
+]
 
 export async function down(knex: Knex): Promise<void[]> {
   return Promise.all(

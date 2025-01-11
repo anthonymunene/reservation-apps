@@ -76,7 +76,7 @@ export const createProfiles = (
   const deps = createUserProfileDependencies(dependencies)
   const { dataGenerator, database } = deps
   const { id } = user
-  const profile: Omit<ProfilesData, "defaultPic"> = dataGenerator(id)
+  const profile: Omit<ProfilesData, "images"> = dataGenerator(id)
   const query = database.query.insert(profile).into(Table.Profile).returning("id")
   return ResultAsync.fromPromise(query, error =>
     createError(ErrorCode.DATABASE, `something went wrong ${error}`)
