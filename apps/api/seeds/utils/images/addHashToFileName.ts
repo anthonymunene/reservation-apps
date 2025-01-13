@@ -14,10 +14,7 @@ const generateHash = (fileName: string, content: StringOrBuffer): Result<string,
   )(fileName, content)
 }
 
-export const addHashToFileName = (
-  fileName: string,
-  content: StringOrBuffer
-): Result<string, AppError> => {
+export const addHashToFileName = (fileName: string, content: Buffer): Result<string, AppError> => {
   if (!fileName) {
     return err(createError(ErrorCode.API, "Filename is required"))
   }
