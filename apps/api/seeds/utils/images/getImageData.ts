@@ -18,7 +18,7 @@ export const getImageData = (
       if (randomisedResult.isOk()) {
         const combineWithOptions = {
           options: imageData.options,
-          result: randomisedResult.value[0],
+          result: imageData.results,
         }
         return ok(combineWithOptions)
       } else {
