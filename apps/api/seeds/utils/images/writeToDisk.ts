@@ -3,12 +3,10 @@ import { createError } from "@seeds/utils/createError"
 import { AppError, ErrorCode } from "@seeds/utils/types/errors"
 import { Result } from "neverthrow"
 
-type StringOrBuffer = string | Buffer
-
 export type WriteSuccess = {
   message: string
 }
-export const writeToDisk = (path: string, buffer: StringOrBuffer): Result<WriteSuccess, AppError> =>
+export const writeToDisk = (path: string, buffer: Buffer): Result<WriteSuccess, AppError> =>
   Result.fromThrowable(
     () => {
       writeFileSync(path, buffer)
