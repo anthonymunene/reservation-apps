@@ -186,11 +186,14 @@ export const updateProfilePictures = (
   const { getUsers, uploadToS3, getMatchingFile } = dependencies
   return getUsers(dbClient).andThen(user => {
     const operations = user.map(user => {
-      return getMatchingFile(user.id, USERS_IMAGE_DIR).andThen(({ file, content }) =>
-        uploadToS3(file, content, "users").andThen(({ fileName }) => {
-          return updateEntityImage(dbClient, user.id, fileName, Table.Profile)
-        })
-      )
+      return getMatchingFile(user.id, USERS_IMAGE_DIR).andThen(files => {
+        const operations = files.map(({ name, content }) =>
+          uploadToS3(name, content, "users").andThen(({ fileName }) => {
+            return updateEntityImage(dbClient, user.id, fileName, Table.Profile)
+          })
+        )
+        return ResultAsync.combine(operations)
+      })
     })
     return ResultAsync.combine(operations)
   })
