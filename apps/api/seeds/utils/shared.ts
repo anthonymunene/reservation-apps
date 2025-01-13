@@ -4,7 +4,13 @@ import { S3Service } from "@utils/s3/lib"
 import * as defaultConfig from "../../config/default.json"
 import { seedImages } from "./seedImages"
 import { AllowedTables, EntityType, S3Path, TableData } from "@seeds/utils/types/shared"
-import { Image, ImageFolders, ImageType, UploadResult } from "@seeds/utils/types/images"
+import {
+  DefaultImageBase,
+  Image,
+  ImageFolders,
+  ImageType,
+  UploadResult,
+} from "@seeds/utils/types/images"
 import { PropertyId } from "@seeds/utils/types/properties"
 import { UserId } from "@seeds/utils/types/users"
 import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, ENTITY_CONFIG } from "./variables"
@@ -84,7 +90,7 @@ export const getMatchingFile = (
   id: string,
   path: ImageFolders,
   dependencies = { getFiles, safeReadFile }
-): ResultAsync<{ file: string; content: Buffer }, ConfigurationError | FileSystemError> => {
+): ResultAsync<DefaultImageBase[], ConfigurationError | FileSystemError> => {
   const { getFiles, safeReadFile } = dependencies
   if (!id) return errAsync(createError(ErrorCode.CONFIGURATION, `missing id parameter`))
   return getFiles(path).andThen(files => {
@@ -93,10 +99,13 @@ export const getMatchingFile = (
     if (!matchingFiles.length)
       return errAsync(createError(ErrorCode.FILE_SYSTEM, `no matching files found`))
 
-    return safeReadFile(`${process.cwd()}/${path}/${matchingFile}`).map(content => ({
-      file: matchingFile,
-      content,
-    }))
+    const operation = matchingFiles.map(file => {
+      return safeReadFile(`${process.cwd()}/${path}/${file}`).map(content => ({
+        name: file,
+        content,
+      }))
+    })
+    return ResultAsync.combine(operation)
   })
 }
 
@@ -146,7 +155,6 @@ export const uploadToS3 = (
   const { getPresignedUrl } = dependencies
   return getPresignedUrl(fileName, path)
     .andThen(url => {
-      console.log(url)
       return uploadContent(url, fileData)
     })
     .mapErr(error => {
