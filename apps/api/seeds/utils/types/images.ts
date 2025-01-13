@@ -1,6 +1,15 @@
 import { PropertyId } from "@seeds/utils/types/properties"
-import { SeederOpts } from "@seeds/utils/types/shared"
 import { PROPERTIES_IMAGE_DIR, USERS_IMAGE_DIR } from "@seeds/utils/variables"
+
+export type ImageDownloadResult = {
+  url: string
+  content: Buffer
+}
+
+export type DefaultImageBase = {
+  name: string
+  content: Buffer
+}
 
 export interface ImageMetadata {
   uploadedAt: string
@@ -45,7 +54,7 @@ export type ImageMetadataResponse = {
 }
 export type ImagedataResponse = {
   options: ImageOptions
-  result: ImageResponse
+  result: ImageResponse[]
 }
 export type UnsplashSearchResponse = {
   total: number
@@ -64,7 +73,7 @@ export type ImageSize = keyof ImageUrls
 export type ImageOptions = {
   query: string
   size: ImageSize
-  imagesCount?: number
+  imageCount?: number
 }
 export type ImageType = ImageConfigOpts["type"]
 
