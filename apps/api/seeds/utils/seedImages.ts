@@ -1,10 +1,11 @@
 //@ts-nocheck
 import { existsSync, mkdirSync } from "fs"
-import type { SeederOpts } from "@seeds/utils/types/shared"
-import { errAsync } from "neverthrow"
+import type { ImageConfigOpts } from "@seeds/utils/types/shared"
+import { errAsync, Result } from "neverthrow"
 import { ErrorCode } from "@seeds/utils/types/errors"
-import { downloadImage, extractImageURL, getImageData, saveImage } from "@seeds/utils/images"
+import { downloadImages, extractImageLinks, getImageData, saveImage } from "@seeds/utils/images"
 import { createError } from "@seeds/utils/createError"
+import { ImageDownloadResult } from "@seeds/utils/types/images"
 
 export const createIfNotExist = (filepath: string) => {
   if (!existsSync(filepath)) {
@@ -13,33 +14,27 @@ export const createIfNotExist = (filepath: string) => {
   return `${filepath}`
 }
 
-export const seedImages = (opts: SeederOpts) => {
-  const { type, id, imageCount = 3 } = opts
+export const seedImages = (opts: ImageConfigOpts) => {
+  const { type, id, imageCount = 1 } = opts
 
   // Validate inputs
-  if (!type || !id) {
+  if (!opts.type || !opts.id) {
     return errAsync(createError(ErrorCode.CONFIGURATION, "Type and ID are required parameters"))
   }
 
-  const seedImageDir = `${process.cwd()}/seeds/images/${type}`
-  const images: string[] = []
-  // const removePath = (imagePath: string) => imagePath?.split(`${seedImageDir}/`)[1]
+  const seedImageDir = `${process.cwd()}/seeds/images/${opts.type}`
 
   createIfNotExist(seedImageDir)
 
-  // TODO: consolidate duplicates
-  // const downloadPromises = Array.from({ length: imageCount }, async () => {
-
   return getImageData(type)
-    .andThen(extractImageURL)
-    .andThen(downloadImage)
-    .andThen((buffer: Buffer) => saveImage(buffer, id, seedImageDir))
-  // const results = await Promise.all(downloadPromises)
-  // images.push(...results.filter(Boolean))
-  //
-  // if (images.length === 0) {
-  //   throw new Error("Failed to generate any valid images")
-  // }
-
-  // return imageCount > 1 ? images : images[0]
+    .andThen(extractImageLinks)
+    .andThen(downloadImages)
+    .andThen((files: ImageDownloadResult[]) => {
+      const file = files.map(file => {
+        const { content } = file
+        const fileName = `${id}`
+        return saveImage(content, fileName, seedImageDir)
+      })
+      return Result.combine(file)
+    })
 }
