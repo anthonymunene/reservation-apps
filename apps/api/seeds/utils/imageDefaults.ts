@@ -29,7 +29,7 @@ export class ImageDefaults {
     } = {}
   ): Image {
     return {
-      id: `img_${randomUUID()}`,
+      id: `${randomUUID()}`,
       url,
       caption: options.caption,
       altText: options.altText,
