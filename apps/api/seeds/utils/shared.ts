@@ -89,8 +89,8 @@ export const getMatchingFile = (
   if (!id) return errAsync(createError(ErrorCode.CONFIGURATION, `missing id parameter`))
   return getFiles(path).andThen(files => {
     if (!files.length) return errAsync(createError(ErrorCode.FILE_SYSTEM, `no files found`))
-    const matchingFile = files.find(file => file.includes(id))
-    if (!matchingFile.length)
+    const matchingFiles = files.filter(file => file.includes(id))
+    if (!matchingFiles.length)
       return errAsync(createError(ErrorCode.FILE_SYSTEM, `no matching files found`))
 
     return safeReadFile(`${process.cwd()}/${path}/${matchingFile}`).map(content => ({
