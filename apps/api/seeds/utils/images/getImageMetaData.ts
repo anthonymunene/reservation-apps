@@ -12,8 +12,8 @@ import { createError } from "@seeds/utils/createError"
  * @returns Constructed URL for the Unsplash API
  */
 const getQuery = (options: ImageOptions, accessKey: string): string => {
-  const { query, imagesCount = 1 } = options
-  return `${IMAGE_URL}?client_id=${accessKey}&query=${encodeURIComponent(query)}&per_page=${imagesCount}`
+  const { query, imageCount = 1 } = options
+  return `${IMAGE_URL}?client_id=${accessKey}&query=${encodeURIComponent(query)}&per_page=${imageCount}`
 }
 /**
  * Validates the configuration required for Unsplash API
