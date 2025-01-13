@@ -104,7 +104,7 @@ const processImage = (
   { id }: UserId | PropertyId,
   imageType: ImageType,
   dependencies = { seedImages }
-): ResultAsync<SavedImageSuccess, ImagesMetaDataError> => {
+): ResultAsync<SavedImageSuccess[], ImagesMetaDataError> => {
   const { seedImages } = dependencies
   return seedImages({
     type: imageType,
@@ -122,7 +122,9 @@ export const generateImages = (
     return errAsync(createError(ErrorCode.CONFIGURATION, "data missing"))
   }
 
-  return ResultAsync.combine(data.map(id => processImage(id, imageType)))
+  return ResultAsync.combine(data.map(id => processImage(id, imageType))).map(results =>
+    results.flat()
+  )
 }
 
 const uploadContent = (url: string, content: Buffer) => {
