@@ -1,20 +1,20 @@
 import { createError } from "@seeds/utils/createError"
-import { ImagesMetaDataError, ErrorCode } from "@seeds/utils/types/errors"
+import { ErrorCode, ImagesMetaDataError } from "@seeds/utils/types/errors"
 import { addHashToFileName, writeToDisk } from "@seeds/utils/images/index"
 import { err, ok, Result } from "neverthrow"
+import { ImageDownloadResult } from "@seeds/utils/types/images"
 
-type StringOrBuffer = string | Buffer
 export type SavedImageSuccess = { success: boolean; value: string }
 export const saveImage = (
-  buffer: StringOrBuffer,
-  fileName: string,
+  content: ImageDownloadResult["content"],
+  name: string,
   dir: string
 ): Result<SavedImageSuccess, ImagesMetaDataError> => {
-  if (!buffer) {
+  if (!content) {
     return err(createError(ErrorCode.CONFIGURATION, "content is missing"))
   }
 
-  if (!fileName) {
+  if (!name) {
     return err(createError(ErrorCode.CONFIGURATION, "filename is missing"))
   }
 
