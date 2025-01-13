@@ -43,9 +43,3 @@ export interface EntityImageConfig {
 export type EntityType = "Property" | "Profile"
 
 export type S3Path = "users" | "properties"
-
-export type SeederOpts = {
-  type: "users" | "properties"
-  id: string
-  imageCount?: number
-}

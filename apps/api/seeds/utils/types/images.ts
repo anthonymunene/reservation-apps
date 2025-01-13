@@ -53,6 +53,12 @@ export type UnsplashSearchResponse = {
   results: ImageResponse[]
 }
 
+export type ImageConfigOpts = {
+  type: "users" | "properties"
+  id: string
+  imagesCount?: number
+}
+
 export type ImageSize = keyof ImageUrls
 
 export type ImageOptions = {
@@ -60,7 +66,7 @@ export type ImageOptions = {
   size: ImageSize
   imagesCount?: number
 }
-export type ImageType = SeederOpts["type"]
+export type ImageType = ImageConfigOpts["type"]
 
 export type ImageFolders = typeof USERS_IMAGE_DIR | typeof PROPERTIES_IMAGE_DIR
 
