@@ -21,10 +21,11 @@ export const saveImage = (
   if (!dir) {
     return err(createError(ErrorCode.CONFIGURATION, "directory is missing"))
   }
-  return addHashToFileName(fileName, buffer)
+
+  return addHashToFileName(name, content)
     .andThen(fileName => {
       const path = `${dir}/${fileName}`
-      return writeToDisk(path, buffer)
+      return writeToDisk(path, content)
     })
     .map(savedImage => ({ success: true, value: savedImage.message }))
     .mapErr(error => {
