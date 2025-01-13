@@ -212,11 +212,14 @@ export const updatePropertyPictures = (
   const { getProperties, uploadToS3, getMatchingFile } = dependencies
   return getProperties(dbClient).andThen(properties => {
     const operations = properties.map(property => {
-      return getMatchingFile(property.id, PROPERTIES_IMAGE_DIR).andThen(({ file, content }) =>
-        uploadToS3(file, content, "properties").andThen(({ fileName }) =>
-          updateEntityImage(dbClient, property.id, fileName, Table.Property)
-        )
-      )
+      return getMatchingFile(property.id, PROPERTIES_IMAGE_DIR).andThen(files => {
+        const matchingFiles = files.map(({ name, content }) => {
+          return uploadToS3(name, content, "properties").andThen(({ fileName }) =>
+            updateEntityImage(dbClient, property.id, fileName, Table.Property)
+          )
+        })
+        return ResultAsync.combine(matchingFiles)
+      })
     })
 
     return ResultAsync.combine(operations)
