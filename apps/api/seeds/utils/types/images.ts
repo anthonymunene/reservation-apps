@@ -52,10 +52,16 @@ export type ImageMetadataResponse = {
   options: ImageOptions
   results: UnsplashSearchResponse["results"]
 }
+export type ImageQueryOptions = {
+  query: string
+  size: ImageSize
+  imageCount?: number
+}
 export type ImagedataResponse = {
-  options: ImageOptions
   result: ImageResponse[]
 }
+
+export type ImageDataWithQueryOptions = ImageQueryOptions & ImagedataResponse
 export type UnsplashSearchResponse = {
   total: number
   total_pages: number
@@ -75,7 +81,7 @@ export type ImageOptions = {
   size: ImageSize
   imageCount?: number
 }
-export type ImageType = ImageConfigOpts["type"]
+export type ImageType = ImageConfigOpts["query"]
 
 export type ImageFolders = typeof USERS_IMAGE_DIR | typeof PROPERTIES_IMAGE_DIR
 
