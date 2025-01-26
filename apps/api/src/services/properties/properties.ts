@@ -17,6 +17,7 @@ import {
 import type { Application } from "../../declarations"
 import { getOptions, PropertiesService } from "./properties.class"
 import { insertAmenity } from "./properties.hooks"
+import { sanitiseImageData } from "../../hooks/sanitiseImagedata"
 import { propertiesMethods, propertiesPath } from "./properties.shared"
 
 export * from "./properties.class"
@@ -57,6 +58,8 @@ export const properties = (app: Application) => {
     },
     after: {
       all: [],
+      find: [sanitiseImageData],
+      get: [],
     },
     error: {
       all: [],
