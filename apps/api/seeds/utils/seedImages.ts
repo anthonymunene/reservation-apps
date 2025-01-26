@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { existsSync, mkdirSync } from "fs"
-import type { ImageConfigOpts } from "@seeds/utils/types/shared"
+import type { ImageConfigOpts } from "@seeds/utils/types/images"
 import { errAsync, Result } from "neverthrow"
 import { ErrorCode } from "@seeds/utils/types/errors"
 import { downloadImages, extractImageLinks, getImageData, saveImage } from "@seeds/utils/images"
