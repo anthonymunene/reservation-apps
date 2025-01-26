@@ -116,7 +116,7 @@ const processImage = (
 ): ResultAsync<SavedImageSuccess[], ImagesMetaDataError> => {
   const { seedImages } = dependencies
   return seedImages({
-    type: imageType,
+    query: imageType,
     id,
   })
 }
