@@ -1,5 +1,4 @@
 import { HookContext, NextFunction } from "../../declarations"
-import { Properties } from "@services/properties/properties.schema"
 
 export const insertAmenity = async (context: HookContext, next: NextFunction) => {
   console.log(`Running hook create order on ${context.path}.${context.method}`)
@@ -18,16 +17,4 @@ export const insertAmenity = async (context: HookContext, next: NextFunction) =>
 
     await context.app.service("propertyamenities").create(amenityData)
   }
-}
-
-const sanitise = (images: Properties["images"]) => images.map(image => ({ url: image.url }))
-
-export const sanitiseImageData = async (context: HookContext) => {
-  console.log(`Running hook create order on ${context.path}.${context.method}`)
-  context.result.data = context.result.data.map((items: Properties) => {
-    const { images, ...rest } = items
-    const sanitisedImageData = sanitise(images)
-    return { ...rest, images: sanitisedImageData }
-  })
-  return context
 }
