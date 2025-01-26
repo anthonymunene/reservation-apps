@@ -15,18 +15,18 @@ export const createIfNotExist = (filepath: string) => {
 }
 
 export const seedImages = (opts: ImageConfigOpts) => {
-  const { type, id, imageCount = 1 } = opts
+  const { query, id } = opts
 
   // Validate inputs
-  if (!opts.type || !opts.id) {
+  if (!opts.query || !opts.id) {
     return errAsync(createError(ErrorCode.CONFIGURATION, "Type and ID are required parameters"))
   }
 
-  const seedImageDir = `${process.cwd()}/seeds/images/${opts.type}`
+  const seedImageDir = `${process.cwd()}/seeds/images/${opts.query}`
 
   createIfNotExist(seedImageDir)
 
-  return getImageData(type)
+  return getImageData(query)
     .andThen(extractImageLinks)
     .andThen(downloadImages)
     .andThen((files: ImageDownloadResult[]) => {

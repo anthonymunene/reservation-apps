@@ -63,7 +63,7 @@ export type UnsplashSearchResponse = {
 }
 
 export type ImageConfigOpts = {
-  type: "users" | "properties"
+  query: "users" | "properties"
   id: string
   imagesCount?: number
 }

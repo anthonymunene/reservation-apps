@@ -17,7 +17,17 @@ export const propertiesSchema = Type.Object(
     countryCode: Type.String(),
     bedrooms: Type.Number(),
     beds: Type.Number(),
-    images: Type.Array(Type.Object({ image: Type.String() })),
+    images: Type.Array(
+      Type.Object({
+        url: Type.String(),
+        metadata: Type.Object({
+          status: Type.String(),
+          uploadedAt: Type.String({ format: "date-time" }),
+          displayOrder: Type.Number(),
+          isPrimaryImage: Type.Boolean(),
+        }),
+      })
+    ),
     host: Type.String({ format: "uuid" }),
     propertyTypeId: Type.String(),
     propertyType: Type.String(),
