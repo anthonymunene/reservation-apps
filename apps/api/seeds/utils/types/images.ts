@@ -71,7 +71,7 @@ export type UnsplashSearchResponse = {
 export type ImageConfigOpts = {
   query: "users" | "properties"
   id: string
-  imagesCount?: number
+  numberOfImages?: number
 }
 
 export type ImageSize = keyof ImageUrls
