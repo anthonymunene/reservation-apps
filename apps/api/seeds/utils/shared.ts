@@ -110,14 +110,14 @@ export const getMatchingFile = (
 }
 
 const processImage = (
-  { id }: UserId | PropertyId,
+  entity: UserId | PropertyId,
   imageType: ImageType,
   dependencies = { seedImages }
 ): ResultAsync<SavedImageSuccess[], ImagesMetaDataError> => {
   const { seedImages } = dependencies
   return seedImages({
     query: imageType,
-    id,
+    id: entity.id,
   })
 }
 
@@ -131,7 +131,7 @@ export const generateImages = (
     return errAsync(createError(ErrorCode.CONFIGURATION, "data missing"))
   }
 
-  return ResultAsync.combine(data.map(id => processImage(id, imageType))).map(results =>
+  return ResultAsync.combine(data.map(item => processImage(item, imageType))).map(results =>
     results.flat()
   )
 }
