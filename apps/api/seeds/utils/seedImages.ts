@@ -14,7 +14,9 @@ export const createIfNotExist = (filepath: string) => {
   return `${filepath}`
 }
 
-export const seedImages = (opts: ImageConfigOpts) => {
+export const seedImages = (
+  opts: ImageConfigOpts
+): ResultAsync<SavedImageSuccess, ImagesMetaDataError> => {
   const { query, id } = opts
 
   // Validate inputs
@@ -29,12 +31,9 @@ export const seedImages = (opts: ImageConfigOpts) => {
   return getImageData(query)
     .andThen(extractImageLinks)
     .andThen(downloadImages)
-    .andThen((files: ImageDownloadResult[]) => {
-      const file = files.map(file => {
-        const { content } = file
-        const fileName = `${id}`
-        return saveImage(content, fileName, seedImageDir)
-      })
-      return Result.combine(file)
+    .andThen((result: ImageDownloadResult) => {
+      const { content } = result
+      const fileName = `${id}`
+      return saveImage(content, fileName, seedImageDir)
     })
 }
