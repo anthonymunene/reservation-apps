@@ -5,7 +5,7 @@ import { Table } from "../../src/types"
 export const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID
 export const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY
 export const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY
-export const IMAGE_URL = "https://api.unsplash.com/search/photos"
+export const IMAGE_URL = "https://api.unsplash.com/photos/random"
 export const DEFAULT_IMAGES_JSON: Images = {
   version: 1,
   updatedAt: new Date().toISOString(),
