@@ -48,24 +48,33 @@ export type ImageResponse = {
   alt_description: string | null
 }
 
-export type ImageMetadataResponse = {
-  options: ImageOptions
-  results: UnsplashSearchResponse["results"]
+export type Ï = {
+  options: ImageQueryOptions
+  results: UnsplashSearchResponse
 }
 export type ImageQueryOptions = {
   query: string
   size: ImageSize
   imageCount?: number
 }
-export type ImagedataResponse = {
-  result: ImageResponse[]
+export type ImageDataResponse = {
+  id: string
+  urls: ImageUrls
+  alt_description: string | null
 }
 
-export type ImageDataWithQueryOptions = ImageQueryOptions & ImagedataResponse
+export type ImagesMetaDataResponse = ImageQueryOptions & UnsplashSearchResponse
+export type ImageMetadataWithQueryOptions = ImageQueryOptions & UnsplashSearchResponse
+type UnsplashImageSize = {
+  raw: string
+  full: string
+  regular: string
+  small: string
+  thumb: string
+  small_s3: string
+}
 export type UnsplashSearchResponse = {
-  total: number
-  total_pages: number
-  results: ImageResponse[]
+  urls: UnsplashImageSize
 }
 
 export type ImageConfigOpts = {
@@ -76,11 +85,6 @@ export type ImageConfigOpts = {
 
 export type ImageSize = keyof ImageUrls
 
-export type ImageOptions = {
-  query: string
-  size: ImageSize
-  imageCount?: number
-}
 export type ImageType = ImageConfigOpts["query"]
 
 export type ImageFolders = typeof USERS_IMAGE_DIR | typeof PROPERTIES_IMAGE_DIR

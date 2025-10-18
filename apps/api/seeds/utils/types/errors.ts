@@ -111,4 +111,9 @@ export class FileSystemError extends AppError {
   }
 }
 
-export type ImagesMetaDataError = ConfigurationError | ParseError | NetworkError
+export type ImagesMetaDataError =
+  | ConfigurationError
+  | ParseError
+  | NetworkError
+  | ApiError
+  | DatabaseError
