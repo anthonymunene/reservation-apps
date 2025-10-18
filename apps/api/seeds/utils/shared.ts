@@ -113,7 +113,7 @@ const processImage = (
   entity: UserId | PropertyId,
   imageType: ImageType,
   dependencies = { seedImages }
-): ResultAsync<SavedImageSuccess[], ImagesMetaDataError> => {
+) => {
   const { seedImages } = dependencies
   return seedImages({
     query: imageType,
