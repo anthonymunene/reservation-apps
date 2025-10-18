@@ -1,11 +1,16 @@
-//@ts-nocheck
 import { existsSync, mkdirSync } from "fs"
 import type { ImageConfigOpts } from "@seeds/utils/types/images"
-import { errAsync, Result } from "neverthrow"
-import { ErrorCode } from "@seeds/utils/types/errors"
-import { downloadImages, extractImageLinks, getImageData, saveImage } from "@seeds/utils/images"
-import { createError } from "@seeds/utils/createError"
 import { ImageDownloadResult } from "@seeds/utils/types/images"
+import { errAsync, ResultAsync } from "neverthrow"
+import { ErrorCode, ImagesMetaDataError } from "@seeds/utils/types/errors"
+import {
+  downloadImages,
+  extractImageLinks,
+  getImageData,
+  SavedImageSuccess,
+  saveImage,
+} from "@seeds/utils/images"
+import { createError } from "@seeds/utils/createError"
 
 export const createIfNotExist = (filepath: string) => {
   if (!existsSync(filepath)) {
@@ -16,7 +21,7 @@ export const createIfNotExist = (filepath: string) => {
 
 export const seedImages = (
   opts: ImageConfigOpts
-): ResultAsync<SavedImageSuccess, ImagesMetaDataError> => {
+): ResultAsync<SavedImageSuccess | SavedImageSuccess[], ImagesMetaDataError> => {
   const { query, id } = opts
 
   // Validate inputs
