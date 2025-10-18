@@ -1,4 +1,4 @@
-import { ImageMetadataResponse, ImageOptions } from "@seeds/utils/types/images"
+import { ImageQueryOptions, ImagesMetaDataResponse } from "@seeds/utils/types/images"
 import { IMAGE_URL, UNSPLASH_ACCESS_KEY } from "@seeds/utils/variables"
 import { err, ok, Result, ResultAsync } from "neverthrow"
 import { fetchImageData } from "@seeds/utils/images/fetchImageData"
@@ -11,7 +11,7 @@ import { createError } from "@seeds/utils/createError"
  * @param accessKey Unsplash API access key
  * @returns Constructed URL for the Unsplash API
  */
-const getQuery = (options: ImageOptions, accessKey: string): string => {
+const getQuery = (options: ImageQueryOptions, accessKey: string): string => {
   const { query, imageCount = 1 } = options
   return `${IMAGE_URL}?client_id=${accessKey}&query=${encodeURIComponent(query)}&per_page=${imageCount}`
 }
@@ -34,8 +34,8 @@ const getAccess = (): Result<string, ConfigurationError> => {
  */
 
 export const getImageMetaData = (
-  options: ImageOptions
-): ResultAsync<ImageMetadataResponse, ImagesMetaDataError> => {
+  options: ImageQueryOptions
+): ResultAsync<ImagesMetaDataResponse, ImagesMetaDataError> => {
   const access = getAccess()
 
   if (access.isErr()) {
@@ -45,11 +45,5 @@ export const getImageMetaData = (
   }
   const url = getQuery(options, access.value)
 
-  // return fetchImageData(url)
-
-  // return imageData.isOk()
-  //   ? ok(imageData.value.results)
-  //   : err(createError(ErrorCode.NETWORK, imageData.error.message))
-
-  return fetchImageData(url).map(imageData => ({ options, results: imageData.results }))
+  return fetchImageData(url).map(imageData => ({ ...options, ...imageData }))
 }
