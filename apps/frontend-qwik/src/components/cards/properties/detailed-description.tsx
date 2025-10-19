@@ -1,23 +1,24 @@
-import { component$ } from '@builder.io/qwik';
+import { component$ } from "@builder.io/qwik"
+
 type Props = {
   property: {
     amenities: {
-      name: string;
-    }[];
-    id: string;
-    title: string;
-    description: string;
-    city: string;
-    countryCode: string;
-    bedrooms: number;
-    ownedBy: string;
-    images: string;
-    beds: number;
-  };
-};
+      name: string
+    }[]
+    id: string
+    title: string
+    description: string
+    city: string
+    countryCode: string
+    bedrooms: number
+    ownedBy: string
+    images: { url: string }[]
+    beds: number
+  }
+}
 
 export const DetailCard = component$((props: Props) => {
-  const { property } = props;
+  const { property } = props
   return (
     <div class="overflow-hidden bg-white shadow sm:rounded-lg">
       <div class="px-4 py-6 sm:px-6">
@@ -29,22 +30,25 @@ export const DetailCard = component$((props: Props) => {
         <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <img
             class="h-36 w-36 flex-none rounded-full bg-gray-50"
-            src="https://images.unsplash.com/photo-1582053433976-25c00369fc93?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=512&q=80"
+            src={`${import.meta.env.PUBLIC_IMAGE_BASE_URL}/properties/${property.images[0].url}`}
             alt=""
           ></img>
         </div>
         <dl class="divide-y divide-gray-100">
-          
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-900">Description</dt>
-            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{property.description}</dd>
+            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {property.description}
+            </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-900">Owner</dt>
-            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{property.ownedBy}</dd>
+            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {property.ownedBy}
+            </dd>
           </div>
         </dl>
       </div>
     </div>
-  );
-});
+  )
+})
