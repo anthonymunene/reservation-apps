@@ -15,7 +15,8 @@ import {
 
 import type { Application } from "../../declarations"
 import { getOptions, ProfilesService } from "./profiles.class"
-import { profilesPath, profilesMethods } from "./profiles.shared"
+import { profilesMethods, profilesPath } from "./profiles.shared"
+import { sanitiseImageData } from "../../hooks/sanitiseImagedata"
 
 export * from "./profiles.class"
 export * from "./profiles.schema"
@@ -56,6 +57,7 @@ export const profiles = (app: Application) => {
     },
     after: {
       all: [],
+      find: [sanitiseImageData],
     },
     error: {
       all: [],
