@@ -65,7 +65,7 @@
         const response = await s3Service.download(file.name)
         // setup an anchor to download the file from the browser
         const anchor = document.createElement('a')
-        anchor.href = URL.createObjectURL(new Blob([response.buffer], { type: response.type }))
+        anchor.href = URL.createObjectURL(new Blob([response.buffer], { type: response.query }))
         anchor.download = file.name
         document.body.appendChild(anchor)
         anchor.click()
