@@ -59,7 +59,7 @@ export const properties = (app: Application) => {
     after: {
       all: [],
       find: [sanitiseImageData],
-      get: [],
+      get: [sanitiseImageData],
     },
     error: {
       all: [],
