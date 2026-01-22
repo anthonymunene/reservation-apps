@@ -70,6 +70,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "mocha": "^10.7.3",
+    "neverthrow": "^8.2.0",
     "nodemon": "^3.1.4",
     "prettier": "^3.3.3",
     "shx": "^0.3.4",
@@ -81,6 +82,7 @@
   },
   "dependencies": {
     "@aws-sdk/s3-request-presigner": "^3.673.0",
+    "config": "4.1.1",
     "@feathersjs/adapter-commons": "^5.0.30",
     "@feathersjs/authentication": "^5.0.30",
     "@feathersjs/authentication-client": "^5.0.30",
