@@ -9,7 +9,7 @@ export type WriteSuccess = {
 export const writeToDisk = (path: string, buffer: Buffer): Result<WriteSuccess, AppError> =>
   Result.fromThrowable(
     () => {
-      writeFileSync(path, buffer)
+      writeFileSync(path, Uint8Array.from(buffer))
       return { message: `Successfully saved image to ${path}` }
     },
     error =>
