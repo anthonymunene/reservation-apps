@@ -22,7 +22,7 @@ export const saveImage = (
     return err(createError(ErrorCode.CONFIGURATION, "directory is missing"))
   }
 
-  return addHashToFileName(name, content)
+  return addHashToFileName(name, new Uint8Array(content))
     .andThen(fileName => {
       const path = `${dir}/${fileName}`
       return writeToDisk(path, content)
