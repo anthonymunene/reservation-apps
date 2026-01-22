@@ -1,12 +1,12 @@
-import { createHash } from "crypto"
+import { BinaryLike, createHash } from "crypto"
 import { createError } from "@seeds/utils/createError"
 import { AppError, ErrorCode } from "@seeds/utils/types/errors"
 import { err, ok, Result } from "neverthrow"
 
 type StringOrBuffer = string | Buffer
-const generateHash = (fileName: string, content: StringOrBuffer): Result<string, AppError> => {
+const generateHash = (fileName: string, content: BinaryLike): Result<string, AppError> => {
   return Result.fromThrowable(
-    (fileName: string, content: StringOrBuffer) => {
+    (fileName: string, content: BinaryLike) => {
       const hash = createHash("md5").update(content).digest("hex").slice(0, 8)
       return `${fileName.toLowerCase().replace(/ /g, "-")}-${hash}.png`
     },
@@ -14,7 +14,10 @@ const generateHash = (fileName: string, content: StringOrBuffer): Result<string,
   )(fileName, content)
 }
 
-export const addHashToFileName = (fileName: string, content: Buffer): Result<string, AppError> => {
+export const addHashToFileName = (
+  fileName: string,
+  content: BinaryLike
+): Result<string, AppError> => {
   if (!fileName) {
     return err(createError(ErrorCode.API, "Filename is required"))
   }
