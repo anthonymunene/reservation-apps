@@ -141,7 +141,7 @@ const uploadContent = (url: string, content: Buffer) => {
   return ResultAsync.fromPromise(
     fetch(url, {
       method: "PUT",
-      body: content,
+      body: content as unknown as BodyInit,
     }),
     error => createError(ErrorCode.API, `something went wrong ${error}`)
   )
