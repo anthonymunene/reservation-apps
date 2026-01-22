@@ -1,16 +1,16 @@
-import { component$ } from '@builder.io/qwik';
-import { routeLoader$ } from '@builder.io/qwik-city';
-import { api } from '../../../client';
-import type { DocumentHead } from '@builder.io/qwik-city';
+import { component$ } from "@builder.io/qwik"
+import { routeLoader$ } from "@builder.io/qwik-city"
+import { api } from "../../../client"
+import type { DocumentHead } from "@builder.io/qwik-city"
 
 export const useAllUsersLoader = routeLoader$(async () => {
-  const { data } = await api.service('users').find();
+  const { data } = await api.service("users").find()
 
-  return data;
-});
+  return data
+})
 
 export default component$(() => {
-  const users = useAllUsersLoader();
+  const users = useAllUsersLoader()
   return (
     <div class="px-4 sm:px-6 lg:px-8">
       <div class="overflow-hidden bg-white shadow sm:rounded-lg">
@@ -20,7 +20,7 @@ export default component$(() => {
               <a href={user.id} class="flex-1">
                 <img
                   class="h-12 w-12 flex-none rounded-full bg-gray-50"
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  src={`${import.meta.env.PUBLIC_IMAGE_BASE_URL}/users/${user.profile.images[0].url}`}
                   alt=""
                 ></img>
                 <div>
@@ -36,11 +36,11 @@ export default component$(() => {
         </ul>
       </div>
     </div>
-  );
-});
+  )
+})
 
 export const head: DocumentHead = () => {
   return {
     title: `users`,
-  };
-};
+  }
+}
