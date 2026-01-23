@@ -77,3 +77,4 @@ cd apps/frontend-qwik && pnpm test.e2e  # E2E tests
 2. **File Naming:** kebab-case for files, PascalCase for classes
 3. **No Semicolons:** Prettier configured without semicolons
 4. **Print Width:** 100 characters
+5. **No Co-Authored-By:** Do not add Co-Authored-By lines in commit messages

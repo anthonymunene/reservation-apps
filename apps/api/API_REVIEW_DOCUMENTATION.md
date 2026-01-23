@@ -81,8 +81,9 @@ apps/api/
 - **Locations**:
   - `/apps/api/src/hooks/sanitiseImagedata.ts:6`
   - `/apps/api/src/services/properties/properties.hooks.ts:4`
+  - `/apps/api/src/utils/imageStorageProvider.ts:18`
 - **Impact**: Performance and security concerns
-- **Status**: ⏳ Pending
+- **Status**: ✅ Resolved (Issue #9)
 
 ### 🟡 Performance Issues
 
@@ -145,7 +146,7 @@ apps/api/
 
 ### Phase 1: Critical Security & Performance (Week 1)
 - [x] Remove hardcoded credentials, implement environment variables
-- [ ] Replace console.log with proper logger
+- [x] Replace console.log with proper logger
 - [ ] Fix N+1 query problems
 - [ ] Add basic error handling middleware
 - [ ] Implement request validation
@@ -187,6 +188,7 @@ apps/api/
 | Date | Change | Files Modified | Notes |
 |------|--------|---------------|-------|
 | 2026-01-23 | Remove hardcoded DB credentials | config/*.json, docker-compose.yml, .gitignore | Issue #7 - Security fix |
+| 2026-01-23 | Replace console.log with Winston logger | sanitiseImagedata.ts, properties.hooks.ts, imageStorageProvider.ts | Issue #9 - Also fixed silent failure anti-pattern |
 
 ### Current Sprint
 **Sprint Goal**: [To be defined]
