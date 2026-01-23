@@ -1,9 +1,10 @@
 import { HookContext } from "../declarations"
 import { Properties } from "@services/properties/properties.schema"
+import { logger } from "../logger"
 
 const sanitise = (images: Properties["images"]) => images.map(image => ({ url: image.url }))
 export const sanitiseImageData = async (context: HookContext) => {
-  console.log(`Running hook create order on ${context.path}.${context.method}`)
+  logger.debug(`Running sanitiseImageData hook on ${context.path}.${context.method}`)
   if (context.method === "get") {
     context.result.images = sanitise(context.result.images)
   }

@@ -1,5 +1,6 @@
 import * as cloudinaryProvider from "cloudinary"
 import * as dotenv from "dotenv" // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+import { logger } from "../logger"
 dotenv.config()
 
 const cloudinary = cloudinaryProvider.v2
@@ -15,6 +16,7 @@ export const uploadToImageStorage = async (fileName: string) => {
     const data = await cloudinary.uploader.upload(fileName)
     return data.secure_url
   } catch (error) {
-    console.log(error)
+    logger.error('Failed to upload image to Cloudinary', { fileName, error })
+    throw error
   }
 }

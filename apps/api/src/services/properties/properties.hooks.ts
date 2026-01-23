@@ -1,7 +1,8 @@
 import { HookContext, NextFunction } from "../../declarations"
+import { logger } from "../../logger"
 
 export const insertAmenity = async (context: HookContext, next: NextFunction) => {
-  console.log(`Running hook create order on ${context.path}.${context.method}`)
+  logger.debug(`Running insertAmenity hook on ${context.path}.${context.method}`)
   if (context.method === "create") {
     const { amenities, ...data } = context.data
 
