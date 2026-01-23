@@ -4,6 +4,9 @@
     "__format": "number"
   },
   "host": "HOSTNAME",
+  "postgresql": {
+    "connection": "DATABASE_URL"
+  },
   "storage": {
     "s3": {
       "s3Client": {
