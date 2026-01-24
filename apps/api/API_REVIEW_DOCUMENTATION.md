@@ -98,7 +98,7 @@ apps/api/
   propertyType: virtual(async (property, context) => {...})
   amenities: virtual(async (property, context) => {...})
   ```
-- **Status**: ⏳ Pending
+- **Status**: ✅ Resolved (Issue #8)
 
 #### 2. Missing Database Indexes
 - **Issue**: No indexes on frequently queried fields
@@ -147,7 +147,7 @@ apps/api/
 ### Phase 1: Critical Security & Performance (Week 1)
 - [x] Remove hardcoded credentials, implement environment variables
 - [x] Replace console.log with proper logger
-- [ ] Fix N+1 query problems
+- [x] Fix N+1 query problems
 - [ ] Add basic error handling middleware
 - [ ] Implement request validation
 
@@ -189,6 +189,7 @@ apps/api/
 |------|--------|---------------|-------|
 | 2026-01-23 | Remove hardcoded DB credentials | config/*.json, docker-compose.yml, .gitignore | Issue #7 - Security fix |
 | 2026-01-23 | Replace console.log with Winston logger | sanitiseImagedata.ts, properties.hooks.ts, imageStorageProvider.ts | Issue #9 - Also fixed silent failure anti-pattern |
+| 2026-01-24 | Fix N+1 query problem | properties.schema.ts, properties.ts, batch-load-property-relations.ts, query-counter.ts | Issue #8 - Replaced virtual resolvers with batch loading hook, added performance tests |
 
 ### Current Sprint
 **Sprint Goal**: [To be defined]
@@ -289,7 +290,7 @@ apps/api/
 ### Database Optimizations
 - [ ] Add indexes on foreign keys
 - [ ] Add composite indexes for common queries
-- [ ] Optimize N+1 queries
+- [x] Optimize N+1 queries
 - [ ] Implement connection pooling
 - [ ] Add query result caching
 
@@ -408,6 +409,6 @@ RATE_LIMIT_MAX_REQUESTS=
 
 ---
 
-*Last Updated: 2026-01-23*
+*Last Updated: 2026-01-24*
 *Version: 1.0.0*
 *Maintainer: Anthony Munene*
