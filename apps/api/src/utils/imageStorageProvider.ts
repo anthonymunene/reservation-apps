@@ -16,7 +16,7 @@ export const uploadToImageStorage = async (fileName: string) => {
     const data = await cloudinary.uploader.upload(fileName)
     return data.secure_url
   } catch (error) {
-    logger.error('Failed to upload image to Cloudinary', { fileName, error })
+    logger.error("Failed to upload image to Cloudinary", { fileName, error })
     throw error
   }
 }
