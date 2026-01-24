@@ -4,12 +4,12 @@ import configuration from "@feathersjs/configuration"
 import {
   bodyParser,
   cors,
-  errorHandler,
   koa,
   parseAuthentication,
   rest,
   serveStatic,
 } from "@feathersjs/koa"
+import { customErrorHandler } from "./middleware/error-handler"
 import socketio from "@feathersjs/socketio"
 
 import { configurationValidator } from "./configuration"
@@ -28,7 +28,7 @@ app.configure(configuration(configurationValidator))
 app.use(cors())
 app.use(serveStatic(app.get("public")))
 app.use(serveStatic("lib/utils"))
-app.use(errorHandler())
+app.use(customErrorHandler())
 app.use(parseAuthentication())
 app.use(bodyParser())
 

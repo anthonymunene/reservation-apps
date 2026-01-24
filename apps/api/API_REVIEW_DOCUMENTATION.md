@@ -148,7 +148,7 @@ apps/api/
 - [x] Remove hardcoded credentials, implement environment variables
 - [x] Replace console.log with proper logger
 - [x] Fix N+1 query problems
-- [ ] Add basic error handling middleware
+- [x] Add basic error handling middleware
 - [ ] Implement request validation
 
 ### Phase 2: API Standards & Documentation (Week 2)
@@ -190,6 +190,7 @@ apps/api/
 | 2026-01-23 | Remove hardcoded DB credentials | config/*.json, docker-compose.yml, .gitignore | Issue #7 - Security fix |
 | 2026-01-23 | Replace console.log with Winston logger | sanitiseImagedata.ts, properties.hooks.ts, imageStorageProvider.ts | Issue #9 - Also fixed silent failure anti-pattern |
 | 2026-01-24 | Fix N+1 query problem | properties.schema.ts, properties.ts, batch-load-property-relations.ts, query-counter.ts | Issue #8 - Replaced virtual resolvers with batch loading hook, added performance tests |
+| 2026-01-24 | Add error handling middleware | errors/types.ts, errors/mapper.ts, middleware/error-handler.ts, logger.ts, log-error.ts, app.ts | Standardized error response format, structured logging with context, environment-aware behavior |
 
 ### Current Sprint
 **Sprint Goal**: [To be defined]
@@ -409,6 +410,6 @@ RATE_LIMIT_MAX_REQUESTS=
 
 ---
 
-*Last Updated: 2026-01-24*
+*Last Updated: 2026-01-24 (Error Handling Middleware)*
 *Version: 1.0.0*
 *Maintainer: Anthony Munene*

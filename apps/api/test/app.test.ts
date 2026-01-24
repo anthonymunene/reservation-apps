@@ -24,7 +24,7 @@ describe("Feathers application tests", () => {
     assert.ok(data.indexOf('<html lang="en">') !== -1)
   })
 
-  it("shows a 404 JSON error", async () => {
+  it("shows a 404 JSON error in standardized format", async () => {
     try {
       await axios.get(`${appUrl}/path/to/nowhere`, {
         responseType: "json",
@@ -32,9 +32,15 @@ describe("Feathers application tests", () => {
       assert.fail("should never get here")
     } catch (error: any) {
       const { response } = error
+      // Check HTTP status
       assert.strictEqual(response?.status, 404)
-      assert.strictEqual(response?.data?.code, 404)
-      assert.strictEqual(response?.data?.name, "NotFound")
+
+      // Check our new standardized error format
+      assert.strictEqual(response?.data?.success, false)
+      assert.strictEqual(response?.data?.error?.code, "NOT_FOUND")
+      assert.ok(response?.data?.error?.message, "Error should have a message")
+      assert.ok(Array.isArray(response?.data?.error?.details), "Details should be an array")
+      assert.ok(response?.data?.error?.timestamp, "Error should have a timestamp")
     }
   })
 })
