@@ -42,6 +42,6 @@ export const createQueryCounter = (app: Application) => {
     /** Stop listening - call this in after() hook to cleanup */
     stop: () => {
       knex.off("query", handler)
-    }
+    },
   }
 }
