@@ -2,6 +2,6 @@
   "port": 8998,
   "postgresql": {
     "client": "postgres",
-    "connection": ""
+    "connection": "postgres://postgres:postgres@localhost:5433/reservation_knex_test"
   }
 }

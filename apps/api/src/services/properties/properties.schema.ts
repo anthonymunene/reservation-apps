@@ -1,5 +1,5 @@
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
-import { resolve, virtual } from "@feathersjs/schema"
+import { resolve } from "@feathersjs/schema"
 import type { Static } from "@feathersjs/typebox"
 import { getDataValidator, getValidator, querySyntax, Type } from "@feathersjs/typebox"
 
@@ -40,46 +40,11 @@ export const propertiesSchema = Type.Object(
   { $id: "Properties", additionalProperties: true }
 )
 export type Properties = Static<typeof propertiesSchema>
-export const propertiesResolver = resolve<Properties, HookContext>({
-  ownedBy: virtual(async (property, context) => {
-    const { data } = await context.app.service("profiles").find({
-      query: {
-        userId: property.host,
-      },
-    })
-
-    const profile = data.map(result => `${result.firstName} ${result.surname}`)
-    return profile.toString()
-  }),
-
-  propertyType: virtual(async (property, context) => {
-    return await context.app
-      .service("propertytypes")
-      .find({
-        paginate: false,
-        query: {
-          id: property.propertyTypeId,
-        },
-      })
-      .then(data => data[0].name)
-  }),
-  amenities: virtual(async (property, context) => {
-    const propertyAmenities = await context.app.service("propertyamenities").find({
-      paginate: false,
-      query: {
-        propertyId: property.id,
-        $select: ["amenityId"],
-      },
-    })
-
-    const propertyAmenityIds = propertyAmenities.map(propertyAmenity => propertyAmenity.amenityId)
-    const amenities = await context.app
-      .service("amenities")
-      .find({ query: { id: { $in: propertyAmenityIds } } })
-
-    return amenities.data.map(amenity => amenity.name)
-  }),
-})
+// Note: Virtual resolvers removed to fix N+1 query problem.
+// Relations (ownedBy, propertyType, amenities) are now populated by the
+// batchLoadPropertyRelations hook in properties.ts for better performance.
+// See: src/hooks/batch-load-property-relations.ts
+export const propertiesResolver = resolve<Properties, HookContext>({})
 
 export const propertiesExternalResolver = resolve<Properties, HookContext>({
   host: async () => undefined,

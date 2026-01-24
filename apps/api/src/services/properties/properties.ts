@@ -13,11 +13,11 @@ import {
   propertiesResolver,
 } from "./properties.schema"
 
-// import { withOwner, withPropertyTypes } from '../../hooks/properties';
 import type { Application } from "../../declarations"
 import { getOptions, PropertiesService } from "./properties.class"
 import { insertAmenity } from "./properties.hooks"
 import { sanitiseImageData } from "../../hooks/sanitiseImagedata"
+import { batchLoadPropertyRelations } from "../../hooks/batch-load-property-relations"
 import { propertiesMethods, propertiesPath } from "./properties.shared"
 
 export * from "./properties.class"
@@ -58,8 +58,10 @@ export const properties = (app: Application) => {
     },
     after: {
       all: [],
-      find: [sanitiseImageData],
-      get: [sanitiseImageData],
+      // batchLoadPropertyRelations runs FIRST to populate ownedBy, propertyType, amenities
+      // sanitiseImageData runs SECOND to strip internal image metadata
+      find: [batchLoadPropertyRelations, sanitiseImageData],
+      get: [batchLoadPropertyRelations, sanitiseImageData],
     },
     error: {
       all: [],
