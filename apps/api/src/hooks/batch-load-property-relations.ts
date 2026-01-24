@@ -90,9 +90,9 @@ export const batchLoadPropertyRelations = async (context: HookContext) => {
   ])
 
   // Step 3: Fetch amenity details (one more query)
-  const amenityIds = [...new Set(
-    (propertyAmenities as any[]).map(pa => pa.amenityId).filter(Boolean)
-  )]
+  const amenityIds = [
+    ...new Set((propertyAmenities as any[]).map(propertyAmenity => propertyAmenity.amenityId).filter(Boolean)),
+  ]
 
   const amenitiesResult = amenityIds.length > 0
     ? await context.app.service("amenities").find({
@@ -111,23 +111,23 @@ export const batchLoadPropertyRelations = async (context: HookContext) => {
   // vs Arrays with .find() which is like searching through a pile of papers
 
   const profileMap = new Map(
-    (profiles as any[]).map(p => [p.userId, p])
+    (profiles as any[]).map(profile => [profile.userId, profile])
   )
 
-  const typeMap = new Map(
-    (propertyTypes as any[]).map(t => [t.id, t])
+  const propertyTypeMap = new Map(
+    (propertyTypes as any[]).map(propertyType => [propertyType.id, propertyType])
   )
 
   const amenityMap = new Map(
-    (amenities as any[]).map(a => [a.id, a])
+    (amenities as any[]).map(amenity => [amenity.id, amenity])
   )
 
   // Group property amenities by propertyId for efficient lookup
   const propertyAmenitiesMap = new Map<string, string[]>()
-  for (const pa of propertyAmenities as any[]) {
-    const existing = propertyAmenitiesMap.get(pa.propertyId) || []
-    existing.push(pa.amenityId)
-    propertyAmenitiesMap.set(pa.propertyId, existing)
+  for (const propertyAmenity of propertyAmenities as any[]) {
+    const existing = propertyAmenitiesMap.get(propertyAmenity.propertyId) || []
+    existing.push(propertyAmenity.amenityId)
+    propertyAmenitiesMap.set(propertyAmenity.propertyId, existing)
   }
 
   // Step 5: Distribute results to each property (O(1) lookups)
@@ -139,7 +139,7 @@ export const batchLoadPropertyRelations = async (context: HookContext) => {
       : ""
 
     // Resolve propertyType (type name)
-    const type = typeMap.get(property.propertyTypeId)
+    const type = propertyTypeMap.get(property.propertyTypeId)
     property.propertyType = type?.name ?? ""
 
     // Resolve amenities (array of amenity names)
