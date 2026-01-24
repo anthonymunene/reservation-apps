@@ -11,7 +11,7 @@ import { randomUUID } from "crypto"
 export const amenitiesSchema = Type.Object(
   {
     id: Type.String({ format: "uuid" }),
-    name: Type.String(),
+    name: Type.String({ minLength: 1, maxLength: 100 }),
     createdAt: Type.String({ format: "date-time" }),
     updatedAt: Type.String({ format: "date-time" }),
     updatedBy: Type.String({ format: "date-time" }),

@@ -29,15 +29,18 @@ export const presignurl = (app: Application) => {
   // Initialize hooks
   app.service(presignurlPath).hooks({
     around: {
-      // all: [schemaHooks.resolveExternal(presignurlExternalResolver), schemaHooks.resolveResult(presignurlResolver)],
+      all: [
+        schemaHooks.resolveExternal(presignurlExternalResolver),
+        schemaHooks.resolveResult(presignurlResolver),
+      ],
     },
     before: {
-      // all: [schemaHooks.validateQuery(presignurlQueryValidator), schemaHooks.resolveQuery(presignurlQueryResolver)],
-      // find: [],
-      // get: [],
-      // putObject: [schemaHooks.validateData(presignurlDataValidator), schemaHooks.resolveData(presignurlDataResolver)],
-      // patch: [schemaHooks.validateData(presignurlPatchValidator), schemaHooks.resolveData(presignurlPatchResolver)],
-      // remove: [],
+      // Validate incoming data for putObject (the only method)
+      // This ensures id and path meet our constraints before S3 interaction
+      putObject: [
+        schemaHooks.validateData(presignurlDataValidator),
+        schemaHooks.resolveData(presignurlDataResolver),
+      ],
     },
     after: {
       all: [],

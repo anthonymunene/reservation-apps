@@ -11,8 +11,8 @@ import { randomUUID } from "crypto"
 export const usersSchema = Type.Object(
   {
     id: Type.String({ format: "uuid" }),
-    email: Type.String({ format: "email" }),
-    password: Type.String(),
+    email: Type.String({ format: "email", maxLength: 255 }),
+    password: Type.String({ minLength: 8, maxLength: 128 }),
     lastLogin: Type.String({ format: "date-time" }),
     profileId: Type.String({ format: "uuid" }),
     createdAt: Type.String({ format: "date-time" }),

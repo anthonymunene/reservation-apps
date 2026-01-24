@@ -11,8 +11,8 @@ import type { PresignurlService } from "./presignurl.class"
 // Main data model schema
 export const presignurlSchema = Type.Object(
   {
-    id: Type.String(),
-    path: Type.String(),
+    id: Type.String({ minLength: 1, maxLength: 255 }),
+    path: Type.String({ minLength: 1, maxLength: 500 }),
   },
   { $id: "Presignurl", additionalProperties: false }
 )

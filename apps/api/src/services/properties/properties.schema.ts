@@ -11,12 +11,13 @@ import { randomUUID } from "crypto"
 export const propertiesSchema = Type.Object(
   {
     id: Type.String({ format: "uuid" }),
-    title: Type.String(),
-    description: Type.String(),
-    city: Type.String(),
-    countryCode: Type.String(),
-    bedrooms: Type.Number(),
-    beds: Type.Number(),
+    title: Type.String({ minLength: 1, maxLength: 200 }),
+    description: Type.String({ maxLength: 5000 }),
+    city: Type.String({ minLength: 1, maxLength: 100 }),
+    // ISO 3166-1 alpha-2: exactly 2 uppercase letters (US, GB, KE)
+    countryCode: Type.String({ minLength: 2, maxLength: 2, pattern: "^[A-Z]{2}$" }),
+    bedrooms: Type.Number({ minimum: 0, maximum: 50 }),
+    beds: Type.Number({ minimum: 0, maximum: 100 }),
     images: Type.Array(
       Type.Object({
         url: Type.String(),

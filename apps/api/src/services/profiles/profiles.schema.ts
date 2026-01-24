@@ -11,9 +11,9 @@ import { randomUUID } from "crypto" // Main data model schema
 export const profilesSchema = Type.Object(
   {
     id: Type.String({ format: "uuid" }),
-    bio: Type.String(),
-    firstName: Type.String(),
-    surname: Type.String(),
+    bio: Type.String({ maxLength: 1000 }),
+    firstName: Type.String({ minLength: 1, maxLength: 100 }),
+    surname: Type.String({ minLength: 1, maxLength: 100 }),
     isSuperHost: Type.Boolean({ default: false }),
     images: Type.Array(
       Type.Object({

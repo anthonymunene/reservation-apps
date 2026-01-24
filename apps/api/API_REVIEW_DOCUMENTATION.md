@@ -115,7 +115,7 @@ apps/api/
 #### 2. Missing Input Validation
 - **Issue**: Incomplete validation schemas
 - **Location**: Various service schemas
-- **Status**: ⏳ Pending
+- **Status**: ✅ Resolved (Added minLength/maxLength/min/max constraints across all schemas)
 
 #### 3. Code Duplication
 - **Issue**: Similar patterns repeated across services
@@ -144,12 +144,12 @@ apps/api/
 
 ## Improvement Roadmap
 
-### Phase 1: Critical Security & Performance (Week 1)
+### Phase 1: Critical Security & Performance (Week 1) ✅ COMPLETE
 - [x] Remove hardcoded credentials, implement environment variables
 - [x] Replace console.log with proper logger
 - [x] Fix N+1 query problems
 - [x] Add basic error handling middleware
-- [ ] Implement request validation
+- [x] Implement request validation
 
 ### Phase 2: API Standards & Documentation (Week 2)
 - [ ] Set up OpenAPI/Swagger documentation
@@ -191,6 +191,7 @@ apps/api/
 | 2026-01-23 | Replace console.log with Winston logger | sanitiseImagedata.ts, properties.hooks.ts, imageStorageProvider.ts | Issue #9 - Also fixed silent failure anti-pattern |
 | 2026-01-24 | Fix N+1 query problem | properties.schema.ts, properties.ts, batch-load-property-relations.ts, query-counter.ts | Issue #8 - Replaced virtual resolvers with batch loading hook, added performance tests |
 | 2026-01-24 | Add error handling middleware | errors/types.ts, errors/mapper.ts, middleware/error-handler.ts, logger.ts, log-error.ts, app.ts | Standardized error response format, structured logging with context, environment-aware behavior |
+| 2026-01-24 | Implement request validation | users.schema.ts, properties.schema.ts, profiles.schema.ts, amenities.schema.ts, reviews.schema.ts, presignurl.schema.ts, presignurl.ts | Added minLength/maxLength constraints to strings, min/max to numbers, pattern for countryCode, enabled presignurl validation hooks |
 
 ### Current Sprint
 **Sprint Goal**: [To be defined]
@@ -410,6 +411,6 @@ RATE_LIMIT_MAX_REQUESTS=
 
 ---
 
-*Last Updated: 2026-01-24 (Error Handling Middleware)*
+*Last Updated: 2026-01-24 (Request Validation - Phase 1 Complete)*
 *Version: 1.0.0*
 *Maintainer: Anthony Munene*

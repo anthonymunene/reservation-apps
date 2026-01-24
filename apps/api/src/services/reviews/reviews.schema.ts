@@ -12,7 +12,7 @@ const reviewUserSchema = Type.Pick(usersSchema, ["id"])
 export const reviewsSchema = Type.Object(
   {
     id: Type.String({ format: "uuid" }),
-    comment: Type.String(),
+    comment: Type.String({ minLength: 1, maxLength: 5000 }),
     propertyTypeId: Type.String(),
     userId: reviewUserSchema,
     createdAt: Type.String({ format: "date-time" }),
