@@ -11,14 +11,18 @@ export const DEFAULT_IMAGES_JSON: Images = {
   updatedAt: new Date().toISOString(),
   images: [],
 }
-export const TOTAL_USER_ACCOUNTS = 10
+
+const isTestEnv = process.env.NODE_ENV === "test"
+
+export const TOTAL_USER_ACCOUNTS = isTestEnv ? 2 : 10
 export const IMAGE_DIR = "seeds/images"
 export const USERS_IMAGE_DIR = `${IMAGE_DIR}/users`
 export const PROPERTIES_IMAGE_DIR = `${IMAGE_DIR}/properties`
 
 export const TOTAL_ROOMS = [1, 2, 3] as const
-export const TOTAL_PROPERTIES = 20
-export const TOTAL_PROPERTIES_TO_OWN = 2
+export const TOTAL_PROPERTIES = isTestEnv ? 3 : 20
+// In test: 2 users × 2 = 4 ownership attempts ensures all 3 properties get owners
+export const TOTAL_PROPERTIES_TO_OWN = isTestEnv ? 2 : 2
 export const TOTAL_AMENITIES_PER_PROPERTY = 3
 export const ENTITY_CONFIG: Record<EntityType, EntityImageConfig> = {
   Property: {

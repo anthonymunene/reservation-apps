@@ -115,5 +115,8 @@ lib/
 .turbo
 vite.config.ts.timestamp-*
 
+# Migration checksum file (auto-generated for test optimization)
+.migration-checksum
+
 # Snyk Security Extension - AI Rules (auto-generated)
 .github/instructions/snyk_rules.instructions.md
