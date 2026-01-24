@@ -42,10 +42,9 @@ describe("properties service", () => {
  * They should pass both before and after our N+1 fix.
  */
 describe("properties service - relation loading", () => {
-
   it("should return ownedBy as a string with owner name", async () => {
     const { data: properties } = await app.service("properties").find({
-      query: { $limit: 1 }
+      query: { $limit: 1 },
     })
     const property = properties[0]
 
@@ -56,7 +55,7 @@ describe("properties service - relation loading", () => {
 
   it("should return propertyType as the type name string", async () => {
     const { data: properties } = await app.service("properties").find({
-      query: { $limit: 1 }
+      query: { $limit: 1 },
     })
     const property = properties[0]
 
@@ -66,7 +65,7 @@ describe("properties service - relation loading", () => {
 
   it("should return amenities as an array of names", async () => {
     const { data: properties } = await app.service("properties").find({
-      query: { $limit: 1 }
+      query: { $limit: 1 },
     })
     const property = properties[0]
 
@@ -81,7 +80,7 @@ describe("properties service - relation loading", () => {
   it("should return correct relations for single property via get", async () => {
     // First find a property to get its ID
     const { data: properties } = await app.service("properties").find({
-      query: { $limit: 1 }
+      query: { $limit: 1 },
     })
     const propertyId = properties[0].id
 
@@ -96,7 +95,7 @@ describe("properties service - relation loading", () => {
   it("should handle multiple properties correctly", async () => {
     // Fetch multiple properties - this is where N+1 would be painful
     const { data: properties } = await app.service("properties").find({
-      query: { $limit: 5 }
+      query: { $limit: 5 },
     })
 
     // All properties should have their relations populated
