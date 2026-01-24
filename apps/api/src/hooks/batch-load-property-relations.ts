@@ -67,7 +67,7 @@ export const batchLoadPropertyRelations = async (context: HookContext) => {
     hostIds.length > 0
       ? context.app.service("profiles").find({
           paginate: false,
-          query: { userId: { $in: hostIds } }
+          query: { userId: { $in: hostIds } },
         })
       : [],
 
@@ -75,7 +75,7 @@ export const batchLoadPropertyRelations = async (context: HookContext) => {
     propertyTypeIds.length > 0
       ? context.app.service("propertytypes").find({
           paginate: false,
-          query: { id: { $in: propertyTypeIds } }
+          query: { id: { $in: propertyTypeIds } },
         })
       : [],
 
@@ -84,22 +84,25 @@ export const batchLoadPropertyRelations = async (context: HookContext) => {
       paginate: false,
       query: {
         propertyId: { $in: propertyIds },
-        $select: ["propertyId", "amenityId"]
-      }
-    })
+        $select: ["propertyId", "amenityId"],
+      },
+    }),
   ])
 
   // Step 3: Fetch amenity details (one more query)
   const amenityIds = [
-    ...new Set((propertyAmenities as any[]).map(propertyAmenity => propertyAmenity.amenityId).filter(Boolean)),
+    ...new Set(
+      (propertyAmenities as any[]).map(propertyAmenity => propertyAmenity.amenityId).filter(Boolean)
+    ),
   ]
 
-  const amenitiesResult = amenityIds.length > 0
-    ? await context.app.service("amenities").find({
-        paginate: false,
-        query: { id: { $in: amenityIds } }
-      })
-    : []
+  const amenitiesResult =
+    amenityIds.length > 0
+      ? await context.app.service("amenities").find({
+          paginate: false,
+          query: { id: { $in: amenityIds } },
+        })
+      : []
 
   // Handle both paginated and non-paginated amenities result
   const amenities = Array.isArray(amenitiesResult)
@@ -110,17 +113,13 @@ export const batchLoadPropertyRelations = async (context: HookContext) => {
   // Maps are like a well-organized filing cabinet - instant access by key
   // vs Arrays with .find() which is like searching through a pile of papers
 
-  const profileMap = new Map(
-    (profiles as any[]).map(profile => [profile.userId, profile])
-  )
+  const profileMap = new Map((profiles as any[]).map(profile => [profile.userId, profile]))
 
   const propertyTypeMap = new Map(
     (propertyTypes as any[]).map(propertyType => [propertyType.id, propertyType])
   )
 
-  const amenityMap = new Map(
-    (amenities as any[]).map(amenity => [amenity.id, amenity])
-  )
+  const amenityMap = new Map((amenities as any[]).map(amenity => [amenity.id, amenity]))
 
   // Group property amenities by propertyId for efficient lookup
   const propertyAmenitiesMap = new Map<string, string[]>()
@@ -134,9 +133,7 @@ export const batchLoadPropertyRelations = async (context: HookContext) => {
   for (const property of properties) {
     // Resolve ownedBy (profile name)
     const profile = profileMap.get(property.host)
-    property.ownedBy = profile
-      ? `${profile.firstName} ${profile.surname}`
-      : ""
+    property.ownedBy = profile ? `${profile.firstName} ${profile.surname}` : ""
 
     // Resolve propertyType (type name)
     const type = propertyTypeMap.get(property.propertyTypeId)
@@ -149,7 +146,9 @@ export const batchLoadPropertyRelations = async (context: HookContext) => {
       .filter((name): name is string => Boolean(name))
   }
 
-  logger.debug(`Batch loading complete: ${profiles.length} profiles, ${propertyTypes.length} types, ${amenities.length} amenities`)
+  logger.debug(
+    `Batch loading complete: ${profiles.length} profiles, ${propertyTypes.length} types, ${amenities.length} amenities`
+  )
 
   return context
 }
