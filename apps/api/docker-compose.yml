@@ -40,7 +40,7 @@ services:
     networks:
       - reservation
 
-  # PostgreSQL pgAdmin panel accessible at http://localhost:16543/
+
   pgadmin-compose-knex:
     container_name: postgres-admin-knex
     image: dpage/pgadmin4
@@ -59,6 +59,7 @@ services:
       - reservation
     profiles:
       - 'dev'
+      - 'test'
 
 volumes:
   node_modules_cache:
