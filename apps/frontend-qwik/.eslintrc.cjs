@@ -26,11 +26,12 @@ module.exports = {
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/no-empty-interface": "off",
+    // typescript-eslint 8 replaced no-empty-interface with no-empty-object-type. Empty interfaces
+    // are still allowed; empty {} types are not.
+    "@typescript-eslint/no-empty-object-type": ["error", { allowInterfaces: "always" }],
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-this-alias": "off",
-    "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/ban-ts-comment": "off",
     "prefer-spread": "off",
     "no-case-declarations": "off",
