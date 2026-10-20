@@ -25,11 +25,11 @@ apps/
 ### Running Tests
 
 ```bash
-cd apps/api
-pnpm test           # Runs docker:test then mocha
+npm test -w api     # Resets the test database, migrates, seeds, then runs Mocha
 ```
 
-The test pipeline requires Docker for a test database.
+The test pipeline requires Docker for a test database, and Infisical for its secrets. `npm test`
+at the repo root runs the same thing through Turborepo.
 
 ### Service Test Pattern
 
@@ -87,9 +87,11 @@ describe("sanitiseImageData hook", () => {
 The API uses a separate test database via Docker:
 
 ```bash
-pnpm docker:test    # Starts test PostgreSQL
-pnpm migrate        # Run migrations on test DB
+npm run docker:test -w api -- test   # Starts the test PostgreSQL container (the "test" profile)
+npm run migrate:test -w api          # Run migrations on the test DB
 ```
+
+`npm test` does both of these for you, after resetting the test database.
 
 ## Frontend Unit Testing (Vitest)
 
@@ -108,8 +110,7 @@ export default defineConfig({
 ### Running Tests
 
 ```bash
-cd apps/frontend-qwik
-pnpm test.unit      # Run Vitest
+npm run test.unit -w frontend-qwik   # Run Vitest (needs Node 22.12 or later)
 ```
 
 ### Component Test Pattern
@@ -155,25 +156,29 @@ describe("Counter", () => {
 ### Configuration
 
 ```typescript
-// playwright.config.ts
-import { defineConfig } from "@playwright/test"
+// playwright.config.ts (trimmed)
+const PORT = process.env.PORT ?? '5173';
+const BASE_URL = `${process.env.PUBLIC_BASE_URL ?? 'http://localhost'}:${PORT}`;
 
-export default defineConfig({
-  testDir: "./e2e",
+const config: PlaywrightTestConfig = {
+  testDir: './tests',
+  use: { baseURL: BASE_URL },
   webServer: {
-    command: "pnpm dev",
-    port: 5173,
+    command: `npm run dev -- --port ${PORT} --strictPort`,
+    url: BASE_URL,
     reuseExistingServer: !process.env.CI,
   },
-})
+};
 ```
 
 ### Running E2E Tests
 
 ```bash
-cd apps/frontend-qwik
-pnpm test.e2e       # Run Playwright tests
+npm run test.e2e -w frontend-qwik   # Run Playwright tests (needs the API running)
 ```
+
+They use the dev server on `http://localhost:5173` if it's running, and start it otherwise.
+Set `PUBLIC_BASE_URL` and `PORT` to test a server somewhere else.
 
 ### E2E Test Pattern
 
@@ -225,10 +230,10 @@ test("submits login form", async ({ page }) => {
 
 | Location | Command | Framework | Purpose |
 |----------|---------|-----------|---------|
-| Root | `pnpm test` | Turborepo | Run all tests |
-| API | `pnpm test` | Mocha | API service tests |
-| Frontend | `pnpm test.unit` | Vitest | Component unit tests |
-| Frontend | `pnpm test.e2e` | Playwright | End-to-end tests |
+| Root | `npm test` | Turborepo | Runs each workspace's `test` script (only the API has one) |
+| API | `npm test -w api` | Mocha | API service tests |
+| Frontend | `npm run test.unit -w frontend-qwik` | Vitest | Component unit tests |
+| Frontend | `npm run test.e2e -w frontend-qwik` | Playwright | End-to-end tests |
 
 ## Best Practices
 

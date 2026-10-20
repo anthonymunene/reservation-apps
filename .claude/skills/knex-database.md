@@ -12,10 +12,11 @@ apps/api/
 ├── migrations/                # Schema migrations
 │   └── 20230227153741_create_initial_reservation.ts
 ├── seeds/                     # Seed data
-│   ├── users.ts
-│   ├── properties.ts
+│   ├── 01-properties.ts
+│   ├── 02-users.ts
 │   └── utils/                 # Seed utilities
-└── src/database-generated-types/  # Generated types
+├── src/types.ts               # Types written by generate-types.ts
+└── src/types/knex-db.ts       # Types the @database-generated-types alias points at (see #65)
 ```
 
 ## Configuration
@@ -46,8 +47,7 @@ Configuration in `config/default.json`:
 ### Creating Migrations
 
 ```bash
-cd apps/api
-pnpm migrate:make migration_name
+npm run migrate:make -w api -- migration_name
 ```
 
 ### Migration Structure
@@ -133,24 +133,30 @@ export async function seed(knex: Knex): Promise<void> {
 
 ## Running Migrations & Seeds
 
+The database connection comes from Infisical secrets. `seed` and `dev:reset` load them
+themselves; the other commands need wrapping in `infisical run`:
+
 ```bash
-cd apps/api
+# Run pending migrations (also regenerates types and runs Prettier)
+infisical run --env=dev --path=/Apps/reservation-apps/api -- npm run migrate -w api
 
-# Run pending migrations
-pnpm migrate
+# Create new migration (no database needed)
+npm run migrate:make -w api -- add_new_table
 
-# Create new migration
-pnpm migrate:make add_new_table
+# See which migrations have run
+infisical run --env=dev --path=/Apps/reservation-apps/api -- npm run migrate:list -w api
 
-# Rollback last migration
-npx knex migrate:rollback
+# Undo the last migration
+infisical run --env=dev --path=/Apps/reservation-apps/api -- npm run migrate:down -w api
 
 # Run seeds
-pnpm seed
+npm run seed -w api
 
-# Reset everything (Docker + migrate + seed)
-pnpm dev:reset
+# Reset everything (Docker + migrate + seed), then start the API
+npm run dev:reset -w api
 ```
+
+Seeding a database that already has records the seeds didn't create can fail; see #64.
 
 ## Query Building in Services
 
@@ -191,10 +197,10 @@ Development uses Docker for PostgreSQL:
 
 ```bash
 # Start database
-pnpm docker:dev
+npm run docker:dev -w api -- dev
 
 # Start fresh (reset)
-pnpm dev:reset
+npm run dev:reset -w api
 ```
 
 Docker compose in `apps/api/docker-compose.yml` handles PostgreSQL setup.
@@ -204,11 +210,15 @@ Docker compose in `apps/api/docker-compose.yml` handles PostgreSQL setup.
 Generate TypeScript types from database schema:
 
 ```bash
-cd apps/api
-pnpm generate-types
+infisical run --env=dev --path=/Apps/reservation-apps/api -- npm run generate:types -w api
 ```
 
-Generated types go to `src/database-generated-types/`.
+`npm run migrate` does this for you after migrating, and then runs Prettier. Run on its own,
+`generate:types` skips Prettier, so expect formatting-only changes.
+
+Generated types are written to `src/types.ts`. Note that the `@database-generated-types/*`
+alias points at `src/types/`, so `@database-generated-types/knex-db` resolves to a separate copy
+(`src/types/knex-db.ts`) that isn't regenerated. #65 tracks merging them into one file.
 
 ## Best Practices
 

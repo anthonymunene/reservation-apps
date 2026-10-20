@@ -2,7 +2,7 @@
 
 ## Overview
 
-The frontend uses Qwik v1.9 with Qwik City for routing, Tailwind CSS for styling, and connects to the FeathersJS API via the REST client.
+The frontend uses Qwik 1.20 (on Vite 6) with Qwik City for routing, Tailwind CSS for styling, and connects to the FeathersJS API via the REST client.
 
 ## Project Structure
 
@@ -160,11 +160,13 @@ export default component$(() => {
 
 ## Scripts
 
+Run from the repo root, or drop `-w frontend-qwik` when inside `apps/frontend-qwik`.
+
 ```bash
-pnpm dev          # Start dev server (waits for API on :3030)
-pnpm build        # Production build
-pnpm test.unit    # Vitest unit tests
-pnpm test.e2e     # Playwright E2E tests
-pnpm lint         # ESLint
-pnpm fmt          # Prettier format
+npm run dev -w frontend-qwik         # Start dev server on :5173 (waits for API on :3030)
+npm run build -w frontend-qwik       # Production build (needs the API compiled first; root npm run build does both)
+npm run test.unit -w frontend-qwik   # Vitest unit tests (needs Node 22.12 or later)
+npm run test.e2e -w frontend-qwik    # Playwright E2E tests (needs the API running)
+npm run lint -w frontend-qwik        # ESLint
+npm run fmt -w frontend-qwik         # Prettier format
 ```
