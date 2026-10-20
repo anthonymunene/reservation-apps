@@ -5,7 +5,6 @@ import { FileInput } from "~/components"
 import { api } from "../../../client"
 import upload from "../../../utils/aws"
 import { paths } from "~/utils/paths"
-import { DetailCard } from "../../../components/cards/user/detailed-description"
 import { USER_IMAGE_FOLDER } from "~/utils/variables"
 
 type SpecialForm = {

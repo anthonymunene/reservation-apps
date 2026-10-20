@@ -5,7 +5,7 @@ test.describe('login', () => {
   let email;
   let password;
   test.beforeEach(async ({ page }) => {
-    page.goto('/login');
+    await page.goto('/login');
     form = page.locator('#add-user');
     email = form.getByTestId('email');
     password = form.getByTestId('password');

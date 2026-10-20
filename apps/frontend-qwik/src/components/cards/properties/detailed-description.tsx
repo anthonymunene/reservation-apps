@@ -1,20 +1,9 @@
 import { component$ } from "@builder.io/qwik"
+import type { Properties } from "api"
 
 type Props = {
-  property: {
-    amenities: {
-      name: string
-    }[]
-    id: string
-    title: string
-    description: string
-    city: string
-    countryCode: string
-    bedrooms: number
-    ownedBy: string
-    images: { url: string }[]
-    beds: number
-  }
+  // Use the API's own type so the card stays in step with what the properties service returns
+  property: Properties
 }
 
 export const DetailCard = component$((props: Props) => {
