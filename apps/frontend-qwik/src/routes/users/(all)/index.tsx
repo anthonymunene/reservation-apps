@@ -1,6 +1,7 @@
 import { component$ } from "@builder.io/qwik"
 import { routeLoader$ } from "@builder.io/qwik-city"
 import { api } from "../../../client"
+import { profileImageUrl } from "~/utils/profile-image"
 import type { DocumentHead } from "@builder.io/qwik-city"
 
 export const useAllUsersLoader = routeLoader$(async () => {
@@ -20,7 +21,7 @@ export default component$(() => {
               <a href={user.id} class="flex-1">
                 <img
                   class="h-12 w-12 flex-none rounded-full bg-gray-50"
-                  src={`${import.meta.env.PUBLIC_IMAGE_BASE_URL}/users/${user.profile.images[0].url}`}
+                  src={profileImageUrl(user.profile.images)}
                   alt=""
                 ></img>
                 <div>

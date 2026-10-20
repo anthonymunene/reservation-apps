@@ -1,4 +1,4 @@
-import { component$, type NoSerialize, $ } from "@builder.io/qwik"
+import { component$, type NoSerialize, $, useSignal } from "@builder.io/qwik"
 import { type DocumentHead, routeLoader$, z } from "@builder.io/qwik-city"
 import { type InitialValues, useForm } from "@modular-forms/qwik"
 import { FileInput } from "~/components"
@@ -6,6 +6,8 @@ import { api } from "../../../client"
 import upload from "../../../utils/aws"
 import { paths } from "~/utils/paths"
 import { USER_IMAGE_FOLDER } from "~/utils/variables"
+import { logError } from "~/utils/logError"
+import { primaryImageEntry, profileImageUrl, uniqueImageName } from "~/utils/profile-image"
 
 type SpecialForm = {
   file: {
@@ -44,20 +46,7 @@ export const useFormLoader = routeLoader$<InitialValues<SpecialForm>>(() => ({
   name: undefined,
 }))
 
-const uploadProfilePicture = $(async (formData: SpecialForm) => {
-  console.log("this works")
-  const {
-    file: { item: item },
-  } = formData
-  console.log(item)
-  try {
-    await upload(item, { expiresIn: 3600, path: USER_IMAGE_FOLDER }).then(async data => {
-      console.log(await data)
-    })
-  } catch (error) {
-    console.log(error)
-  }
-})
+type UploadStatus = { kind: "success" | "error"; message: string } | null
 
 export default component$(() => {
   // Use special form
@@ -68,6 +57,42 @@ export default component$(() => {
   const user = useUserUpdate()
 
   const { firstName, surname } = user.value.profile
+  const userId = user.value.id
+  const pictureUrl = useSignal(profileImageUrl(user.value.profile.images))
+  const uploadStatus = useSignal<UploadStatus>(null)
+
+  // Uploads the chosen file to S3, then saves it on the profile as the user's picture
+  const uploadProfilePicture = $(async (formData: SpecialForm) => {
+    const file = formData.file.item
+    if (!file) {
+      uploadStatus.value = { kind: "error", message: "Choose an image to upload first." }
+      return
+    }
+
+    const fileName = uniqueImageName(userId, file.name)
+    try {
+      const response = await upload(file, {
+        expiresIn: 3600,
+        path: USER_IMAGE_FOLDER,
+        fileName,
+      })
+      if (!response?.ok) throw new Error("The image could not be uploaded.")
+
+      // The new picture replaces the previous one on the profile
+      await api
+        .service("profiles")
+        .patch(null, { images: [primaryImageEntry(fileName)] }, { query: { userId } })
+
+      pictureUrl.value = profileImageUrl([{ url: fileName }])
+      uploadStatus.value = { kind: "success", message: "Your profile picture has been updated." }
+    } catch (error) {
+      logError(error instanceof Error ? error : new Error(String(error)))
+      uploadStatus.value = {
+        kind: "error",
+        message: "Your profile picture could not be updated. Please try again.",
+      }
+    }
+  })
 
   return (
     <Form class="space-y-12 md:space-y-14 lg:space-y-16" onSubmit$={uploadProfilePicture}>
@@ -80,8 +105,9 @@ export default component$(() => {
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <img
               class="h-36 w-36 flex-none rounded-full bg-gray-50"
-              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-              alt=""
+              src={pictureUrl.value}
+              alt={`${firstName} ${surname}`}
+              data-testid="profile-picture"
             ></img>
           </div>
           <dl class="divide-y divide-gray-100">
@@ -114,6 +140,19 @@ export default component$(() => {
                   />
                 </svg>
               </button>
+              {uploadStatus.value && (
+                <p
+                  role="status"
+                  data-testid="upload-status"
+                  class={
+                    uploadStatus.value.kind === "success"
+                      ? "mt-2 text-sm text-green-700"
+                      : "mt-2 text-sm text-red-700"
+                  }
+                >
+                  {uploadStatus.value.message}
+                </p>
+              )}
             </div>
           </dl>
         </div>
