@@ -22,6 +22,8 @@
   "rules": {
     "prettier/prettier": 2, // Means error
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-empty-interface": "off"
+    // typescript-eslint 8 replaced no-empty-interface with no-empty-object-type. Empty interfaces
+    // are still allowed (Feathers extends them through declaration merging); empty {} types are not.
+    "@typescript-eslint/no-empty-object-type": ["error", { "allowInterfaces": "always" }]
   }
 }
