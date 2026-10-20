@@ -1,12 +1,4 @@
 import { component$ } from "@builder.io/qwik"
-//@ts-ignore
-import { getClientService } from "@kalisio/feathers-s3"
-import { io } from "socket.io-client"
-import { feathers } from "@feathersjs/client"
-import { z } from "zod"
-import { type InitialValues, useForm, zodForm$, Form, Field } from "@modular-forms/qwik"
-import { FileInput } from "~/components"
-import { UserForm, SpecialForm } from "~/routes/users/[id]"
 
 type Props = {
   user: {
@@ -18,17 +10,11 @@ type Props = {
       bio?: string
     }
   }
-  Form: SpecialForm
-  Field: SpecialForm
 }
 
 export const DetailCard = component$((props: Props) => {
-  const {
-    user: { profile },
-    Form,
-    Field,
-  } = props
-  console.log(props.user)
+  const { user } = props
+  const { profile } = user
   return (
     <div class="overflow-hidden bg-white shadow sm:rounded-lg">
       <div class="px-4 py-6 sm:px-6">
