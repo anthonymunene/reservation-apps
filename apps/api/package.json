@@ -30,15 +30,11 @@
     "lib": "src",
     "test": "test"
   },
-  "files": [
-    "lib/client.js",
-    "lib/**/*.d.ts",
-    "lib/**/*.shared.js",
-    "lib/utils/s3/lib/*.js"
-  ],
-  "main": "lib/client",
+  "main": "lib/src/client.js",
+  "types": "lib/src/client.d.ts",
   "scripts": {
-    "dev": "npm run bundle:client && infisical run --env=dev --path=/Apps/reservation-apps/api -- nodemon -x ts-node src/index.ts",
+    "build": "npm run compile",
+    "dev": "npm run compile && infisical run --env=dev --path=/Apps/reservation-apps/api -- nodemon -x ts-node src/index.ts",
     "dev:reset": "infisical run --env=dev --path=/Apps/reservation-apps/api --command \"npm run docker:dev -- dev true && npm run migrate && npm run seed && npm run dev\"",
     "compile": "shx rm -rf lib/ && tsc",
     "start": "node lib/",
@@ -51,7 +47,6 @@
     "test:full": "export NODE_ENV=test; npm run docker:test -- test true force && npm run migrate:test && npm run seed:test && npm run mocha",
     "test:watch": "export NODE_ENV=test; npm run docker:test -- test && npm run mocha:watch",
     "migrate:test": "infisical run --env=test --path=/Apps/reservation-apps/api --command \"knex migrate:latest\"",
-    "bundle:client": "npm run compile && npm pack --pack-destination ./public",
     "migrate": "knex migrate:latest && ts-node generate-types.ts && npm run prettier-format",
     "migrate:make": "knex migrate:make",
     "migrate:seed": "knex seed:make",

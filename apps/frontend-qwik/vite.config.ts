@@ -25,9 +25,24 @@ export default defineConfig(({ command, mode }): UserConfig => {
     plugins: [qwikCity(), qwikVite(), tsconfigPaths()],
     // This tells Vite which dependencies to pre-build in dev mode.
     optimizeDeps: {
+      // The api client is a linked workspace package compiled to CommonJS. Vite treats linked
+      // packages as source code, so it has to be told to convert this one for the browser.
+      include: ["api"],
       // Put problematic deps that break bundling here, mostly those with binaries.
       // For example ['better-sqlite3'] if you use that in server functions.
       exclude: [],
+    },
+
+    // In dev, let Node load the CommonJS api client directly instead of Vite evaluating it as
+    // an ES module, which fails with "exports is not defined".
+    ssr: command === "serve" ? { external: ["api"] } : undefined,
+
+    build: {
+      commonjsOptions: {
+        // Production builds only convert CommonJS under node_modules by default. The api client
+        // is linked from the workspace, so its real path is outside node_modules.
+        include: [/node_modules/, /apps\/api\/lib/],
+      },
     },
 
     /**
