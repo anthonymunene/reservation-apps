@@ -72,11 +72,16 @@ export const profilesPatchSchema = Type.Partial(profilesSchema, {
 })
 export type ProfilesPatch = Static<typeof profilesPatchSchema>
 export const profilesPatchValidator = getDataValidator(profilesPatchSchema, dataValidator)
+// updatedBy is not set here: the Profile table has no updatedBy column, and the API has no
+// logged-in user yet to record. Add it back with the authentication feature.
 export const profilesPatchResolver = resolve<Profiles, HookContext>({
   updatedAt: async () => {
     return new Date().toISOString()
   },
-  updatedBy: async (_value, _document, context: HookContext) => context.params.user.id,
+  // images is a jsonb column. node-postgres sends a JavaScript array as a Postgres array, which
+  // jsonb rejects, so send it as a JSON string instead.
+  images: async value =>
+    value === undefined ? undefined : (JSON.stringify(value) as unknown as Profiles["images"]),
 })
 
 // Schema for allowed query properties
