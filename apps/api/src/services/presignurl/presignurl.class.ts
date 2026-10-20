@@ -5,7 +5,7 @@ import type { Application } from "../../declarations"
 import type { Presignurl, PresignurlData } from "./presignurl.schema"
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { BadRequest } from "@feathersjs/errors"
+import { BadRequest, GeneralError } from "@feathersjs/errors"
 
 export type { Presignurl, PresignurlData }
 const debug = createDebug("feathers-s3:service")
@@ -34,6 +34,7 @@ export class PresignurlService {
     const signatureVersion = options.s3Client.signatureVersion
 
     const credentials = options.s3Client.credentials
+    this.credentials = credentials
     if (signatureVersion !== "v4") {
       throw new Error(
         "feathers-s3:constructor: `options.s3Client.signatureVersion` must be provided and equal to `v4`"
@@ -59,6 +60,15 @@ export class PresignurlService {
     if (!data.id) throw new BadRequest('create: missing "data.id" parameter')
     if (!data.path) throw new BadRequest('create: missing "data.path" paramater')
     debug(`method 'putOject' called with 'id': ${data.id} and 'path': ${data.path}`)
+
+    // Checked per request rather than at startup, so the API (and its tests) can still run
+    // without S3 credentials. Without this check the AWS SDK fails with a vague
+    // "Resolved credential object is not valid", or signs with an empty secret.
+    if (!this.credentials?.accessKeyId || !this.credentials?.secretAccessKey) {
+      throw new GeneralError(
+        "S3 credentials are not configured. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY."
+      )
+    }
 
     const commandParams = {
       Key: this.getKey(data.id, data.path),
