@@ -29,5 +29,28 @@
     // typescript-eslint 8 replaced no-empty-interface with no-empty-object-type. Empty interfaces
     // are still allowed (Feathers extends them through declaration merging); empty {} types are not.
     "@typescript-eslint/no-empty-object-type": ["error", { "allowInterfaces": "always" }]
-  }
+  },
+  "overrides": [
+    {
+      // The compiled API (npm start) runs with plain Node, which can't resolve the tsconfig path
+      // aliases. Code in src must use relative imports for anything that runs. Type-only imports
+      // are fine because they disappear when compiled. Seeds and tests run through ts-node,
+      // which does resolve aliases.
+      "files": ["apps/api/src/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@services/*", "@utils/*", "@seeds/*", "@database-generated-types/*"],
+                "allowTypeImports": true,
+                "message": "Use a relative import here. The compiled API can't resolve path aliases (type-only imports are fine)."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

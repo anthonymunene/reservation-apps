@@ -1,8 +1,8 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { errAsync, ResultAsync } from "neverthrow"
-import { createError } from "@seeds/utils/createError"
-import { ErrorCode } from "@seeds/utils/types/errors"
+import { createError } from "../../../../seeds/utils/createError"
+import { ErrorCode } from "../../../../seeds/utils/types/errors"
 
 // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/interfaces/_aws_sdk_types.requestpresigningarguments-1.html
 
