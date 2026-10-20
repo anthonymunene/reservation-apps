@@ -8,7 +8,7 @@ import { TextInput, FormFooter } from '~/components';
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Please enter your email.').email('The email address is badly formatted.'),
-  password: z.string().min(1, 'Please enter your password.').min(8, 'You password must have 8 characters or more.'),
+  password: z.string().min(1, 'Please enter your password.').min(8, 'Your password must have 8 characters or more.'),
 });
 
 type LoginForm = z.input<typeof loginSchema>;

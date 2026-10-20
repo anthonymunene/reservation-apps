@@ -48,6 +48,18 @@ npm start # or `yarn start`
 
 > Note: during dev mode, Vite may request a significant number of `.js` files. This does not represent a Qwik production build.
 
+## End-to-end tests
+
+The Playwright tests in `tests/` run against the dev server, and the pages load their data from the API, so the API needs to be running first (`npm run dev` at the repo root starts both).
+
+```shell
+npm run test.e2e
+```
+
+If the dev server is already running on `http://localhost:5173`, the tests use it. Otherwise Playwright starts it. To test a server somewhere else, set `PUBLIC_BASE_URL` and `PORT`, for example `PUBLIC_BASE_URL=http://localhost PORT=5199 npm run test.e2e`.
+
+The profile picture tests stub S3 in the browser, so they never write to the real bucket. They create their own user through the API and delete it afterwards.
+
 ## Preview
 
 The preview command will create a production build of the client modules, a production build of `src/entry.preview.tsx`, and run a local server. The preview server is only for convenience to locally preview a production build, and it should not be used as a production server.
