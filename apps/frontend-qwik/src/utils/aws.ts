@@ -7,6 +7,8 @@ type UploadData = (
     path?: string
     debug?: boolean
     expiresIn: number
+    // Name to store the file under. Defaults to the file's own name.
+    fileName?: string
   }
 ) => Promise<Response | undefined>
 
@@ -22,6 +24,10 @@ const getSignedURL: SignedURL = async (name, path) => {
       },
       body: JSON.stringify({ id: name, path }),
     })
+    // An error response has no signedUrl, so treat it as a failure rather than returning it
+    if (!response.ok) {
+      throw new Error(`presignurl request failed with status ${response.status}`)
+    }
     return response.json()
   } catch (error) {
     if (error instanceof Error) {
@@ -31,7 +37,7 @@ const getSignedURL: SignedURL = async (name, path) => {
 }
 const upload: UploadData = async function (data, options) {
   if (!data) throw new Error('upload: missing "data" file parameter')
-  const { name } = data
+  const name = options.fileName ?? data.name
 
   if (!options.path) throw new Error('create: missing "missing options.path" parameter')
   const { path } = options

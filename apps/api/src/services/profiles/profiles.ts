@@ -17,6 +17,7 @@ import type { Application } from "../../declarations"
 import { getOptions, ProfilesService } from "./profiles.class"
 import { profilesMethods, profilesPath } from "./profiles.shared"
 import { sanitiseImageData } from "../../hooks/sanitiseImagedata"
+import { patchProfileByUserId } from "../../hooks/patch-profile-by-user-id"
 
 export * from "./profiles.class"
 export * from "./profiles.schema"
@@ -50,6 +51,7 @@ export const profiles = (app: Application) => {
         schemaHooks.resolveData(profilesDataResolver),
       ],
       patch: [
+        patchProfileByUserId,
         schemaHooks.validateData(profilesPatchValidator),
         schemaHooks.resolveData(profilesPatchResolver),
       ],
