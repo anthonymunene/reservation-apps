@@ -14,7 +14,7 @@ export interface ReviewsParams extends KnexAdapterParams<ReviewsQuery> {}
 export class ReviewsService<ServiceParams extends Params = ReviewsParams> extends KnexService<
   Reviews,
   ReviewsData,
-  ReviewsParams,
+  ServiceParams,
   ReviewsPatch
 > {}
 

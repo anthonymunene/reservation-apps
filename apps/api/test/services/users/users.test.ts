@@ -1,7 +1,7 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.test.html
 import assert from "assert"
 import { app } from "../../../src/app"
-const { faker } = require("@faker-js/faker")
+import { faker } from "@faker-js/faker"
 import { describe } from "mocha"
 
 describe("users service", () => {

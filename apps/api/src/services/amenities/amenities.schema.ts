@@ -64,11 +64,14 @@ export const amenitiesQuerySchema = Type.Intersect(
     querySyntax(amenitiesQueryProperties),
     Type.Object(
       {
-        id: Type.Object(
-          {
-            $in: Type.Array(Type.String()),
-          },
-          { additionalProperties: false }
+        // Optional: filtering by a list of ids is allowed, not required on every query
+        id: Type.Optional(
+          Type.Object(
+            {
+              $in: Type.Array(Type.String()),
+            },
+            { additionalProperties: false }
+          )
         ),
       },
       { additionalProperties: false }

@@ -26,7 +26,7 @@ export class PropertyAmenitiesService<
 > extends KnexService<
   PropertyAmenities,
   PropertyAmenitiesData,
-  PropertyAmenitiesParams,
+  ServiceParams,
   PropertyAmenitiesPatch
 > {}
 

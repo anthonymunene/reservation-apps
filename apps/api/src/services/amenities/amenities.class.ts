@@ -14,7 +14,7 @@ export interface AmenitiesParams extends KnexAdapterParams<AmenitiesQuery> {}
 export class AmenitiesService<ServiceParams extends Params = AmenitiesParams> extends KnexService<
   Amenities,
   AmenitiesData,
-  AmenitiesParams,
+  ServiceParams,
   AmenitiesPatch
 > {}
 

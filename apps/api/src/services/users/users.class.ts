@@ -14,7 +14,7 @@ export interface UsersParams extends KnexAdapterParams<UsersQuery> {}
 export class UsersService<ServiceParams extends Params = UsersParams> extends KnexService<
   Users,
   UsersData,
-  UsersParams,
+  ServiceParams,
   UsersPatch
 > {}
 
