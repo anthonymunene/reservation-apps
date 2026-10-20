@@ -11,8 +11,8 @@
     "s3": {
       "s3Client": {
         "credentials": {
-          "accessKeyId": "ACCESS_KEY_ID",
-          "secretAccessKey": "SECRET_ACCESS_KEY"
+          "accessKeyId": "AWS_ACCESS_KEY_ID",
+          "secretAccessKey": "AWS_SECRET_ACCESS_KEY"
         }
       }
     }
