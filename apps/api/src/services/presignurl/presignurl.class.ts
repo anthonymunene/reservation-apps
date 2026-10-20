@@ -1,24 +1,28 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.class.html#custom-services
-// @ts-nocheck
 import createDebug from "debug"
 import type { Application } from "../../declarations"
 import type { Presignurl, PresignurlData } from "./presignurl.schema"
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
+import type { PutObjectCommandInput } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { BadRequest, GeneralError } from "@feathersjs/errors"
 
 export type { Presignurl, PresignurlData }
 const debug = createDebug("feathers-s3:service")
 
+type S3Credentials = {
+  accessKeyId?: string
+  secretAccessKey?: string
+}
+
 export interface PresignurlServiceOptions {
   s3Client: {
-    credentials: {
-      accessKeyId: string
-      secretAccessKey: string
-    }
+    // Optional: the API can run without S3 credentials, and putObject reports it clearly
+    credentials?: S3Credentials
     // endpoint,
     region: string
-    prefix: string
+    prefix?: string
+    // AWS SDK v3 always signs with v4. This is checked to catch old config, not passed on.
     signatureVersion: string
     bucket: string
   }
@@ -26,14 +30,18 @@ export interface PresignurlServiceOptions {
 
 // This is a skeleton for a custom service class. Remove or add the methods you need here
 export class PresignurlService {
+  credentials?: S3Credentials
+  s3Client: S3Client
+  bucket: string
+  delimiter: string
+  prefix?: string
+
   constructor(public options: PresignurlServiceOptions) {
     if (!options) {
       throw new Error("feathers-s3:constructor: `options` must be provided")
     }
 
-    const signatureVersion = options.s3Client.signatureVersion
-
-    const credentials = options.s3Client.credentials
+    const { signatureVersion, credentials } = options.s3Client
     this.credentials = credentials
     if (signatureVersion !== "v4") {
       throw new Error(
@@ -42,8 +50,11 @@ export class PresignurlService {
     }
     this.s3Client = new S3Client({
       region: options.s3Client.region,
-      signatureVersion,
-      credentials: { ...credentials },
+      // Left out when incomplete; putObject refuses to sign without both values anyway
+      credentials:
+        credentials?.accessKeyId && credentials?.secretAccessKey
+          ? { accessKeyId: credentials.accessKeyId, secretAccessKey: credentials.secretAccessKey }
+          : undefined,
     })
     // Check for bucket
     if (!options.s3Client.bucket) {
@@ -72,7 +83,7 @@ export class PresignurlService {
 
     const commandParams = {
       Key: this.getKey(data.id, data.path),
-      Bucket: this.options.s3Client.bucket,
+      Bucket: this.bucket,
     }
 
     const signedUrl = await this.getPresignedUrl(commandParams)
@@ -82,11 +93,11 @@ export class PresignurlService {
     }
   }
 
-  getKey(id, path) {
+  getKey(id: string, path: string) {
     return this.prefix ? this.prefix + this.delimiter + path + this.delimiter + id : id
   }
 
-  async getPresignedUrl(commandParams) {
+  async getPresignedUrl(commandParams: PutObjectCommandInput) {
     const command = new PutObjectCommand(commandParams)
     return await getSignedUrl(this.s3Client, command, { expiresIn: 3600 })
   }

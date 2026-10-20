@@ -18,7 +18,7 @@ export interface PropertyTypesParams extends KnexAdapterParams<PropertyTypesQuer
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class PropertyTypesService<
   ServiceParams extends Params = PropertyTypesParams,
-> extends KnexService<PropertyTypes, PropertyTypesData, PropertyTypesParams, PropertyTypesPatch> {}
+> extends KnexService<PropertyTypes, PropertyTypesData, ServiceParams, PropertyTypesPatch> {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
   return {

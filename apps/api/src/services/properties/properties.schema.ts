@@ -56,12 +56,21 @@ export const propertiesExternalResolver = resolve<Properties, HookContext>({
 })
 
 // Schema for creating new entries
-export const propertiesDataSchema = Type.Pick(
-  propertiesSchema,
-  ["title", "description", "city", "countryCode", "propertyTypeId", "host"],
-  {
-    $id: "PropertiesData",
-  }
+export const propertiesDataSchema = Type.Intersect(
+  [
+    Type.Pick(propertiesSchema, [
+      "title",
+      "description",
+      "city",
+      "countryCode",
+      "propertyTypeId",
+      "host",
+    ]),
+    // Amenity ids to link to the new property. The insertAmenity hook removes these from the
+    // data before it is validated and saved, and creates the property-amenity links instead.
+    Type.Object({ amenities: Type.Optional(Type.Array(Type.String({ format: "uuid" }))) }),
+  ],
+  { $id: "PropertiesData" }
 )
 
 export type PropertiesData = Static<typeof propertiesDataSchema>

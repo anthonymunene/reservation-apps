@@ -1,22 +1,11 @@
-// @ts-nocheck
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.shared.html
 
-import type { Params } from "@feathersjs/feathers"
 import type { ClientApplication } from "../../client"
-import type {
-  Presignurl,
-  PresignurlData,
-  PresignurlPatch,
-  PresignurlQuery,
-  PresignurlService,
-} from "./presignurl.class"
+import type { Presignurl, PresignurlData, PresignurlService } from "./presignurl.class"
 
-export type { Presignurl, PresignurlData, PresignurlPatch, PresignurlQuery }
+export type { Presignurl, PresignurlData }
 
-export type PresignurlClientService = Pick<
-  PresignurlService<Params<PresignurlQuery>>,
-  (typeof presignurlMethods)[number]
->
+export type PresignurlClientService = Pick<PresignurlService, (typeof presignurlMethods)[number]>
 
 export const presignurlPath = "presignurl"
 

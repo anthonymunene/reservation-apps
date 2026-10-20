@@ -1,5 +1,4 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
-// @ts-nocheck
 import { hooks as schemaHooks } from "@feathersjs/schema"
 
 import {

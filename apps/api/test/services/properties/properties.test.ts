@@ -1,8 +1,7 @@
-//@ts-nocheck
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.test.html
 import assert from "assert"
 import { app } from "../../../src/app"
-const { faker } = require("@faker-js/faker")
+import { faker } from "@faker-js/faker"
 import { randomiseMany } from "../../../src/utils/randomise"
 import { createQueryCounter } from "../../utils/query-counter"
 
@@ -19,7 +18,7 @@ describe("properties service", () => {
       await app.service("amenities").find({ query: { $select: ["id"] } })
     ).data.map(amenity => amenity.id)
 
-    const randomAmenities = randomiseMany(amenities, 3)
+    const randomAmenities = randomiseMany(amenities, { count: 3 })
 
     const user = await app.service("users").find({ query: { $limit: 1 } })
     const property = await app.service("properties").create({
@@ -32,6 +31,10 @@ describe("properties service", () => {
       amenities: randomAmenities,
     })
     assert.ok(property, "Success Created User")
+
+    // The insertAmenity hook links the chosen amenities to the new property
+    const saved = await app.service("properties").get(property.id)
+    assert.equal(saved.amenities.length, 3, "Linked the 3 chosen amenities")
   })
 })
 

@@ -5,12 +5,7 @@ import authenticationClient from "@feathersjs/authentication-client"
 import type { AuthenticationClientOptions } from "@feathersjs/authentication-client"
 
 import { presignurlClient } from "./services/presignurl/presignurl.shared"
-export type {
-  Presignurl,
-  PresignurlData,
-  PresignurlQuery,
-  PresignurlPatch,
-} from "./services/presignurl/presignurl.shared"
+export type { Presignurl, PresignurlData } from "./services/presignurl/presignurl.shared"
 
 import { propertyTypesClient } from "./services/propertyTypes/propertyTypes.shared"
 export type {
@@ -79,7 +74,7 @@ export type ClientApplication = Application<ServiceTypes, Configuration>
  * @see https://dove.feathersjs.com/api/client.html
  * @returns The Feathers client application
  */
-export const createClient = <Configuration = any>(
+export const createClient = (
   connection: TransportConnection<ServiceTypes>,
   authenticationOptions: Partial<AuthenticationClientOptions> = {}
 ) => {

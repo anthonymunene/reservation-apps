@@ -1,14 +1,7 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/application.html
 import { feathers } from "@feathersjs/feathers"
 import configuration from "@feathersjs/configuration"
-import {
-  bodyParser,
-  cors,
-  koa,
-  parseAuthentication,
-  rest,
-  serveStatic,
-} from "@feathersjs/koa"
+import { bodyParser, cors, koa, parseAuthentication, rest, serveStatic } from "@feathersjs/koa"
 import { customErrorHandler } from "./middleware/error-handler"
 import socketio from "@feathersjs/socketio"
 
