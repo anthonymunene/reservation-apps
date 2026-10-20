@@ -1,5 +1,5 @@
 import { HookContext } from "../declarations"
-import { Properties } from "@services/properties/properties.schema"
+import type { Properties } from "@services/properties/properties.schema"
 import { logger } from "../logger"
 
 const sanitise = (images: Properties["images"]) => images.map(image => ({ url: image.url }))

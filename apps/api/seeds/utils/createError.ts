@@ -8,7 +8,9 @@ import {
   ParseError,
   FileSystemError,
   UnknownError,
-} from "@seeds/utils/types/errors"
+  // Relative, not @seeds/...: the API's S3Service (in src) imports this file, and the compiled
+  // API runs with plain Node, which can't resolve path aliases
+} from "./types/errors"
 
 export const createError = (
   code: ErrorCode,
