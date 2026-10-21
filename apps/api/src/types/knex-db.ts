@@ -26,6 +26,7 @@ export type Amenity = {
   name: string | null
   createdAt: Date
   updatedAt: Date
+  updatedBy: string | null
 }
 
 export type Profile = {
@@ -39,6 +40,7 @@ export type Profile = {
   userId: string | null
   createdAt: Date
   updatedAt: Date
+  updatedBy: string | null
 }
 
 export type Property = {
@@ -54,6 +56,7 @@ export type Property = {
   propertyTypeId: string | null
   createdAt: Date
   updatedAt: Date
+  updatedBy: string | null
 }
 
 export type PropertyAmenity = {
@@ -62,6 +65,7 @@ export type PropertyAmenity = {
   amenityId: string | null
   createdAt: Date
   updatedAt: Date
+  updatedBy: string | null
 }
 
 export type PropertyType = {
@@ -69,6 +73,7 @@ export type PropertyType = {
   name: string
   createdAt: Date
   updatedAt: Date
+  updatedBy: string | null
 }
 
 export type Review = {
@@ -78,6 +83,7 @@ export type Review = {
   comment: string | null
   createdAt: Date
   updatedAt: Date
+  updatedBy: string | null
 }
 
 export type User = {
@@ -87,4 +93,5 @@ export type User = {
   createdAt: Date
   updatedAt: Date
   lastLogin: Date | null
+  updatedBy: string | null
 }

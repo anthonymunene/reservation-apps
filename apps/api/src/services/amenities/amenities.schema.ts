@@ -14,7 +14,7 @@ export const amenitiesSchema = Type.Object(
     name: Type.String({ minLength: 1, maxLength: 100 }),
     createdAt: Type.String({ format: "date-time" }),
     updatedAt: Type.String({ format: "date-time" }),
-    updatedBy: Type.String({ format: "date-time" }),
+    updatedBy: Type.Union([Type.String({ format: "uuid" }), Type.Null()]),
   },
   { $id: "Amenities", additionalProperties: false }
 )
@@ -54,7 +54,7 @@ export const amenitiesPatchResolver = resolve<Amenities, HookContext>({
   updatedAt: async () => {
     return new Date().toISOString()
   },
-  updatedBy: async (_value, _document, context: HookContext) => context.params.user.id,
+  updatedBy: async (_value, _document, context: HookContext) => context.params.user?.id,
 })
 
 // Schema for allowed query properties
