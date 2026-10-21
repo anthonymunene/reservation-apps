@@ -1,5 +1,6 @@
 import type { NoSerialize } from "@builder.io/qwik"
 import { logError } from "~/utils/logError"
+import { api } from "~/client"
 
 type UploadData = (
   data: NoSerialize<File>,
@@ -16,19 +17,9 @@ type SignedURL = (id: string, path: string) => Promise<{ signedUrl: string } | u
 
 const getSignedURL: SignedURL = async (name, path) => {
   try {
-    const response = await fetch("http://localhost:3030/presignurl", {
-      method: "POST",
-      headers: {
-        "X-Service-Method": "putObject",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: name, path }),
-    })
-    // An error response has no signedUrl, so treat it as a failure rather than returning it
-    if (!response.ok) {
-      throw new Error(`presignurl request failed with status ${response.status}`)
-    }
-    return response.json()
+    // Through the api client rather than fetch: the API only signs upload URLs for a logged-in
+    // user, and the client adds the login token to the request
+    return await api.service("presignurl").putObject({ id: name, path })
   } catch (error) {
     if (error instanceof Error) {
       logError(error)

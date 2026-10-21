@@ -1,7 +1,5 @@
 import { test, expect, type Page } from "@playwright/test"
-
-const API_URL = process.env.PUBLIC_API_URL ?? "http://localhost:3030"
-const PASSWORD = "correct-horse-battery"
+import { createTestUser, deleteTestUser, PASSWORD, type TestUser } from "./helpers"
 
 // Where the Feathers authentication client keeps the token in the browser
 const TOKEN_KEY = "feathers-jwt"
@@ -14,19 +12,19 @@ const fillLogin = async (page: Page, email: string, password: string) => {
 }
 
 test.describe("logging in and out", () => {
+  let user: TestUser
   let userId: string
   let email: string
 
   // Each test uses its own user, created through the API so its password is hashed
   test.beforeEach(async ({ request }) => {
-    email = `e2e-${crypto.randomUUID()}@example.test`
-    const response = await request.post(`${API_URL}/users`, { data: { email, password: PASSWORD } })
-    expect(response.ok()).toBeTruthy()
-    userId = (await response.json()).id
+    user = await createTestUser(request)
+    userId = user.id
+    email = user.email
   })
 
   test.afterEach(async ({ request }) => {
-    await request.delete(`${API_URL}/users/${userId}`)
+    await deleteTestUser(request, user)
   })
 
   test("logs in, goes to the user's page, and shows who is signed in", async ({ page }) => {
