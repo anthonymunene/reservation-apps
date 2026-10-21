@@ -1,5 +1,6 @@
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import { resolve, virtual } from "@feathersjs/schema"
+import { passwordHash } from "@feathersjs/authentication-local"
 import type { Static } from "@feathersjs/typebox"
 import { getDataValidator, getValidator, querySyntax, Type } from "@feathersjs/typebox"
 import type { HookContext } from "../../declarations"
@@ -55,6 +56,8 @@ export const usersDataResolver = resolve<Users, HookContext>({
   id: async () => {
     return randomUUID()
   },
+  // Store a bcrypt hash, never the password itself. The local login strategy checks against it.
+  password: passwordHash({ strategy: "local" }),
   createdAt: async () => {
     return new Date().toISOString()
   },
@@ -67,6 +70,8 @@ export const usersPatchSchema = Type.Partial(usersSchema, {
 export type UsersPatch = Static<typeof usersPatchSchema>
 export const usersPatchValidator = getDataValidator(usersPatchSchema, dataValidator)
 export const usersPatchResolver = resolve<Users, HookContext>({
+  // A changed password is hashed the same way as on create
+  password: passwordHash({ strategy: "local" }),
   updatedAt: async () => {
     return new Date().toISOString()
   },

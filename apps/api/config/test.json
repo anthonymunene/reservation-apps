@@ -3,5 +3,8 @@
   "postgresql": {
     "client": "postgres",
     "connection": "postgres://postgres:postgres@localhost:5433/reservation_knex_test"
+  },
+  "authentication": {
+    "secret": "test-only-secret-not-used-outside-the-test-database"
   }
 }

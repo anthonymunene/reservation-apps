@@ -16,5 +16,8 @@
         }
       }
     }
+  },
+  "authentication": {
+    "secret": "FEATHERS_SECRET"
   }
 }
