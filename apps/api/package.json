@@ -42,7 +42,7 @@
     "prettier-format": "npx prettier --config ../../.prettierrc \"src/**/*.ts\" \"test/**/*.ts\"  --write",
     "mocha": "cross-env NODE_ENV=test mocha test/ --require ts-node/register --recursive --extension .ts --exit",
     "mocha:watch": "cross-env NODE_ENV=test mocha test/ --require ts-node/register --recursive --extension .ts --watch --watch-files src/**/*.ts,test/**/*.ts",
-    "test": "export NODE_ENV=test; npm run docker:test -- test true && npm run migrate:test && npm run seed:test && npm run mocha",
+    "test": "export NODE_ENV=test; npm run docker:test -- test true force && npm run migrate:test && npm run seed:test && npm run mocha",
     "test:fast": "export NODE_ENV=test; npm run docker:test -- test && npm run mocha",
     "test:full": "export NODE_ENV=test; npm run docker:test -- test true force && npm run migrate:test && npm run seed:test && npm run mocha",
     "test:watch": "export NODE_ENV=test; npm run docker:test -- test && npm run mocha:watch",

@@ -2,7 +2,8 @@
 
 ## Overview
 
-This project uses Turborepo for monorepo management with pnpm workspaces.
+This project uses Turborepo for monorepo management with npm workspaces. There is one lockfile,
+`package-lock.json`, at the repo root. Don't use pnpm or yarn.
 
 ## Workspace Structure
 
@@ -12,8 +13,7 @@ reservation-apps/
 │   ├── api/              # FeathersJS backend
 │   └── frontend-qwik/    # Qwik frontend
 ├── packages/
-│   ├── tsconfig/         # Shared TypeScript configs
-│   └── storage/          # Shared storage utilities
+│   └── tsconfig/         # Shared TypeScript configs
 ├── turbo.json            # Turborepo configuration
 └── package.json          # Root workspace config
 ```
@@ -22,43 +22,32 @@ reservation-apps/
 
 ```json
 {
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "test": "turbo test",
-    "lint": "turbo lint",
-    "clean": "turbo clean"
-  }
+    "test": "turbo run test",
+    "build": "turbo run build",
+    "dev": "turbo run dev --no-cache"
+  },
+  "packageManager": "npm@10.1.0"
 }
 ```
+
+There is no root `lint` script; run `npx turbo run lint` instead.
 
 ## Turborepo Configuration (turbo.json)
 
 ```json
 {
-  "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["lib/**", "dist/**", "server/**"]
+      "outputs": ["lib/**", "dist/**", "server/**"],
+      "dependsOn": ["^build"]
     },
-    "test": {
-      "dependsOn": ["docker:test", "dev:api"],
-      "cache": false
-    },
-    "lint": {},
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "dev:reset": {},
-    "clean": {
-      "cache": false
-    }
+    "test": { "cache": false },
+    "lint": { "dependsOn": ["^build"], "outputs": [] },
+    "dev": { "cache": false },
+    "dev:reset": { "cache": false },
+    "clean": { "cache": false }
   }
 }
 ```
@@ -67,41 +56,41 @@ reservation-apps/
 
 | Task | Dependencies | Cache | Description |
 |------|--------------|-------|-------------|
-| `build` | `^build` | Yes | Build with topological dependency order |
-| `test` | `docker:test`, `dev:api` | No | Run tests (needs DB + API) |
-| `lint` | None | Yes | Lint all packages |
-| `dev` | None | No | Development mode (persistent) |
-| `clean` | None | No | Clean build artifacts |
+| `build` | `^build` | Yes | Build in dependency order. The API builds first, because the frontend imports its client |
+| `test` | None | No | Runs each workspace's `test` script. Only the API has one; it starts and resets the test database itself |
+| `lint` | `^build` | Yes | Lint the API and frontend |
+| `dev` | None | No | Development mode |
 
 ## Running Commands
 
 ```bash
 # Run in all workspaces
-pnpm dev              # Start all apps
-pnpm build            # Build all apps
-pnpm lint             # Lint all packages
+npm run dev                  # Start all apps
+npm run build                # Build all apps
+npx turbo run lint           # Lint all packages
 
-# Run in specific workspace
-pnpm --filter api dev          # Dev API only
-pnpm --filter frontend-qwik dev # Dev frontend only
+# Run in one workspace (-w is short for --workspace)
+npm run dev -w api           # Dev API only
+npm run dev -w frontend-qwik # Dev frontend only (waits for the API on :3030)
 
-# Run in multiple workspaces
-pnpm --filter "apps/*" build   # Build all apps
+# Run in several workspaces
+npx turbo run build --filter="./apps/*"
 ```
 
 ## Adding Dependencies
 
 ```bash
-# Add to specific workspace
-pnpm --filter api add lodash
-pnpm --filter frontend-qwik add -D vitest
+# Add to a specific workspace
+npm install lodash -w api
+npm install -D vitest -w frontend-qwik
 
-# Add to root (dev tools)
-pnpm add -D -w typescript
-
-# Add workspace dependency
-pnpm --filter frontend-qwik add api@workspace:*
+# Add to the root (shared dev tools). In npm, -w means "workspace", so leave it off here
+npm install -D typescript
 ```
+
+To depend on another workspace, add it by name with the version `"*"` and run `npm install`;
+npm links the local package instead of downloading it. npm doesn't support pnpm's
+`workspace:*` protocol.
 
 ## Shared Packages
 
@@ -122,10 +111,6 @@ Usage in apps:
 }
 ```
 
-### packages/storage
-
-Shared storage utilities for S3/Cloudinary operations.
-
 ## Inter-Package Dependencies
 
 The frontend depends on the API package for typed client:
@@ -134,10 +119,14 @@ The frontend depends on the API package for typed client:
 // apps/frontend-qwik/package.json
 {
   "dependencies": {
-    "api": "workspace:*"
+    "api": "*"
   }
 }
 ```
+
+The API's `main` and `types` point at its compiled client (`lib/src/client.js` and `.d.ts`), so
+the API must be compiled before the frontend can type-check against it. `npm run build` does
+this in the right order.
 
 This enables importing the typed Feathers client:
 ```typescript

@@ -164,7 +164,13 @@ export const myExternalResolver = resolve<MyEntity, HookContext>({
 
 ## Path Aliases
 
-Use these imports in service files:
+Available aliases:
 - `@services/*` → `src/services/*`
 - `@utils/*` → `src/utils/*`
-- `@database-generated-types/*` → `src/database-generated-types/*`
+- `@seeds/*` → `seeds/*`
+- `@database-generated-types/*` → `src/types/*`
+
+In service files (and anything else under `src`), use these only for type imports
+(`import type ...`). Code that runs must use relative imports, because the compiled API runs
+with plain Node, which can't resolve aliases. ESLint enforces this, and `npm run compile` checks
+the compiled output.

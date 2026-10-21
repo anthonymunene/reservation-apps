@@ -51,8 +51,8 @@ File: `.eslintrc.json`
 ### Running Linter
 
 ```bash
-pnpm lint           # Lint all packages
-pnpm --filter api lint     # Lint API only
+npx turbo run lint       # Lint all packages
+npm run lint -w api      # Lint API only
 ```
 
 ## TypeScript Standards
@@ -76,12 +76,19 @@ Frontend uses strict TypeScript:
 ```json
 {
   "paths": {
+    "@seeds/*": ["seeds/*"],
     "@services/*": ["src/services/*"],
     "@utils/*": ["src/utils/*"],
-    "@database-generated-types/*": ["src/database-generated-types/*"]
+    "@database-generated-types/*": ["src/types/*"]
   }
 }
 ```
+
+The aliases only resolve under ts-node (dev, tests and seeds). The compiled API runs with plain
+Node, so code in `apps/api/src` must use relative imports for anything that runs. Type-only
+imports (`import type ...`) can still use aliases, because they are removed when compiled. The
+ESLint config enforces this for `src`, and `npm run compile` fails if compiled code still
+requires an alias.
 
 **Frontend** (`apps/frontend-qwik/tsconfig.json`):
 ```json
@@ -210,15 +217,19 @@ import type { MyType } from "../types"
 ## Code Formatting Commands
 
 ```bash
-# Format all files
-pnpm --filter frontend-qwik fmt
+# Format the frontend's files
+npm run fmt -w frontend-qwik
 
-# Check formatting
-pnpm lint
+# Check formatting and other lint rules
+npx turbo run lint
 
-# Fix auto-fixable issues
-pnpm lint --fix
+# Fix auto-fixable lint issues in one workspace
+npm run lint -w api -- --fix
 ```
+
+`npm run fmt.check -w frontend-qwik` currently reports 35 frontend files that don't match the
+shared Prettier config (much of the frontend uses semicolons and single quotes), so expect
+`npm run fmt -w frontend-qwik` to change many files the first time.
 
 ## Editor Setup
 
