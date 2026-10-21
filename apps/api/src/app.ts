@@ -8,6 +8,7 @@ import socketio from "@feathersjs/socketio"
 import { configurationValidator } from "./configuration"
 import type { Application } from "./declarations"
 import { logError } from "./hooks/log-error"
+import { hideDatabaseErrors } from "./hooks/hide-database-errors"
 import { postgresql } from "./postgresql"
 import { authentication } from "./authentication"
 import { services } from "./services"
@@ -43,7 +44,9 @@ app.configure(services)
 // Register hooks that run on all service methods
 app.hooks({
   around: {
-    all: [logError],
+    // Order matters: logError runs inside hideDatabaseErrors, so the full database error (with
+    // its SQL) is logged on the server before clients get a safe version of it
+    all: [hideDatabaseErrors, logError],
   },
   before: {},
   after: {},
