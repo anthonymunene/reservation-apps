@@ -15,8 +15,7 @@ apps/api/
 │   ├── 01-properties.ts
 │   ├── 02-users.ts
 │   └── utils/                 # Seed utilities
-├── src/types.ts               # Types written by generate-types.ts
-└── src/types/knex-db.ts       # Types the @database-generated-types alias points at (see #65)
+└── src/types/knex-db.ts       # Generated types (@database-generated-types/knex-db)
 ```
 
 ## Configuration
@@ -213,12 +212,10 @@ Generate TypeScript types from database schema:
 infisical run --env=dev --path=/Apps/reservation-apps/api -- npm run generate:types -w api
 ```
 
-`npm run migrate` does this for you after migrating, and then runs Prettier. Run on its own,
-`generate:types` skips Prettier, so expect formatting-only changes.
-
-Generated types are written to `src/types.ts`. Note that the `@database-generated-types/*`
-alias points at `src/types/`, so `@database-generated-types/knex-db` resolves to a separate copy
-(`src/types/knex-db.ts`) that isn't regenerated. #65 tracks merging them into one file.
+`npm run migrate` does this for you after migrating. Either way the types are written to
+`src/types/knex-db.ts` and formatted with Prettier, so regenerating against an up-to-date
+database leaves no changes. Import them with `@database-generated-types/knex-db` (as a type
+import in `src`). Don't edit the file by hand; the next migration overwrites it.
 
 ## Best Practices
 

@@ -7,7 +7,7 @@ const config = app.get("postgresql")
 const db = knex({ ...config, debug: true })
 // @ts-ignore
 updateTypes(db, {
-  output: "./src/types.ts",
+  output: "./src/types/knex-db.ts",
   exclude: ["knex_migrations", "knex_migrations_lock"],
 }).catch(err => {
   console.error(err)

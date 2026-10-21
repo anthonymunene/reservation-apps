@@ -47,7 +47,7 @@
     "test:full": "export NODE_ENV=test; npm run docker:test -- test true force && npm run migrate:test && npm run seed:test && npm run mocha",
     "test:watch": "export NODE_ENV=test; npm run docker:test -- test && npm run mocha:watch",
     "migrate:test": "infisical run --env=test --path=/Apps/reservation-apps/api --command \"knex migrate:latest\"",
-    "migrate": "knex migrate:latest && ts-node generate-types.ts && npm run prettier-format",
+    "migrate": "knex migrate:latest && npm run generate:types && npm run prettier-format",
     "migrate:make": "knex migrate:make",
     "migrate:seed": "knex seed:make",
     "seed": "infisical run --env=dev --path=/Apps/reservation-apps/api --command \"knex seed:run\"",
@@ -55,7 +55,7 @@
     "migrate:clear": "knex migrate:down",
     "migrate:list": "knex migrate:list",
     "migrate:down": "knex migrate:down",
-    "generate:types": "ts-node generate-types.ts",
+    "generate:types": "ts-node generate-types.ts && npx prettier --config ../../.prettierrc src/types/knex-db.ts --write",
     "docker:dev": "./docker-init.sh",
     "docker:test": "./docker-init.sh"
   },
