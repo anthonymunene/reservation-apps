@@ -20,8 +20,6 @@
       "~/*": ["./src/*"]
     }
   },
-  "files": ["./.eslintrc.cjs",
-    "./tailwind.config.cjs"
-  ],
+  "files": ["./.eslintrc.cjs", "./tailwind.config.cjs"],
   "include": ["src", "./*.d.ts", "./*.config.ts"]
 }

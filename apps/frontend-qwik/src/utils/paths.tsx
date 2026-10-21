@@ -1,8 +1,8 @@
 export const paths = {
-  index: '/',
-  properties: '/properties',
+  index: "/",
+  properties: "/properties",
   property: (id: string) => `/properties/${id}`,
-  notFound: '/404',
+  notFound: "/404",
   user: (id: string) => `/users/${id}`,
-  users: '/users',
-};
+  users: "/users",
+}

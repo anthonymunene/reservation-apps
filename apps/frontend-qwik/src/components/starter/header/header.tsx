@@ -1,6 +1,6 @@
-import { component$ } from '@builder.io/qwik';
-import { QwikLogo } from '../icons/qwik';
-import styles from './header.module.css';
+import { component$ } from "@builder.io/qwik"
+import { QwikLogo } from "../icons/qwik"
+import styles from "./header.module.css"
 
 export default component$(() => {
   return (
@@ -28,5 +28,5 @@ export default component$(() => {
         </li>
       </ul>
     </header>
-  );
-});
+  )
+})

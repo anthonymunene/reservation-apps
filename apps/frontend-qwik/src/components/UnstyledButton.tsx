@@ -1,29 +1,29 @@
-import { $, component$, type PropFunction, Slot, useSignal } from '@builder.io/qwik';
-import { Link } from '@builder.io/qwik-city';
-import clsx from 'clsx';
-import { Spinner } from './Spinner';
+import { $, component$, type PropFunction, Slot, useSignal } from "@builder.io/qwik"
+import { Link } from "@builder.io/qwik-city"
+import clsx from "clsx"
+import { Spinner } from "./Spinner"
 
 type LinkProps = {
-  type: 'link';
-  href: string;
-  download?: boolean | string;
-  target?: '_blank';
-};
+  type: "link"
+  href: string
+  download?: boolean | string
+  target?: "_blank"
+}
 
 type ButtonProps = {
-  type: 'button' | 'reset' | 'submit';
-  'preventdefault:click'?: boolean;
-  onClick$?: PropFunction<() => unknown>;
-  loading?: boolean;
-  form?: string;
-};
+  type: "button" | "reset" | "submit"
+  "preventdefault:click"?: boolean
+  onClick$?: PropFunction<() => unknown>
+  loading?: boolean
+  form?: string
+}
 
-export type DefaultButtonProps = LinkProps | ButtonProps;
+export type DefaultButtonProps = LinkProps | ButtonProps
 
 type UnstyledButtonProps = DefaultButtonProps & {
-  class?: string;
-  'aria-label'?: string;
-};
+  class?: string
+  "aria-label"?: string
+}
 
 /**
  * Basic button component that contains important functionality and is used to
@@ -31,19 +31,19 @@ type UnstyledButtonProps = DefaultButtonProps & {
  */
 export const UnstyledButton = component$((props: UnstyledButtonProps) => {
   // Use loading signal
-  const loading = useSignal(false);
+  const loading = useSignal(false)
 
   return (
     <>
       {/* Link button */}
-      {props.type === 'link' && (
-        <Link {...props} rel={props.target === '_blank' ? 'noreferrer' : undefined}>
+      {props.type === "link" && (
+        <Link {...props} rel={props.target === "_blank" ? "noreferrer" : undefined}>
           <Slot />
         </Link>
       )}
 
       {/* Normal button */}
-      {props.type !== 'link' && (
+      {props.type !== "link" && (
         <button
           {...props}
           // disabled={loading.value || props.loading}
@@ -51,24 +51,28 @@ export const UnstyledButton = component$((props: UnstyledButtonProps) => {
           onClick$={
             props.onClick$ &&
             $(async () => {
-              loading.value = true;
-              await props.onClick$!();
-              loading.value = false;
+              loading.value = true
+              await props.onClick$!()
+              loading.value = false
             })
           }
         >
           <div
             class={clsx(
-              'transition-[opacity,transform,visibility] duration-200',
-              loading.value || props.loading ? 'invisible translate-x-5 opacity-0' : 'visible delay-300'
+              "transition-[opacity,transform,visibility] duration-200",
+              loading.value || props.loading
+                ? "invisible translate-x-5 opacity-0"
+                : "visible delay-300"
             )}
           >
             <Slot />
           </div>
           <div
             class={clsx(
-              'absolute duration-200',
-              loading.value || props.loading ? 'visible delay-300' : 'invisible -translate-x-5 opacity-0'
+              "absolute duration-200",
+              loading.value || props.loading
+                ? "visible delay-300"
+                : "invisible -translate-x-5 opacity-0"
             )}
           >
             <Spinner />
@@ -76,5 +80,5 @@ export const UnstyledButton = component$((props: UnstyledButtonProps) => {
         </button>
       )}
     </>
-  );
-});
+  )
+})

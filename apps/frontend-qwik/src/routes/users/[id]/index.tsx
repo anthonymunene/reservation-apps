@@ -99,7 +99,9 @@ export default component$(() => {
       <div class="overflow-hidden bg-white shadow sm:rounded-lg">
         <div class="px-4 py-6 sm:px-6">
           <h3 class="text-base font-semibold leading-7 text-gray-900">Applicant Information</h3>
-          <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">Personal details and application.</p>
+          <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">
+            Personal details and application.
+          </p>
         </div>
         <div class="border-t border-gray-100">
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -125,14 +127,21 @@ export default component$(() => {
           <dl class="divide-y divide-gray-100">
             <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <Field name="file.item" type="File">
-                {(field, props) => <FileInput {...props} value={field.value} error={field.error} label="File item" />}
+                {(field, props) => (
+                  <FileInput {...props} value={field.value} error={field.error} label="File item" />
+                )}
               </Field>
               <button
                 type="submit"
                 class="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Upload file
-                <svg class="-mr-0.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg
+                  class="-mr-0.5 h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
                   <path
                     fill-rule="evenodd"
                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"

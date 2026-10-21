@@ -1,30 +1,30 @@
-import { component$ } from '@builder.io/qwik';
-import { routeLoader$, z } from '@builder.io/qwik-city';
-import { api } from '../../../client';
-import type { DocumentHead } from '@builder.io/qwik-city';
-import { paths } from '~/utils/paths';
-import { DetailCard } from '../../../components/cards/properties/detailed-description';
+import { component$ } from "@builder.io/qwik"
+import { routeLoader$, z } from "@builder.io/qwik-city"
+import { api } from "../../../client"
+import type { DocumentHead } from "@builder.io/qwik-city"
+import { paths } from "~/utils/paths"
+import { DetailCard } from "../../../components/cards/properties/detailed-description"
 
 export const usePropertyUpdate = routeLoader$(async requestEvent => {
-  const { params } = requestEvent;
-  const parseResult = z.object({ id: z.coerce.string().uuid() }).safeParse(params);
+  const { params } = requestEvent
+  const parseResult = z.object({ id: z.coerce.string().uuid() }).safeParse(params)
 
   if (!parseResult.success) {
-    throw requestEvent.redirect(302, paths.notFound);
+    throw requestEvent.redirect(302, paths.notFound)
   }
 
-  const propertyId = parseResult.data.id;
-  const { data } = await api.service('properties').find({
+  const propertyId = parseResult.data.id
+  const { data } = await api.service("properties").find({
     query: {
       id: propertyId,
     },
-  });
+  })
 
-  return data[0];
-});
+  return data[0]
+})
 
 export default component$(() => {
-  const property = usePropertyUpdate();
+  const property = usePropertyUpdate()
   return (
     <>
       <div class="px-4 sm:px-6 lg:px-8">
@@ -49,11 +49,11 @@ export default component$(() => {
       </div> */}
       </div>
     </>
-  );
-});
+  )
+})
 
 export const head: DocumentHead = () => {
   return {
     title: `users`,
-  };
-};
+  }
+}

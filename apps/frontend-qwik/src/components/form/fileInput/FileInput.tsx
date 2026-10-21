@@ -6,7 +6,13 @@ import { InputLabel } from "../inputLabel/InputLabel"
 type FileInputProps = {
   ref: QRL<(element: HTMLInputElement) => void>
   name: string
-  value: NoSerialize<Blob> | NoSerialize<Blob>[] | NoSerialize<File> | NoSerialize<File>[] | null | undefined
+  value:
+    | NoSerialize<Blob>
+    | NoSerialize<Blob>[]
+    | NoSerialize<File>
+    | NoSerialize<File>[]
+    | null
+    | undefined
   onInput$: (event: Event, element: HTMLInputElement) => void
   onChange$: (event: Event, element: HTMLInputElement) => void
   onBlur$: (event: Event, element: HTMLInputElement) => void
