@@ -1,6 +1,6 @@
 import { EntityImageConfig, EntityType } from "@seeds/utils/types/shared"
 import { Images } from "@seeds/utils/types/images"
-import { Table } from "../../src/types"
+import { Table } from "@database-generated-types/knex-db"
 
 export const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID
 export const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY
