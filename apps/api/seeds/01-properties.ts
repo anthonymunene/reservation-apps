@@ -11,8 +11,11 @@ export async function seed(dbClient: DatabaseClient) {
   const result = await createAmenities(dbClient)
     .andThen(() => createPropertyTypes(dbClient))
     .andThen(() => createProperties(dbClient))
+    // Only the properties created in this run have cached pictures to attach
     .andThen(propertyData =>
-      generateImages(propertyData, "properties").andThen(() => updatePropertyPictures(dbClient))
+      generateImages(propertyData, "properties").andThen(() =>
+        updatePropertyPictures(dbClient, propertyData)
+      )
     )
 
   if (result.isErr()) {
