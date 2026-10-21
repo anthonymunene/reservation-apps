@@ -3,7 +3,7 @@ import { type RequestHandler, routeLoader$ } from "@builder.io/qwik-city"
 import type { DocumentHead } from "@builder.io/qwik-city"
 import Header from "~/components/sidebar"
 import Footer from "~/components/starter/footer/footer"
-import { AuthContext, type AuthState, restoreSession } from "~/utils/auth"
+import { authContext, type AuthState, restoreSession } from "~/utils/auth"
 
 export const onGet: RequestHandler = async ({ cacheControl }) => {
   // Control caching for this request for best performance and to reduce hosting costs:
@@ -24,7 +24,7 @@ export const useServerTimeLoader = routeLoader$(() => {
 
 export default component$(() => {
   const auth = useStore<AuthState>({ user: null, checked: false })
-  useContextProvider(AuthContext, auth)
+  useContextProvider(authContext, auth)
 
   // Runs in the browser only: picks up the session saved by an earlier login, if any
   useVisibleTask$(async () => {

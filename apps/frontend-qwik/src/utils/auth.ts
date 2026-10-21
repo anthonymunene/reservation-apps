@@ -17,9 +17,9 @@ export type AuthState = {
   checked: boolean
 }
 
-export const AuthContext = createContextId<AuthState>("auth")
+export const authContext = createContextId<AuthState>("auth")
 
-export const useAuth = () => useContext(AuthContext)
+export const useAuth = () => useContext(authContext)
 
 const toAuthUser = (user: { id: string; email: string }): AuthUser => ({
   id: user.id,
