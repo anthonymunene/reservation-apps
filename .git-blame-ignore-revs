@@ -1,0 +1,8 @@
+# Commits that only reformat code. `git blame` skips them, so it shows who last changed the code
+# itself rather than who ran the formatter.
+#
+# GitHub uses this file automatically. For local `git blame`, run once per clone:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# style(frontend): format the frontend with the shared Prettier config (#69)
+378107c4b9a2e43c9749c9e2d992a72854593ef0

@@ -22,7 +22,7 @@
     "dev.debug": "wait-on http://localhost:3030 && infisical run --env=dev --path=/Infisical -- node --inspect-brk ./node_modules/vite/bin/vite.js --mode ssr --force",
     "fmt": "prettier --write .",
     "fmt.check": "prettier --check .",
-    "lint": "eslint \"src/**/*.ts*\"",
+    "lint": "eslint \"src/**/*.ts*\" && prettier --check .",
     "preview": "qwik build preview && vite preview --open",
     "start": "vite --open --mode ssr",
     "test.e2e": "playwright test",
