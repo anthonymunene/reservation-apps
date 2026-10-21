@@ -1,6 +1,7 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 
 import { hooks as schemaHooks } from "@feathersjs/schema"
+import { authenticate } from "@feathersjs/authentication"
 
 import {
   propertiesDataResolver,
@@ -39,7 +40,11 @@ export const properties = (app: Application) => {
         schemaHooks.resolveExternal(propertiesExternalResolver),
         schemaHooks.resolveResult(propertiesResolver),
       ],
-      create: [insertAmenity],
+      // Changing data needs a logged-in user; reading stays public
+      // authenticate first, so an anonymous request is turned away before amenities are linked
+      create: [authenticate("jwt"), insertAmenity],
+      patch: [authenticate("jwt")],
+      remove: [authenticate("jwt")],
     },
     before: {
       all: [

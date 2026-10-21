@@ -62,18 +62,22 @@ describe("profiles service", () => {
       assert.deepEqual(otherAfter.images, otherBefore.images, "Other profiles are untouched")
     })
 
-    it("works without a logged-in user", async () => {
-      // The API has no authentication yet, so requests arrive with no params.user
-      await app
-        .service("profiles")
-        .patch(
-          null,
-          { images: [imageEntry("anonymous.png")] },
-          { query: { userId }, provider: "rest" }
-        )
+    it("refuses an outside request without a logged-in user", async () => {
+      const before = await getStoredProfile(userId)
 
-      const updated = await getStoredProfile(userId)
-      assert.equal(updated.images[0].url, "anonymous.png")
+      await assert.rejects(
+        app
+          .service("profiles")
+          .patch(
+            null,
+            { images: [imageEntry("anonymous.png")] },
+            { query: { userId }, provider: "rest" }
+          ),
+        { name: "NotAuthenticated" }
+      )
+
+      const after = await getStoredProfile(userId)
+      assert.deepEqual(after.images, before.images, "The profile is unchanged")
     })
 
     it("rejects a patch with neither a profile id nor a userId", async () => {

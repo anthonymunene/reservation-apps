@@ -1,6 +1,7 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 
 import { hooks as schemaHooks } from "@feathersjs/schema"
+import { authenticate } from "@feathersjs/authentication"
 
 import {
   profilesDataResolver,
@@ -18,6 +19,7 @@ import { getOptions, ProfilesService } from "./profiles.class"
 import { profilesMethods, profilesPath } from "./profiles.shared"
 import { sanitiseImageData } from "../../hooks/sanitiseImagedata"
 import { patchProfileByUserId } from "../../hooks/patch-profile-by-user-id"
+import { ownProfileRecord, restrictToOwner } from "../../hooks/restrict-to-owner"
 
 export * from "./profiles.class"
 export * from "./profiles.schema"
@@ -38,6 +40,10 @@ export const profiles = (app: Application) => {
         schemaHooks.resolveExternal(profilesExternalResolver),
         schemaHooks.resolveResult(profilesResolver),
       ],
+      // Changing data needs a logged-in user; reading stays public
+      create: [authenticate("jwt")],
+      patch: [authenticate("jwt")],
+      remove: [authenticate("jwt")],
     },
     before: {
       all: [
@@ -50,12 +56,15 @@ export const profiles = (app: Application) => {
         schemaHooks.validateData(profilesDataValidator),
         schemaHooks.resolveData(profilesDataResolver),
       ],
+      // A user can only change or delete their own profile. patchProfileByUserId runs first so a
+      // PATCH /profiles?userId=... request is checked against the profile it actually targets.
       patch: [
         patchProfileByUserId,
+        restrictToOwner(ownProfileRecord),
         schemaHooks.validateData(profilesPatchValidator),
         schemaHooks.resolveData(profilesPatchResolver),
       ],
-      remove: [],
+      remove: [restrictToOwner(ownProfileRecord)],
     },
     after: {
       all: [],

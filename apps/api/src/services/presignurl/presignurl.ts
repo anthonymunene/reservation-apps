@@ -1,5 +1,6 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 import { hooks as schemaHooks } from "@feathersjs/schema"
+import { authenticate } from "@feathersjs/authentication"
 
 import {
   presignurlExternalResolver,
@@ -32,6 +33,8 @@ export const presignurl = (app: Application) => {
         schemaHooks.resolveExternal(presignurlExternalResolver),
         schemaHooks.resolveResult(presignurlResolver),
       ],
+      // Changing data needs a logged-in user; reading stays public
+      putObject: [authenticate("jwt")],
     },
     before: {
       // Validate incoming data for putObject (the only method)
