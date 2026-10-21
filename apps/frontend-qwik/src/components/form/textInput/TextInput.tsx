@@ -7,11 +7,13 @@ import {
   type QwikFocusEvent,
 } from "@builder.io/qwik"
 import clsx from "clsx"
+import type { FieldElement } from "@modular-forms/qwik"
 import { InputError } from "../inputError/InputError"
 import { InputLabel } from "../inputLabel/InputLabel"
 
 type TextInputProps = {
-  ref: PropFunction<(element: Element) => void>
+  // modular-forms passes a ref callback that expects one of its form field elements
+  ref: PropFunction<(element: FieldElement) => void>
   type: "text" | "email" | "tel" | "password" | "url" | "number" | "date"
   name: string
   value: string | number | undefined
@@ -28,6 +30,8 @@ type TextInputProps = {
   label?: string
   error?: string
   form?: string
+  // Passed through to the <input> for tests to find it
+  "data-testid"?: string
 }
 
 /**
