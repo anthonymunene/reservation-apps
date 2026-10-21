@@ -61,6 +61,13 @@ describe("authentication", () => {
     assert.equal(response.data.error.message, "Invalid login")
   })
 
+  it("gives the Feathers client a typed NotAuthenticated error for a wrong password", async () => {
+    await assert.rejects(
+      newClient().authenticate({ strategy: "local", email, password: "wrong-password" }),
+      { name: "NotAuthenticated", code: 401, message: "Invalid login" }
+    )
+  })
+
   it("accepts the returned JWT on later requests", async () => {
     const { accessToken } = await newClient().authenticate({ strategy: "local", email, password })
 

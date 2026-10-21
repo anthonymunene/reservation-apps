@@ -1,10 +1,9 @@
-//@ts-nocheck
-import { component$ } from "@builder.io/qwik"
-import { routeLoader$, routeAction$ } from "@builder.io/qwik-city"
-import { api } from "../../client"
+import { $, component$, useSignal } from "@builder.io/qwik"
+import { routeLoader$, useNavigate, type DocumentHead } from "@builder.io/qwik-city"
 import { z } from "zod"
-import { type InitialValues, useForm, zodForm$ } from "@modular-forms/qwik"
+import { type InitialValues, type SubmitHandler, useForm, zodForm$ } from "@modular-forms/qwik"
 import { TextInput, FormFooter } from "~/components"
+import { isLoginRejected, logIn, useAuth } from "~/utils/auth"
 
 const loginSchema = z.object({
   email: z
@@ -24,21 +23,30 @@ export const useFormLoader = routeLoader$<InitialValues<LoginForm>>(() => ({
   password: "",
 }))
 
-export const useLoginUser = routeAction$(async (data, ctx) => {
-  console.log("Form data:", await ctx.request.formData())
-  console.log("JSON data:", data)
-  //@ts-ignore
-  await api.service("users").create(data)
-})
-
 export default component$(() => {
   const [loginForm, { Form, Field }] = useForm<LoginForm>({
     loader: useFormLoader(),
     validate: zodForm$(loginSchema),
   })
-  // const login = useLoginAction();
+  const auth = useAuth()
+  const navigate = useNavigate()
+  const loginError = useSignal<string | null>(null)
+
+  // Runs in the browser after the form passes validation
+  const handleSubmit = $<SubmitHandler<LoginForm>>(async values => {
+    loginError.value = null
+    try {
+      auth.user = await logIn(values.email, values.password)
+      await navigate(`/users/${auth.user.id}/`)
+    } catch (error) {
+      loginError.value = isLoginRejected(error)
+        ? "That email and password don't match an account."
+        : "We couldn't sign you in. Please try again."
+    }
+  })
+
   return (
-    <div class={"something"}>
+    <div>
       <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <img
           class="mx-auto h-10 w-auto"
@@ -51,7 +59,7 @@ export default component$(() => {
       </div>
       <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
         <div class="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
-          <Form id="add-user" class="space-y-6">
+          <Form id="add-user" class="space-y-6" onSubmit$={handleSubmit}>
             <Field name="email">
               {(field, props) => (
                 <TextInput
@@ -80,6 +88,11 @@ export default component$(() => {
                 />
               )}
             </Field>
+            {loginError.value && (
+              <p role="alert" class="text-sm text-red-600" data-testid="login-error">
+                {loginError.value}
+              </p>
+            )}
             <FormFooter of={loginForm} />
           </Form>
         </div>
@@ -87,3 +100,7 @@ export default component$(() => {
     </div>
   )
 })
+
+export const head: DocumentHead = {
+  title: "Sign in",
+}
