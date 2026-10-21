@@ -22,6 +22,7 @@ import { DatabaseError, ErrorCode } from "@seeds/utils/types/errors"
 import { Users } from "@services/users/users.schema"
 import { Knex } from "knex"
 import bcrypt from "bcryptjs"
+import { getDemoAccount } from "./demo-account"
 
 export const createDefaultUserDataGenerator: UserDataGenerator = {
   generateUserAccount: () => ({
@@ -133,10 +134,13 @@ export const createUsersAndProfiles = (
         })
     )
 
-  const processAccounts = (trx: DatabaseClient): ResultAsync<UserId[], DatabaseError> => {
+  const processAccounts = (
+    trx: DatabaseClient,
+    accounts: UserAccount[]
+  ): ResultAsync<UserId[], DatabaseError> => {
     let result = okAsync<void, DatabaseError>(undefined)
 
-    for (const userAccount of userAccounts) {
+    for (const userAccount of accounts) {
       result = result.andThen(() =>
         processUser(trx, userAccount)
           .orElse(error => {
@@ -160,8 +164,16 @@ export const createUsersAndProfiles = (
       ? okAsync(users)
       : errAsync(createError(ErrorCode.DATABASE, "No users were created during the transaction"))
 
+  // The demo account (known email and password) goes through the same steps as the generated
+  // users, so it gets a profile, a property and a picture too
+  const addDemoAccount = (trx: DatabaseClient): ResultAsync<UserAccount[], DatabaseError> =>
+    ResultAsync.fromPromise(getDemoAccount(trx), error =>
+      createError(ErrorCode.DATABASE, `could not check for the demo account ${error}`)
+    ).map(demoAccount => (demoAccount ? [demoAccount, ...userAccounts] : userAccounts))
+
   const handleTransaction = (trx: DatabaseClient): ResultAsync<UserId[], DatabaseError> =>
-    processAccounts(trx)
+    addDemoAccount(trx)
+      .andThen(accounts => processAccounts(trx, accounts))
       .andThen(validateResults)
       .map(users => {
         console.log(`Successfully processed ${users.length} users`)
