@@ -191,37 +191,31 @@ export const createAmenities = (dbClient: DatabaseClient) => {
   })
 }
 
-const getProperties = (dbClient: DatabaseClient) => {
-  const query: Knex.QueryBuilder<Properties, PropertyId[]> = dbClient
-    .select("id")
-    .from(Table.Property)
-
-  return ResultAsync.fromPromise(query, error =>
-    createError(ErrorCode.DATABASE, `something went wrong ${error}`)
-  )
-}
-
+/**
+ * Uploads the cached picture for each of the given properties and saves it on the property.
+ *
+ * Pass the properties created in this seed run. Other properties in the database (made by the
+ * tests or the app) have no cached picture, so including them would fail the whole seed.
+ */
 export const updatePropertyPictures = (
   dbClient: DatabaseClient,
+  properties: PropertyId[],
   dependencies = {
-    getProperties,
     uploadToS3,
     getMatchingFile,
   }
 ) => {
-  const { getProperties, uploadToS3, getMatchingFile } = dependencies
-  return getProperties(dbClient).andThen(properties => {
-    const operations = properties.map(property => {
-      return getMatchingFile(property.id, PROPERTIES_IMAGE_DIR).andThen(files => {
-        const matchingFiles = files.map(({ name, content }) => {
-          return uploadToS3(name, content, "properties").andThen(({ fileName }) =>
-            updateEntityImage(dbClient, property.id, fileName, Table.Property)
-          )
-        })
-        return ResultAsync.combine(matchingFiles)
+  const { uploadToS3, getMatchingFile } = dependencies
+  const operations = properties.map(property => {
+    return getMatchingFile(property.id, PROPERTIES_IMAGE_DIR).andThen(files => {
+      const matchingFiles = files.map(({ name, content }) => {
+        return uploadToS3(name, content, "properties").andThen(({ fileName }) =>
+          updateEntityImage(dbClient, property.id, fileName, Table.Property)
+        )
       })
+      return ResultAsync.combine(matchingFiles)
     })
-
-    return ResultAsync.combine(operations)
   })
+
+  return ResultAsync.combine(operations)
 }

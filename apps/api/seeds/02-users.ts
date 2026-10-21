@@ -6,12 +6,18 @@ import { DatabaseClient } from "@seeds/utils/types/shared"
 import { ResultAsync } from "neverthrow"
 
 export async function seed(dbClient: DatabaseClient) {
-  await createUsersAndProfiles(dbClient).andThen(users => {
+  const result = await createUsersAndProfiles(dbClient).andThen(users => {
     return ResultAsync.combine([
       createReviews(dbClient),
+      // Only the users created in this run have cached pictures to attach
       generateImages(users, "users").andThen(() => {
-        return updateProfilePictures(dbClient)
+        return updateProfilePictures(dbClient, users)
       }),
     ])
   })
+
+  // Fail the seed run on an error, as 01-properties does, instead of carrying on silently
+  if (result.isErr()) {
+    throw new Error((result.error as Error).message)
+  }
 }

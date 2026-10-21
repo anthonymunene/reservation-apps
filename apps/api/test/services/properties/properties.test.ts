@@ -36,6 +36,23 @@ describe("properties service", () => {
     const saved = await app.service("properties").get(property.id)
     assert.equal(saved.amenities.length, 3, "Linked the 3 chosen amenities")
   })
+
+  it("creates a property without amenities", async () => {
+    const propertyType = await app.service("propertytypes").find({ query: { $limit: 1 } })
+    const user = await app.service("users").find({ query: { $limit: 1 } })
+
+    const property = await app.service("properties").create({
+      title: faker.word.adjective(7),
+      description: faker.lorem.sentences(),
+      city: faker.location.city(),
+      host: user.data[0].id,
+      countryCode: faker.location.countryCode(),
+      propertyTypeId: propertyType.data[0].id,
+    })
+
+    const saved = await app.service("properties").get(property.id)
+    assert.deepEqual(saved.amenities, [], "Has no amenities")
+  })
 })
 
 /**

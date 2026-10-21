@@ -37,15 +37,6 @@ export const createDefaultUserDataGenerator: UserDataGenerator = {
   }),
 }
 
-export const getUsers = (dbClient: DatabaseClient) => {
-  const query: Knex.QueryBuilder<Users, UserId[]> = dbClient.select("id").from("User")
-  return ResultAsync.fromPromise(query, error =>
-    createError(ErrorCode.DATABASE, `something went wrong ${error}`)
-  ).andThen(user =>
-    user?.length ? ok(user) : err(createError(ErrorCode.DATABASE, "something went wrong"))
-  )
-}
-
 export const createUserAccountDependencies = (
   overrides: Partial<UserAccountDependencies> = {}
 ): UserAccountDependencies => ({
@@ -175,26 +166,30 @@ export const createUsersAndProfiles = (
   )
 }
 
+/**
+ * Uploads the cached profile picture for each of the given users and saves it on their profile.
+ *
+ * Pass the users created in this seed run. Other users in the database (made by the tests or
+ * the app) have no cached picture, so including them would fail the whole seed.
+ */
 export const updateProfilePictures = (
   dbClient: DatabaseClient,
+  users: UserId[],
   dependencies = {
-    getUsers,
     uploadToS3,
     getMatchingFile,
   }
 ) => {
-  const { getUsers, uploadToS3, getMatchingFile } = dependencies
-  return getUsers(dbClient).andThen(user => {
-    const operations = user.map(user => {
-      return getMatchingFile(user.id, USERS_IMAGE_DIR).andThen(files => {
-        const operations = files.map(({ name, content }) =>
-          uploadToS3(name, content, "users").andThen(({ fileName }) => {
-            return updateEntityImage(dbClient, user.id, fileName, Table.Profile)
-          })
-        )
-        return ResultAsync.combine(operations)
-      })
+  const { uploadToS3, getMatchingFile } = dependencies
+  const operations = users.map(user => {
+    return getMatchingFile(user.id, USERS_IMAGE_DIR).andThen(files => {
+      const operations = files.map(({ name, content }) =>
+        uploadToS3(name, content, "users").andThen(({ fileName }) => {
+          return updateEntityImage(dbClient, user.id, fileName, Table.Profile)
+        })
+      )
+      return ResultAsync.combine(operations)
     })
-    return ResultAsync.combine(operations)
   })
+  return ResultAsync.combine(operations)
 }
