@@ -18,6 +18,7 @@ import {
   downloadMockImages,
   shouldUseMockImages,
 } from "@seeds/utils/images/mockImageProvider"
+import { logger } from "../../src/logger"
 
 export const createIfNotExist = (filepath: string) => {
   if (!existsSync(filepath)) {
@@ -27,8 +28,27 @@ export const createIfNotExist = (filepath: string) => {
 }
 
 /**
+ * Whether Unsplash is still worth asking during this seed run. Once it refuses a request (most
+ * often its 50-requests-an-hour limit), the rest of the run uses placeholder images instead of
+ * making requests that would fail the same way.
+ */
+export const unsplashStatus = { available: true }
+
+/** Lets tests start each case with Unsplash treated as available again. */
+export const resetUnsplashStatus = () => {
+  unsplashStatus.available = true
+}
+
+// Local placeholder images, used in tests and whenever Unsplash can't provide an image
+const placeholderImages = {
+  getImageData: getMockImageData,
+  extractImageLinks: extractMockImageLinks,
+  downloadImages: downloadMockImages,
+}
+
+/**
  * Creates the appropriate dependencies based on environment.
- * In test environment, uses mock providers to avoid Unsplash API calls.
+ * In test environment (or with MOCK_IMAGES=true), uses placeholder images and never calls Unsplash.
  */
 const createDependencies = () => {
   const useMock = shouldUseMockImages()
@@ -39,8 +59,19 @@ const createDependencies = () => {
     extractImageLinks: useMock ? extractMockImageLinks : extractImageLinks,
     downloadImages: useMock ? downloadMockImages : downloadImages,
     saveImage,
+    placeholderImages,
+    logger,
+    unsplashStatus,
   }
 }
+
+type ImageSource = Pick<
+  ReturnType<typeof createDependencies>,
+  "getImageData" | "extractImageLinks" | "downloadImages"
+>
+
+const fetchImage = (source: ImageSource, query: ImageConfigOpts["query"]) =>
+  source.getImageData(query).andThen(source.extractImageLinks).andThen(source.downloadImages)
 
 export const seedImages = (
   opts: ImageConfigOpts,
@@ -72,14 +103,35 @@ export const seedImages = (
     return okAsync({ success: true, value: cacheCheck.path })
   }
 
-  // Not in cache - download image (from Unsplash or mock provider)
-  return dependencies
-    .getImageData(query)
-    .andThen(dependencies.extractImageLinks)
-    .andThen(dependencies.downloadImages)
-    .andThen((result: ImageDownloadResult) => {
-      const { content } = result
-      const fileName = `${id}`
-      return dependencies.saveImage(content, fileName, seedImageDir)
-    })
+  // Not in cache: get an image from Unsplash (or the mock provider), falling back to a
+  // placeholder if Unsplash can't provide one. Only failures getting the image fall back; a
+  // failure saving it still fails the seed, because that points to a problem on our side.
+  const image = dependencies.unsplashStatus.available
+    ? fetchImage(dependencies, query).orElse(error => {
+        // This runs later than the check above: that one ran when the request started, this one
+        // runs when its refusal comes back. Images are requested in parallel, so by now an
+        // earlier refusal may already have marked Unsplash unavailable. Checking again means only
+        // the first refusal logs the warning. The URL is left out because it contains the key.
+        if (dependencies.unsplashStatus.available) {
+          dependencies.unsplashStatus.available = false
+          dependencies.logger.warn(
+            `Unsplash couldn't provide an image for ${query} ${id} (${error.message}). ` +
+              "Using placeholder images for the rest of this seed run.",
+            { query, entityId: id, errorCode: error.context.code, details: error.context.details }
+          )
+        } else {
+          dependencies.logger.debug(`Using a placeholder image for ${query} ${id}`)
+        }
+        return fetchImage(dependencies.placeholderImages, query)
+      })
+    : fetchImage(dependencies.placeholderImages, query).map(result => {
+        dependencies.logger.debug(`Using a placeholder image for ${query} ${id}`)
+        return result
+      })
+
+  return image.andThen((result: ImageDownloadResult) => {
+    const { content } = result
+    const fileName = `${id}`
+    return dependencies.saveImage(content, fileName, seedImageDir)
+  })
 }

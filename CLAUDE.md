@@ -65,6 +65,10 @@ npm run migrate:make -w api -- <migration_name>                                 
 npm run seed -w api                                                                 # Run seed files
 ```
 
+The seeds create a demo login, `demo@example.test` / `demo-password` (override with
+`DEMO_USER_EMAIL` and `DEMO_USER_PASSWORD`). It's never created in production, and reseeding
+doesn't duplicate it. The other seeded users have random passwords.
+
 ### Testing
 ```bash
 npm test                              # API tests: resets the test database, migrates, seeds, runs Mocha
