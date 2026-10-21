@@ -36,7 +36,7 @@ export const profilesSchema = Type.Object(
     userId: Type.String({ format: "uuid" }),
     createdAt: Type.String({ format: "date-time" }),
     updatedAt: Type.String({ format: "date-time" }),
-    updatedBy: Type.String({ format: "date-time" }),
+    updatedBy: Type.Union([Type.String({ format: "uuid" }), Type.Null()]),
   },
   { $id: "Profiles", additionalProperties: false }
 )
@@ -72,12 +72,12 @@ export const profilesPatchSchema = Type.Partial(profilesSchema, {
 })
 export type ProfilesPatch = Static<typeof profilesPatchSchema>
 export const profilesPatchValidator = getDataValidator(profilesPatchSchema, dataValidator)
-// updatedBy is not set here: the Profile table has no updatedBy column, and the API has no
-// logged-in user yet to record. Add it back with the authentication feature.
 export const profilesPatchResolver = resolve<Profiles, HookContext>({
   updatedAt: async () => {
     return new Date().toISOString()
   },
+  // Who made the change. Internal calls (seeds, other services) have no user and leave it unset.
+  updatedBy: async (_value, _document, context: HookContext) => context.params.user?.id,
   // images is a jsonb column. node-postgres sends a JavaScript array as a Postgres array, which
   // jsonb rejects, so send it as a JSON string instead.
   images: async value =>

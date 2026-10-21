@@ -1,6 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-
-const API_URL = process.env.PUBLIC_API_URL ?? 'http://localhost:3030';
+import { createTestUser, deleteTestUser, logInThroughPage, type TestUser } from './helpers';
 
 // A 1x1 transparent PNG
 const tinyPng = Buffer.from(
@@ -13,6 +12,12 @@ const tinyPng = Buffer.from(
 // through the real API.
 const stubS3 = async (page: Page, presignStatus = 200) => {
   await page.route('**/presignurl', async route => {
+    // Like the real API, refuse a request that doesn't carry the login token
+    const authorization = route.request().headers()['authorization'] ?? '';
+    if (!authorization.startsWith('Bearer ')) {
+      await route.fulfill({ status: 401, json: { name: 'NotAuthenticated', code: 401 } });
+      return;
+    }
     if (presignStatus !== 200) {
       await route.fulfill({ status: presignStatus, json: { success: false } });
       return;
@@ -37,26 +42,22 @@ const uploadPicture = async (page: Page) => {
 };
 
 test.describe('profile picture', () => {
-  let userId: string;
+  let user: TestUser;
 
   // Each run uses its own user, so it never changes the seeded users' pictures
   test.beforeEach(async ({ request }) => {
-    const response = await request.post(`${API_URL}/users`, {
-      // A random id, not a timestamp: parallel workers can start in the same millisecond
-      data: { email: `e2e-${crypto.randomUUID()}@example.test`, password: 'longenough1' },
-    });
-    expect(response.ok()).toBeTruthy();
-    userId = (await response.json()).id;
+    user = await createTestUser(request);
   });
 
   test.afterEach(async ({ request }) => {
-    // Deleting the user also deletes their profile
-    await request.delete(`${API_URL}/users/${userId}`);
+    await deleteTestUser(request, user);
   });
 
   test('uploading a picture shows it on the profile and keeps it after a reload', async ({ page }) => {
     await stubS3(page);
-    await page.goto(`/users/${userId}/`, { waitUntil: 'networkidle' });
+    // Logging in lands on the user's own page
+    await logInThroughPage(page, user.email);
+    await expect(page).toHaveURL(new RegExp(`/users/${user.id}/$`));
 
     const picture = page.getByTestId('profile-picture');
     await expect(picture).toHaveAttribute('src', /unsplash/); // placeholder, no picture yet
@@ -68,7 +69,7 @@ test.describe('profile picture', () => {
       { timeout: STATUS_TIMEOUT }
     );
     // Stored under a unique name that starts with the user's id
-    const savedName = new RegExp(`/users/${userId}-[0-9a-f-]+\\.png$`);
+    const savedName = new RegExp(`/users/${user.id}-[0-9a-f-]+\\.png$`);
     await expect(picture).toHaveAttribute('src', savedName);
 
     await page.reload({ waitUntil: 'networkidle' });
@@ -77,7 +78,8 @@ test.describe('profile picture', () => {
 
   test('a failed upload shows an error and keeps the old picture', async ({ page }) => {
     await stubS3(page, 500);
-    await page.goto(`/users/${userId}/`, { waitUntil: 'networkidle' });
+    await logInThroughPage(page, user.email);
+    await expect(page).toHaveURL(new RegExp(`/users/${user.id}/$`));
 
     await uploadPicture(page);
 
@@ -86,5 +88,24 @@ test.describe('profile picture', () => {
       { timeout: STATUS_TIMEOUT }
     );
     await expect(page.getByTestId('profile-picture')).toHaveAttribute('src', /unsplash/);
+  });
+
+  test("only shows the upload controls on the user's own page", async ({ page, request }) => {
+    // Logged out: no upload controls
+    await page.goto(`/users/${user.id}/`, { waitUntil: 'networkidle' });
+    await expect(page.getByRole('link', { name: 'Log in' })).toBeVisible();
+    await expect(page.getByTestId('upload-section')).toHaveCount(0);
+
+    // Logged in as someone else: still no upload controls on this page
+    const someoneElse = await createTestUser(request);
+    try {
+      await logInThroughPage(page, someoneElse.email);
+      await expect(page.getByTestId('signed-in-as')).toBeVisible();
+      await page.goto(`/users/${user.id}/`, { waitUntil: 'networkidle' });
+      await expect(page.getByTestId('signed-in-as')).toBeVisible();
+      await expect(page.getByTestId('upload-section')).toHaveCount(0);
+    } finally {
+      await deleteTestUser(request, someoneElse);
+    }
   });
 });

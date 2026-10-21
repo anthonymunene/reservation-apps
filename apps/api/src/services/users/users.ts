@@ -1,6 +1,7 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 
 import { hooks as schemaHooks } from "@feathersjs/schema"
+import { authenticate } from "@feathersjs/authentication"
 
 import {
   usersDataResolver,
@@ -14,6 +15,7 @@ import {
 } from "./users.schema"
 
 import type { Application } from "../../declarations"
+import { ownUserRecord, restrictToOwner } from "../../hooks/restrict-to-owner"
 import { getOptions, UsersService } from "./users.class"
 import { createProfile } from "./user.hooks"
 import { usersPath, usersMethods } from "./users.shared"
@@ -37,6 +39,9 @@ export const users = (app: Application) => {
         schemaHooks.resolveExternal(usersExternalResolver),
         schemaHooks.resolveResult(usersResolver),
       ],
+      // Changing data needs a logged-in user. users.create stays open so people can sign up.
+      patch: [authenticate("jwt")],
+      remove: [authenticate("jwt")],
     },
     before: {
       all: [
@@ -49,11 +54,13 @@ export const users = (app: Application) => {
         schemaHooks.validateData(usersDataValidator),
         schemaHooks.resolveData(usersDataResolver),
       ],
+      // A user can only change or delete their own account
       patch: [
+        restrictToOwner(ownUserRecord),
         schemaHooks.validateData(usersPatchValidator),
         schemaHooks.resolveData(usersPatchResolver),
       ],
-      remove: [],
+      remove: [restrictToOwner(ownUserRecord)],
     },
     after: {
       all: [],

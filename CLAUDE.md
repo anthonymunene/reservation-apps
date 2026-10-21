@@ -27,6 +27,7 @@ reservation-apps/
 - **Validation:** TypeBox (API) / Zod (Frontend)
 - **Linting:** ESLint 8 + typescript-eslint 8
 - **Secrets:** Infisical
+- **Auth:** email and password login (`POST /authentication`) returning a JWT signed with `FEATHERS_SECRET` (from Infisical). Reading is public; creating, changing and deleting need a logged-in user, and users can only change their own account and profile. In the frontend, login only happens in the browser (`src/utils/auth.ts`), because the `api` client is shared across server-side requests
 
 ## Skills Catalog
 

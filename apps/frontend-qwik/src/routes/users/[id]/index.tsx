@@ -1,4 +1,4 @@
-import { component$, type NoSerialize, $, useSignal } from "@builder.io/qwik"
+import { component$, type NoSerialize, $, useComputed$, useSignal } from "@builder.io/qwik"
 import { type DocumentHead, routeLoader$, z } from "@builder.io/qwik-city"
 import { type InitialValues, useForm } from "@modular-forms/qwik"
 import { FileInput } from "~/components"
@@ -8,6 +8,7 @@ import { paths } from "~/utils/paths"
 import { USER_IMAGE_FOLDER } from "~/utils/variables"
 import { logError } from "~/utils/logError"
 import { primaryImageEntry, profileImageUrl, uniqueImageName } from "~/utils/profile-image"
+import { useAuth } from "~/utils/auth"
 
 type SpecialForm = {
   file: {
@@ -60,6 +61,8 @@ export default component$(() => {
   const userId = user.value.id
   const pictureUrl = useSignal(profileImageUrl(user.value.profile.images))
   const uploadStatus = useSignal<UploadStatus>(null)
+  const auth = useAuth()
+  const isOwnPage = useComputed$(() => auth.user?.id === userId)
 
   // Uploads the chosen file to S3, then saves it on the profile as the user's picture
   const uploadProfilePicture = $(async (formData: SpecialForm) => {
@@ -124,46 +127,54 @@ export default component$(() => {
             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{user.profile.bio}</dd> */}
             </div>
           </dl>
-          <dl class="divide-y divide-gray-100">
-            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <Field name="file.item" type="File">
-                {(field, props) => (
-                  <FileInput {...props} value={field.value} error={field.error} label="File item" />
+          {/* Only the user themselves can change their picture; the API refuses anyone else */}
+          {isOwnPage.value && (
+            <dl class="divide-y divide-gray-100" data-testid="upload-section">
+              <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <Field name="file.item" type="File">
+                  {(field, props) => (
+                    <FileInput
+                      {...props}
+                      value={field.value}
+                      error={field.error}
+                      label="File item"
+                    />
+                  )}
+                </Field>
+                <button
+                  type="submit"
+                  class="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                  Upload file
+                  <svg
+                    class="-mr-0.5 h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+                {uploadStatus.value && (
+                  <p
+                    role="status"
+                    data-testid="upload-status"
+                    class={
+                      uploadStatus.value.kind === "success"
+                        ? "mt-2 text-sm text-green-700"
+                        : "mt-2 text-sm text-red-700"
+                    }
+                  >
+                    {uploadStatus.value.message}
+                  </p>
                 )}
-              </Field>
-              <button
-                type="submit"
-                class="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              >
-                Upload file
-                <svg
-                  class="-mr-0.5 h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </button>
-              {uploadStatus.value && (
-                <p
-                  role="status"
-                  data-testid="upload-status"
-                  class={
-                    uploadStatus.value.kind === "success"
-                      ? "mt-2 text-sm text-green-700"
-                      : "mt-2 text-sm text-red-700"
-                  }
-                >
-                  {uploadStatus.value.message}
-                </p>
-              )}
-            </div>
-          </dl>
+              </div>
+            </dl>
+          )}
         </div>
       </div>
 
