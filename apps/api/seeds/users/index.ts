@@ -21,6 +21,7 @@ import { createError } from "@seeds/utils/createError"
 import { DatabaseError, ErrorCode } from "@seeds/utils/types/errors"
 import { Users } from "@services/users/users.schema"
 import { Knex } from "knex"
+import bcrypt from "bcryptjs"
 
 export const createDefaultUserDataGenerator: UserDataGenerator = {
   generateUserAccount: () => ({
@@ -81,18 +82,34 @@ export const createProfiles = (
   })
 }
 
+// Matches the default the Feathers local strategy uses when the users service hashes passwords
+const PASSWORD_HASH_ROUNDS = 10
+
 export const createAccount = (
   dbClient: DatabaseClient,
   userAccount: UserAccount
 ): ResultAsync<UserId, DatabaseError> => {
-  const query: Knex.QueryBuilder<Users, UserId[]> = dbClient
-    .insert(userAccount, ["id"])
-    .into(Table.User)
-  return ResultAsync.fromPromise(query, error =>
-    createError(ErrorCode.DATABASE, `could not create user ${error}`)
-  ).andThen(user => {
-    return user?.length ? ok(user[0]) : err(createError(ErrorCode.DATABASE, `something went wrong`))
-  })
+  // The seeds insert straight into the database, bypassing the users service that normally
+  // hashes passwords, so hash here too. Login only works against a bcrypt hash.
+  const hashPassword = ResultAsync.fromPromise(
+    bcrypt.hash(userAccount.password, PASSWORD_HASH_ROUNDS),
+    error => createError(ErrorCode.DATABASE, `could not hash password ${error}`)
+  )
+
+  return hashPassword
+    .andThen(password => {
+      const query: Knex.QueryBuilder<Users, UserId[]> = dbClient
+        .insert({ ...userAccount, password }, ["id"])
+        .into(Table.User)
+      return ResultAsync.fromPromise(query, error =>
+        createError(ErrorCode.DATABASE, `could not create user ${error}`)
+      )
+    })
+    .andThen(user => {
+      return user?.length
+        ? ok(user[0])
+        : err(createError(ErrorCode.DATABASE, `something went wrong`))
+    })
 }
 export const createUsersAndProfiles = (
   dbClient: DatabaseClient,
