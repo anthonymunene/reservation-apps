@@ -38,6 +38,12 @@ describe("Feathers application tests", () => {
       assert.ok(response?.data?.error?.message, "Error should have a message")
       assert.ok(Array.isArray(response?.data?.error?.details), "Details should be an array")
       assert.ok(response?.data?.error?.timestamp, "Error should have a timestamp")
+
+      // Feathers' own error fields, so the Feathers client can rebuild a typed error
+      assert.strictEqual(response?.data?.name, "NotFound")
+      assert.strictEqual(response?.data?.code, 404)
+      assert.strictEqual(response?.data?.className, "not-found")
+      assert.strictEqual(response?.data?.message, response?.data?.error?.message)
     }
   })
 })

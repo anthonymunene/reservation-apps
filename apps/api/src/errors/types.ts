@@ -46,6 +46,18 @@ export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes]
  * to process and handle problems.
  */
 export interface ApiErrorResponse {
+  // Feathers' own error fields, at the top level where the Feathers client looks for them. Without
+  // these the client can't rebuild a typed error (NotAuthenticated, NotFound...) and every error
+  // reaches the frontend as a plain Error with the message "[object Object]".
+  /** Feathers error class name, e.g. "NotAuthenticated" */
+  name: string
+  /** Same as error.message */
+  message: string
+  /** HTTP status code, e.g. 401 */
+  code: number
+  /** Feathers error class name in kebab-case, e.g. "not-authenticated" */
+  className: string
+
   success: false
   error: {
     /** Categorized error code (e.g., "VALIDATION_ERROR", "NOT_FOUND") */

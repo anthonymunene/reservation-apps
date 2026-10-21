@@ -12,7 +12,7 @@
  * the customer always gets a response in the same predictable format.
  */
 
-import { FeathersError } from "@feathersjs/errors"
+import { FeathersError, GeneralError } from "@feathersjs/errors"
 import { ErrorCodes, ErrorCode, ApiErrorResponse } from "./types"
 
 /**
@@ -122,6 +122,10 @@ function extractErrorDetails(error: Error): unknown[] {
  *
  * // Output:
  * // {
+ * //   name: "BadRequest",
+ * //   message: "Invalid email",
+ * //   code: 400,
+ * //   className: "bad-request",
  * //   success: false,
  * //   error: {
  * //     code: "BAD_REQUEST",
@@ -132,11 +136,19 @@ function extractErrorDetails(error: Error): unknown[] {
  * // }
  */
 export function formatErrorResponse(error: Error): ApiErrorResponse {
+  const message = error.message || "An unexpected error occurred"
+  // Errors that aren't Feathers errors are reported as a 500 GeneralError
+  const feathersError = error instanceof FeathersError ? error : new GeneralError(message)
+
   return {
+    name: feathersError.name,
+    message,
+    code: feathersError.code,
+    className: feathersError.className,
     success: false,
     error: {
       code: mapErrorToCode(error),
-      message: error.message || "An unexpected error occurred",
+      message,
       details: extractErrorDetails(error),
       timestamp: new Date().toISOString(),
     },
