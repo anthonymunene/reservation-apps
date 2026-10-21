@@ -1,13 +1,13 @@
-import { type ActionStore, Form } from '@builder.io/qwik-city';
-import { reset, type FormStore } from '@modular-forms/qwik';
-import { ActionButton } from '../../ActionButton';
+import { type ActionStore, Form } from "@builder.io/qwik-city"
+import { reset, type FormStore } from "@modular-forms/qwik"
+import { ActionButton } from "../../ActionButton"
 
 type FormHeaderProps = {
-  of: FormStore<any, any>;
-  heading: string;
-  resetAction?: ActionStore<void, Record<string, any>>;
-  form?: string;
-};
+  of: FormStore<any, any>
+  heading: string
+  resetAction?: ActionStore<void, Record<string, any>>
+  form?: string
+}
 
 /**
  * Form header with heading and buttons to reset and submit the form.
@@ -17,11 +17,11 @@ export function FormHeader({ of: formStore, heading, resetAction, form }: FormHe
     <ActionButton
       variant="secondary"
       label="Reset"
-      type={resetAction ? 'submit' : 'button'}
+      type={resetAction ? "submit" : "button"}
       preventdefault:click
       onClick$={() => reset(formStore)}
     />
-  );
+  )
   return (
     <header class="flex items-center justify-between px-8 lg:px-10">
       <h1 class="text-2xl text-slate-900 dark:text-slate-200 md:text-3xl lg:text-4xl">{heading}</h1>
@@ -31,5 +31,5 @@ export function FormHeader({ of: formStore, heading, resetAction, form }: FormHe
         <ActionButton variant="primary" label="Submit" type="submit" form={form} />
       </div>
     </header>
-  );
+  )
 }

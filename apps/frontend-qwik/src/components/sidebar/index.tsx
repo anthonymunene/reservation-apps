@@ -1,5 +1,5 @@
-import { component$ } from '@builder.io/qwik';
-import { QwikLogo } from '../starter/icons/qwik';
+import { component$ } from "@builder.io/qwik"
+import { QwikLogo } from "../starter/icons/qwik"
 
 export default component$(() => {
   return (
@@ -32,5 +32,5 @@ export default component$(() => {
         </nav>
       </div>
     </header>
-  );
-});
+  )
+})

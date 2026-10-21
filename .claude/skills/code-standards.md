@@ -14,10 +14,12 @@ File: `.prettierrc`
   "printWidth": 100,
   "semi": false,
   "tabWidth": 2,
-  "arrowParens": "avoid",
-  "parser": "typescript"
+  "arrowParens": "avoid"
 }
 ```
+
+There is no `parser` setting: Prettier picks one from each file's extension, so JSON, CSS and
+Markdown are formatted with their own parsers.
 
 ### Key Rules
 
@@ -227,9 +229,13 @@ npx turbo run lint
 npm run lint -w api -- --fix
 ```
 
-`npm run fmt.check -w frontend-qwik` currently reports 35 frontend files that don't match the
-shared Prettier config (much of the frontend uses semicolons and single quotes), so expect
-`npm run fmt -w frontend-qwik` to change many files the first time.
+Formatting is enforced in both apps. The API's ESLint config runs Prettier as a lint rule, and
+the frontend's `lint` script runs `prettier --check .` after ESLint. A badly formatted file fails
+`npx turbo run lint` and the frontend build; `npm run fmt -w frontend-qwik` fixes the frontend.
+
+Commits that only reformat code are listed in `.git-blame-ignore-revs`, so `git blame` skips
+them. Run `git config blame.ignoreRevsFile .git-blame-ignore-revs` once per clone for local
+blame; GitHub uses the file automatically.
 
 ## Editor Setup
 

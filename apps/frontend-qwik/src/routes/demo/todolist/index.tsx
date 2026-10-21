@@ -1,39 +1,32 @@
-import { component$ } from '@builder.io/qwik';
-import {
-  type DocumentHead,
-  routeLoader$,
-  routeAction$,
-  zod$,
-  z,
-  Form,
-} from '@builder.io/qwik-city';
-import styles from './todolist.module.css';
+import { component$ } from "@builder.io/qwik"
+import { type DocumentHead, routeLoader$, routeAction$, zod$, z, Form } from "@builder.io/qwik-city"
+import styles from "./todolist.module.css"
 
 interface ListItem {
-  text: string;
+  text: string
 }
 
-export const list: ListItem[] = [];
+export const list: ListItem[] = []
 
 export const useListLoader = routeLoader$(() => {
-  return list;
-});
+  return list
+})
 
 export const useAddToListAction = routeAction$(
-  (item) => {
-    list.push(item);
+  item => {
+    list.push(item)
     return {
       success: true,
-    };
+    }
   },
   zod$({
     text: z.string().trim().min(1),
   })
-);
+)
 
 export default component$(() => {
-  const list = useListLoader();
-  const action = useAddToListAction();
+  const list = useListLoader()
+  const action = useAddToListAction()
 
   return (
     <>
@@ -65,9 +58,9 @@ export default component$(() => {
         </div>
       </div>
     </>
-  );
-});
+  )
+})
 
 export const head: DocumentHead = {
-  title: 'Qwik Todo List',
-};
+  title: "Qwik Todo List",
+}

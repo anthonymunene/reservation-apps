@@ -58,7 +58,8 @@ export default component$(() => {
               Example Apps
             </div>
             <p>
-              Have a look at the <a href="/demo/flower">Flower App</a> or the <a href="/demo/todolist">Todo App</a>.
+              Have a look at the <a href="/demo/flower">Flower App</a> or the{" "}
+              <a href="/demo/todolist">Todo App</a>.
             </p>
           </Infobox>
 
