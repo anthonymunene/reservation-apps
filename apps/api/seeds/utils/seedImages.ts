@@ -108,8 +108,10 @@ export const seedImages = (
   // failure saving it still fails the seed, because that points to a problem on our side.
   const image = dependencies.unsplashStatus.available
     ? fetchImage(dependencies, query).orElse(error => {
-        // Images are requested in parallel, so several requests can be refused at once. Only the
-        // first failure logs the warning; the URL is left out because it contains the access key.
+        // This runs later than the check above: that one ran when the request started, this one
+        // runs when its refusal comes back. Images are requested in parallel, so by now an
+        // earlier refusal may already have marked Unsplash unavailable. Checking again means only
+        // the first refusal logs the warning. The URL is left out because it contains the key.
         if (dependencies.unsplashStatus.available) {
           dependencies.unsplashStatus.available = false
           dependencies.logger.warn(
